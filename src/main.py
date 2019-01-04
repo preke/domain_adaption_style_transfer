@@ -17,6 +17,8 @@ TRAIN_PATH = '../data/train.ft.txt'
 TEST_PATH = '../data/test.ft.txt'
 POS_TEST_PATH = '../data/test.pos'
 NEG_TEST_PATH = '../data/test.neg'
+POS_TRAIN_PATH = '../data/train.pos'
+NEG_TRAIN_PATH = '../data/train.neg'
 # parser = argparse.ArgumentParser(description='')
 # parser.add_argument('-test', action='store_true', default=False, help='train or test')
 # args = parser.parse_args()
@@ -24,5 +26,6 @@ NEG_TEST_PATH = '../data/test.neg'
 
 
 # Preprocess
+preprocess(TRAIN_PATH, POS_TRAIN_PATH, NEG_TRAIN_PATH)
 preprocess(TEST_PATH, POS_TEST_PATH, NEG_TEST_PATH)
 
