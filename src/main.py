@@ -9,7 +9,8 @@ import os
 import datetime
 import traceback
 import model
-from load_data import preprocess
+from utils import preprocess
+from dataload import get_batches
 
 
 
@@ -26,6 +27,14 @@ NEG_TRAIN_PATH = '../data/train.neg'
 
 
 # Preprocess
-preprocess(TRAIN_PATH, POS_TRAIN_PATH, NEG_TRAIN_PATH)
-preprocess(TEST_PATH, POS_TEST_PATH, NEG_TEST_PATH)
+if not os.path.exists(POS_TRAIN_PATH):
+    preprocess(TRAIN_PATH, POS_TRAIN_PATH, NEG_TRAIN_PATH)
+    preprocess(TEST_PATH, POS_TEST_PATH, NEG_TEST_PATH)
+
+
+# load data
+train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
+dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
+test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
+vocab, w2i = get_batches(POS_TEST_PATH, NEG_TEST_PATH)
 

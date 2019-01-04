@@ -10,7 +10,7 @@ from nltk.tokenize import word_tokenize
 import codecs
 import random
 
-prefix = "rt-polaritydata/"
+
 
 Average = True
 
@@ -36,7 +36,7 @@ def clean_str(string):
 
 def readSent(fileName,flag):
     sent_list = []
-    with codecs.open(prefix + fileName,"r",encoding = 'utf-8', errors = "ignore") as f:
+    with codecs.open(fileName,"r",encoding = 'utf-8', errors = "ignore") as f:
         lines = f.readlines()
     
     for line in lines:
@@ -110,16 +110,19 @@ def generateBatch(sort_sent,w2i,batch_size):
     
     return samples_batch,lenth_batch,labels_batch,mask_batch
 
-def getMRBatch():
-    train_pos,dev_pos,test_pos = readSent("rt-polarity.pos",1)
-    train_neg,dev_neg,test_neg = readSent("rt-polarity.neg",0)
-    
-    train_sentence = train_pos + train_neg
 
+
+def get_batches(POS_PATH, NEG_PATH):
+    '''
+    original:  getMRBatch()
+    Get batches of 32
+    '''
+    train_pos,dev_pos,test_pos = readSent(POS_PATH,1)
+    train_neg,dev_neg,test_neg = readSent(NEG_PATH,0)
+
+    train_sentence = train_pos + train_neg
     vocab,w2i,i2w = buildVocab(train_sentence)
-    
     train_sentence = sortSamples(train_sentence,w2i)
-    
     train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch = generateBatch(train_sentence,w2i,32)
     
     dev_sent = dev_pos + dev_neg
@@ -136,7 +139,7 @@ def getMRBatch():
             vocab, w2i
     
     
-if __name__ == "__main__":
+def load_data():
     train_pos,dev_pos,test_pos = readSent("rt-polarity.pos",1)
     train_neg,dev_neg,test_neg = readSent("rt-polarity.neg",0)
     train_sent = train_pos + train_neg

@@ -1,9 +1,5 @@
 import re
 
-
-
-
-
 def preprocess(in_path, pos_output_paths, neg_output_paths):
     '''
     Remove labels and split data into 2 files(.pos and .neg)
