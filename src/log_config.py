@@ -7,7 +7,6 @@ logging_config = dict(
     },
     handlers={
         'default_handlers': {'class': 'logging.handlers.RotatingFileHandler',
-                             'filename': './logfile/logger.log',
                              'maxBytes': 1024 * 1024 * 20,
                              'backupCount': 50,
                              'level': 'WARNING',
