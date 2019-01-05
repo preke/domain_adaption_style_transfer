@@ -16,7 +16,7 @@ from dataload import get_batches
 import logging
 from logging.config import dictConfig
 from log_config import logging_config
-dictConfig(logging_config.logging_config)
+dictConfig(logging_config)
 logger = logging.getLogger("default_handlers")
 
 TRAIN_PATH = '../data/train.ft.txt'
