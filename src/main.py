@@ -63,7 +63,10 @@ embedding = initialWordEmbedding(GLOVE_PATH, w2i)
 
 # Train RGL()
 logger.info('Training RGL begin...')
-trainRGL()
+trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
+        dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
+        test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
+        vocab, w2i)
 
 
 
