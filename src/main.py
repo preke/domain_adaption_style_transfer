@@ -62,6 +62,7 @@ logger.info('Initial word embedding begin...')
 embedding = initialWordEmbedding(GLOVE_PATH, w2i)    
 
 # Train RGL()
+logger.info('Training RGL begin...')
 trainRGL()
 
 

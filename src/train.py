@@ -53,7 +53,7 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
     return accuracy,flag
 
 def  trainRGL():
-    rgl_net = model.RGLIndividualSaperateSC(len(vocab),300,2,300,embedding).cuda()
+    rgl_net = RGLIndividualSaperateSC(len(vocab),300,2,300,embedding).cuda()
     # rgl_net = RGL.RGLCommonSaperateSC(len(vocab),300,2,300,embedding).cuda()
     # rgl_net = RGL.RGLIndividualSingleSC(len(vocab),300,2,300,embedding).cuda()
     # rgl_net = RGL.RGLCommonSingleSC(len(vocab),300,2,300,embedding).cuda()
