@@ -44,11 +44,11 @@ GLOVE_PATH     = '../data/glove.42B.300d.txt'
 
 # Preprocess
 if not os.path.exists(POS_TRAIN_PATH):
-	logger.info('Preprocessing begin...')
+    logger.info('Preprocessing begin...')
     preprocess(TRAIN_PATH, POS_TRAIN_PATH, NEG_TRAIN_PATH)
     preprocess(TEST_PATH, POS_TEST_PATH, NEG_TEST_PATH)
 else:
-	logger.info('No need to preprocess!')
+    logger.info('No need to preprocess!')
 
 # Load data
 logger.info('Loading data begin...')
