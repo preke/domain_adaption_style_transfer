@@ -4,7 +4,7 @@ def preprocess(in_path, pos_output_paths, neg_output_paths):
     '''
     Remove labels and split data into 2 files(.pos and .neg)
     '''
-    print('Preprocess Begin!')
+    
     pos_writer = open(pos_output_paths, 'w')
     neg_writer = open(neg_output_paths, 'w')
     with open(in_path, 'r') as reader:
@@ -21,4 +21,4 @@ def preprocess(in_path, pos_output_paths, neg_output_paths):
                 pos_writer.write(text.split(': ')[1].lower())
     pos_writer.close()
     neg_writer.close()
-    print('Preprocess is done!')
+    

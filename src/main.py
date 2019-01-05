@@ -12,7 +12,12 @@ import model
 from utils import preprocess
 from dataload import get_batches
 
-
+# logging
+import logging
+from logging.config import dictConfig
+from log_config import logging_config
+dictConfig(logging_config.logging_config)
+logger = logging.getLogger("default_handlers")
 
 TRAIN_PATH = '../data/train.ft.txt'
 TEST_PATH = '../data/test.ft.txt'
@@ -26,11 +31,13 @@ NEG_TRAIN_PATH = '../data/train.neg'
 
 
 
+
 # Preprocess
 if not os.path.exists(POS_TRAIN_PATH):
     preprocess(TRAIN_PATH, POS_TRAIN_PATH, NEG_TRAIN_PATH)
     preprocess(TEST_PATH, POS_TEST_PATH, NEG_TEST_PATH)
-
+else:
+	logger.info('No need to preprocess!')
 
 # load data
 train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
