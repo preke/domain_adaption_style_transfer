@@ -14,10 +14,10 @@ from dataload import get_batches
 
 # logging
 import logging
-from logging.config import dictConfig
-from log_config import logging_config
-dictConfig(logging_config)
-logger = logging.getLogger("default_handlers")
+import logging.config
+config_file = 'logging.ini'
+logging.config.fileConfig(config_file, disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
 
 TRAIN_PATH = '../data/train.ft.txt'
 TEST_PATH = '../data/test.ft.txt'
