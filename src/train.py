@@ -55,7 +55,7 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
 def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
             dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
             test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
-            vocab, w2i):
+            vocab, w2i, embedding):
     rgl_net = RGLIndividualSaperateSC(len(vocab),300,2,300,embedding).cuda()
     # rgl_net = RGL.RGLCommonSaperateSC(len(vocab),300,2,300,embedding).cuda()
     # rgl_net = RGL.RGLIndividualSingleSC(len(vocab),300,2,300,embedding).cuda()
