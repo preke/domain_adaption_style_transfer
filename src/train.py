@@ -18,6 +18,14 @@ import torch.nn.functional as F
 import dataload
 from model import *
 
+
+# logging
+import logging
+import logging.config
+config_file = 'logging.ini'
+logging.config.fileConfig(config_file, disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
+
 best_results = 0
 KL = True
 lr = 1e-3
@@ -86,12 +94,14 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             err.backward()
             optimizer.step()
             acc,flag = eval(dev_samples_batch,dev_lenth_batch,dev_labels_batch,rgl_net,alpha,dev_mask_batch)
-            save_path = "RGLModel/IndSep"
+            save_path = "RGLModel/IndSep/"
+            if not os.path.exists(save_path):
+                os.mkdir(save_path)
             save_path += " epoch " + str(epoch) + " batch " + str(i) + " bestmodel.pt"
             if flag:
                 torch.save(rgl_net.state_dict(), save_path)
                 #'''
-                print('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f' \
+                logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f' \
                   % (epoch, i, len_iter, err_label.cpu().data.numpy(),
                      err_domain.cpu().data.numpy(), out))
                 '''
@@ -99,7 +109,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
                   % (epoch, i, len_iter, err_label.cpu().data.numpy()))
                 '''
                 acc,flag = eval(test_samples_batch,test_lenth_batch,test_labels_batch,rgl_net,alpha,test_mask_batch,True)
-                print("The test accuracy is " + str(acc))
+                logger.info("The test accuracy is " + str(acc))
             i += 1
 
 
