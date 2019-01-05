@@ -21,4 +21,17 @@ def preprocess(in_path, pos_output_paths, neg_output_paths):
                 pos_writer.write(text.split(': ')[1].lower())
     pos_writer.close()
     neg_writer.close()
-    
+
+def initialWordEmbedding(fileName,stoi):
+    embedding = np.random.random((len(stoi),300))
+    with codecs.open(fileName, encoding="utf-8") as f:
+        lines = f.readlines()
+        for i,line in enumerate(lines):
+            #print("The " + str(i) + " line: " + line)
+            line = line.strip().split()
+            if len(line) < 10:
+                continue
+            if line[0] in stoi:
+                embedding[stoi[line[0]]] = np.array([float(val) for val in line[-300:]])
+    return embedding
+
