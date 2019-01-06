@@ -139,15 +139,15 @@ class LSTMSC(nn.Module):
         
 class RGLIndividualSaperateSC(nn.Module):
     def __init__(self,embedding_num,embedding_size,num_class,hidden_size,pre_embedding):
-        super(RGLIndividualSaperateSC,self).__init__()
-        self.embedding_num = embedding_num
+        super(RGLIndividualSaperateSC, self).__init__()
+        self.embedding_num  = embedding_num
         self.embedding_size = embedding_size
-        self.embedding = nn.Embedding(embedding_num,embedding_size)
-        self.hidden_size = hidden_size
-        self.linear = nn.Linear(embedding_size,num_class)
+        self.embedding      = nn.Embedding(embedding_num,embedding_size)
+        self.hidden_size    = hidden_size
+        self.linear         = nn.Linear(embedding_size,num_class)
         self.linear.weight.data.normal_(0,0.01)
         self.linear.bias.data.fill_(0)
-        self.layers = 4
+        self.layers         = 4
         self.embedding.weight.data.copy_(torch.from_numpy(pre_embedding))
         self.bi_encoder01 = nn.LSTM(
             self.embedding_size,
@@ -278,7 +278,7 @@ class RGLIndividualSaperateSC(nn.Module):
         #domain_out = self.class_classifier(reverse_feature)
         domain_out = self.domain_classifier(reverse_feature)
 
-        # 2 classifier, why reverse
+        # 2 classifier, no need to reverse first
 
         feature_out = feature01.mm(feature02.t())
         feature_out = feature_out ** 2
