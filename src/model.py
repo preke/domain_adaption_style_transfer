@@ -65,7 +65,7 @@ class ReverseLayerF(Function):
         return output, None
 
 class LSTMSC(nn.Module):
-    def __init__(self,embedding_num,embedding_size,num_class,hidden_size,pre_embedding):
+    def __init__(self, embedding_num, embedding_size, num_class, hidden_size, pre_embedding):
         super(LSTMSC,self).__init__()
         self.embedding_num = embedding_num
         self.embedding_size = embedding_size
@@ -188,7 +188,7 @@ class RGLIndividualSaperateSC(nn.Module):
         self.domain_classifier.weight.data.normal_(0,0.01)
         self.domain_classifier.bias.data.fill_(0)
 
-    def get_state(self,input_line):
+    def get_state(self, input_line):
         batch_size = input_line.size(0)
         h0_encoder_bi01 = Variable(torch.zeros(
             2,
@@ -280,6 +280,12 @@ class RGLIndividualSaperateSC(nn.Module):
         feature_out = feature_out ** 2
         feature_out = torch.mean(feature_out)
         return class_out,domain_out,feature_out
+
+
+
+
+
+
 
 class RGLCommonSaperateSC(nn.Module):
     def __init__(self,embedding_num,embedding_size,num_class,hidden_size,pre_embedding):
