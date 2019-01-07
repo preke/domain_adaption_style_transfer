@@ -272,18 +272,20 @@ class RGLIndividualSaperateSC(nn.Module):
     
     def forward(self,input_line,lenth,alpha,mask):
         feature01,feature02 = self.extractFeature(input_line, lenth, mask)
-        
-        reverse_feature = ReverseLayerF.apply(feature01,alpha)
         class_out = self.class_classifier(feature02)
-        #domain_out = self.class_classifier(reverse_feature)
         domain_out = self.domain_classifier(reverse_feature)
+        # before 
+        # reverse_feature = ReverseLayerF.apply(feature01,alpha)
+        # class_out = self.class_classifier(feature02)
+        # #domain_out = self.class_classifier(reverse_feature)
+        # domain_out = self.domain_classifier(reverse_feature)
 
-        # 2 classifier, no need to reverse first
+        # # 2 classifier, no need to reverse first
 
-        feature_out = feature01.mm(feature02.t())
-        feature_out = feature_out ** 2
-        feature_out = torch.mean(feature_out)
-        return class_out,domain_out,feature_out
+        # feature_out = feature01.mm(feature02.t())
+        # feature_out = feature_out ** 2
+        # feature_out = torch.mean(feature_out)
+        # return class_out,domain_out,feature_out
 
 
 
