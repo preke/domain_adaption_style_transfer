@@ -78,22 +78,23 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
     for epoch in range(n_epoch):
         for i,sample,lenth,label,mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
             rgl_net.train()
-            p = float(i + epoch * len_iter) / n_epoch / len_iter
-            alpha = 2. / (1. + np.exp(-10 * p)) - 1
+            p       = float(i + epoch * len_iter) / n_epoch / len_iter
+            alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(torch.LongTensor(sample).cuda())
-            target = Variable(torch.LongTensor(label).cuda())
-            mask = Variable(torch.FloatTensor(mask).cuda())
+            target  = Variable(torch.LongTensor(label).cuda())
+            mask    = Variable(torch.FloatTensor(mask).cuda())
             rgl_net.zero_grad()
-            class_out,domain_out,out = rgl_net(feature,lenth,alpha,mask)
+            class_out, domain_out, out = rgl_net(feature,lenth,alpha,mask)
     
-            err_label = loss_class(class_out,target)
-            err_domain = loss_domain(class_out,target)
+            err_label   = loss_class(class_out,target)
+            err_domain  = loss_domain(class_out,target)
+            
             #domain_out = F.log_softmax(domain_out)
             err = err_domain + err_label + lamda * out
             #err = err_label
             err.backward()
             optimizer.step()
-            acc,flag = eval(dev_samples_batch,dev_lenth_batch,dev_labels_batch,rgl_net,alpha,dev_mask_batch)
+            acc, flag = eval(dev_samples_batch, dev_lenth_batch, dev_labels_batch, rgl_net, alpha, dev_mask_batch)
             save_path = "RGLModel/IndSep/"
             if not os.path.exists(save_path):
                 os.mkdir(save_path)
