@@ -42,13 +42,14 @@ def readSent(fileName,flag):
     for line in lines:
         line = clean_str(line)
         words = word_tokenize(line)
+        print len(words)
         sent_list.append((words,flag))
     
     lenth = int(0.1 * len(sent_list))
     train = sent_list[:8 * lenth]
     dev = sent_list[8 * lenth : 9 * lenth]
     test = sent_list[9 * lenth :]
-    return train,dev,test
+    return train, dev, test
 
 def sortSamples(sentence,w2i):
     sent2idx = []
@@ -121,9 +122,9 @@ def get_batches(POS_PATH, NEG_PATH):
     train_neg,dev_neg,test_neg = readSent(NEG_PATH,0)
 
     train_sentence = train_pos + train_neg
-    vocab,w2i,i2w = buildVocab(train_sentence)
+    vocab, w2i, i2w = buildVocab(train_sentence)
     train_sentence = sortSamples(train_sentence,w2i)
-    train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch = generateBatch(train_sentence,w2i,32)
+    train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch = generateBatch(train_sentence, w2i, 32)
     
     dev_sent = dev_pos + dev_neg
     dev_sentence = sortSamples(dev_sent,w2i)
