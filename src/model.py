@@ -68,7 +68,7 @@ class Decoder(nn.Module):
             target = self.embed(target)
             print 'Target'
             for sentence in target:
-                print sentence  
+                print [self.trg_soi(i) for i in sentence]
             for i in range(target_len):
                 ctx          = self.attention(enc_h, prev_s)                     
                 prev_s       = self.decodercell(target[:, i], prev_s, ctx)
