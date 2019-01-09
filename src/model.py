@@ -50,15 +50,15 @@ class Decoder(nn.Module):
         self.dec2word = nn.Linear(hidden_dim, vocab_size)
 
 
-    def forward(self, enc_h, prev_s, target=None):
-        '''
-        enc_h  : B x S x 2*H 
-        prev_s : B x H
-        '''
+    def forward(self, content, sentiment, target=None):
+
+        # '''
+        # enc_h  : B x S x 2*H 
+        # prev_s : B x H
+        # '''
 
         if target is not None:
             batch_size, target_len = target.size(0), target.size(1)
-            
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
 
             if torch.cuda.is_available():
@@ -66,34 +66,31 @@ class Decoder(nn.Module):
 
             target = self.embed(target)  
             for i in range(target_len):
-                ctx = self.attention(enc_h, prev_s)                     
-                prev_s = self.decodercell(target[:, i], prev_s, ctx)
-                dec_h[:,i,:] = prev_s# .unsqueeze(1)
+                ctx          = self.attention(enc_h, prev_s)                     
+                prev_s       = self.decodercell(target[:, i], prev_s, ctx)
+                dec_h[:,i,:] = prev_s # .unsqueeze(1)
 
             outputs = self.dec2word(dec_h)
 
         else:
-            batch_size = enc_h.size(0)
+            batch_size = content.size(0)
             target     = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
             outputs    = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
 
             if torch.cuda.is_available():
                 target  = target.cuda()
                 outputs = outputs.cuda()
-            
+                
             for i in range(self.max_len):
-                target         = self.embed(target).squeeze(1)              
-                dec_h0 = enc_h_t[-1] # B x H 
-                dec_h0 = F.tanh(self.linear(dec_h0)) # B x 1 x 2*H
-
-                out = self.decoder(enc_h, dec_h0, target) # B x S x H
+                target = self.embed(target).squeeze(1)              
                 # ctx            = self.attention(enc_h, prev_s)                 
                 # prev_s         = self.decodercell(target, prev_s, ctx)
-                # output         = self.dec2word(prev_s)
-                outputs[:,i,:] = output
-                target         = output.topk(1)[1]
+                output, hidden = nn.lstm(output, hidden)
+                output         = self.dec2word(prev_s)
+                outputs[:, i, :] = output
+                target           = output.topk(1)[1]
             
-        return outputs
+            return outputs
 
 
 class DecoderCell(nn.Module):
@@ -402,15 +399,17 @@ class RGLIndividualSaperateSC(nn.Module):
 
         return feature01,feature02
     
-    def reconstruct(content, style, length):
-        self.decoder
+    def reconstruct(content, style, input_line, length):
+        print input_line.size()
+        print length
+        self.decoder(content, style, input_line, length)
         pass
 
 
     def forward(self,input_line,lenth,alpha,mask):
         feature01, feature02 = self.extractFeature(input_line, lenth, mask)
         
-        reconstruction_loss = self.reconstruct(feature01, feature02, lenth)
+        reconstruction_loss = self.reconstruct(feature01, feature02, input_line, lenth)
         
 
         
