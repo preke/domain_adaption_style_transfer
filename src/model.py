@@ -368,7 +368,7 @@ class RGLIndividualSaperateSC(nn.Module):
         return (h0_encoder_bi01.cuda(), c0_encoder_bi01.cuda()), (h0_encoder_bi02.cuda(), c0_encoder_bi02.cuda()),\
             (h0_encoder01.cuda(), c0_encoder01.cuda()),(h0_encoder02.cuda(), c0_encoder02.cuda())
     
-    def extractFeature(self,input_line,lenth,mask):
+    def extractFeature(self, input_line,lenth,mask):
         embed = self.embedding (input_line)
         hidden_bi01,hidden_bi02, hidden_01,hidden_02 = self.get_state(input_line)
         
@@ -399,7 +399,7 @@ class RGLIndividualSaperateSC(nn.Module):
 
         return feature01,feature02
     
-    def reconstruct(content, style, input_line, length):
+    def reconstruct(self, content, style, input_line, length):
         print input_line.size()
         print length
         self.decoder(content, style, input_line, length)
