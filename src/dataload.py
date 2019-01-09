@@ -42,7 +42,6 @@ def readSent(fileName,flag):
     for line in lines:
         line = clean_str(line)
         words = word_tokenize(line)
-        print len(words)
         sent_list.append((words,flag))
     
     lenth = int(0.1 * len(sent_list))
@@ -122,7 +121,6 @@ def get_batches(POS_PATH, NEG_PATH):
     train_neg,dev_neg,test_neg = readSent(NEG_PATH,0)
 
     train_sentence = train_pos + train_neg
-    print len(train_pos), len(train_neg), len(train_sentence)
     vocab, w2i, i2w = buildVocab(train_sentence)
     train_sentence = sortSamples(train_sentence,w2i)
     train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch = generateBatch(train_sentence, w2i, 32)

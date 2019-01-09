@@ -35,9 +35,9 @@ POS_TRAIN_PATH = '../data/train.pos'
 NEG_TRAIN_PATH = '../data/train.neg'
 GLOVE_PATH     = '../data/glove.42B.300d.txt'
 
-small_pos_path = '../data/small.pos'
-small_neg_path = '../data/small.neg'
-
+small_pos_path   = '../data/small.pos'
+small_neg_path   = '../data/small.neg'
+small_glove_path = '../data/small_glove.txt'
 # parser = argparse.ArgumentParser(description='')
 # parser.add_argument('-test', action='store_true', default=False, help='train or test')
 # args = parser.parse_args()
@@ -62,7 +62,7 @@ vocab, w2i = get_batches(small_pos_path, small_neg_path)
 
 # Initial word embedding
 logger.info('Initial word embedding begin...')
-embedding = initialWordEmbedding(GLOVE_PATH, w2i)    
+embedding = initialWordEmbedding(small_glove_path, w2i)    
 
 # Train RGL()
 logger.info('Training RGL begin...')

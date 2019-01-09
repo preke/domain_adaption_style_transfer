@@ -56,6 +56,9 @@ class Decoder(nn.Module):
         # enc_h  : B x S x 2*H 
         # prev_s : B x H
         # '''
+        print 'Target'
+        for sentence in target:
+            print sentence
 
         if target is not None:
             batch_size, target_len = target.size(0), target.size(1)
@@ -400,9 +403,8 @@ class RGLIndividualSaperateSC(nn.Module):
         return feature01,feature02
     
     def reconstruct(self, content, style, input_line, length):
-        print input_line.size()
-        print length
         self.decoder(content, style, input_line, length)
+
         pass
 
 
