@@ -35,14 +35,16 @@ class Attention(nn.Module):
         return ctx 
 
 class Decoder(nn.Module):
-    def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi, pre_embedding):
         super(Decoder, self).__init__()
         self.hidden_dim = hidden_dim
         self.max_len = max_len
         self.vocab_size = vocab_size
         self.trg_soi = trg_soi
         
-        self.embed = nn.Embedding(vocab_size, embed_dim)        
+        self.embed = nn.Embedding(vocab_size, embed_dim)
+        self.embed.weight.data.copy_(torch.from_numpy(pre_embedding))
+        
         self.attention = Attention(hidden_dim) 
         self.decodercell = DecoderCell(embed_dim, hidden_dim)
         self.dec2word = nn.Linear(hidden_dim, vocab_size)
@@ -72,18 +74,22 @@ class Decoder(nn.Module):
 
         else:
             batch_size = enc_h.size(0)
-            target = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
-            outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
+            target     = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
+            outputs    = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
 
             if torch.cuda.is_available():
-                target = target.cuda()
+                target  = target.cuda()
                 outputs = outputs.cuda()
             
             for i in range(self.max_len):
                 target         = self.embed(target).squeeze(1)              
-                ctx            = self.attention(enc_h, prev_s)                 
-                prev_s         = self.decodercell(target, prev_s, ctx)
-                output         = self.dec2word(prev_s)
+                dec_h0 = enc_h_t[-1] # B x H 
+                dec_h0 = F.tanh(self.linear(dec_h0)) # B x 1 x 2*H
+
+                out = self.decoder(enc_h, dec_h0, target) # B x S x H
+                # ctx            = self.attention(enc_h, prev_s)                 
+                # prev_s         = self.decodercell(target, prev_s, ctx)
+                # output         = self.dec2word(prev_s)
                 outputs[:,i,:] = output
                 target         = output.topk(1)[1]
             
@@ -110,7 +116,7 @@ class DecoderCell(nn.Module):
         ctx      : B x 2*H
         '''
         gates = self.input_weights(trg_word) + self.hidden_weights(prev_s) + self.ctx_weights(ctx)
-        reset_gate, update_gate = gates.chunk(2,1)
+        reset_gate, update_gate = gates.chunk(2, 1)
 
         reset_gate = F.sigmoid(reset_gate)
         update_gate = F.sigmoid(update_gate)
@@ -212,6 +218,10 @@ class LSTMSC(nn.Module):
             batch_first=True,
             dropout=0.2
         )
+
+
+
+
     def get_state(self,input_line):
         batch_size = input_line.size(0)
         h0_encoder_bi01 = Variable(torch.zeros(
@@ -258,7 +268,7 @@ class LSTMSC(nn.Module):
         return out,None,None
         
 class RGLIndividualSaperateSC(nn.Module):
-    def __init__(self,embedding_num,embedding_size,num_class,hidden_size,pre_embedding):
+    def __init__(self,embedding_num,embedding_size,num_class,hidden_size,pre_embedding, w2i):
         super(RGLIndividualSaperateSC, self).__init__()
         self.embedding_num  = embedding_num
         self.embedding_size = embedding_size
@@ -269,6 +279,7 @@ class RGLIndividualSaperateSC(nn.Module):
         self.linear.bias.data.fill_(0)
         self.layers         = 4
         self.embedding.weight.data.copy_(torch.from_numpy(pre_embedding))
+        self.w2i = w2i
         self.bi_encoder01 = nn.LSTM(
             self.embedding_size,
             self.hidden_size // 2,
@@ -307,6 +318,7 @@ class RGLIndividualSaperateSC(nn.Module):
         self.domain_classifier = nn.Linear(hidden_size,num_class)
         self.domain_classifier.weight.data.normal_(0,0.01)
         self.domain_classifier.bias.data.fill_(0)
+        self.decoder = Decoder(self.embedding_num, self.embedding_size, self.hidden_dim, max_len=50, self.w2i, pre_embedding)
 
     def get_state(self, input_line):
         batch_size = input_line.size(0)
@@ -390,12 +402,19 @@ class RGLIndividualSaperateSC(nn.Module):
 
         return feature01,feature02
     
+    def reconstruct(content, style, length):
+        self.decoder
+        pass
+
+
     def forward(self,input_line,lenth,alpha,mask):
         feature01, feature02 = self.extractFeature(input_line, lenth, mask)
-        print feature01.size()
-        print feature02.size()
+        
+        reconstruction_loss = self.reconstruct(feature01, feature02, lenth)
+        
+
+        
         class_out = self.class_classifier(feature02)
-        domain_out = self.domain_classifier(reverse_feature)
         
         # before 
         reverse_feature = ReverseLayerF.apply(feature01,alpha)
@@ -409,6 +428,8 @@ class RGLIndividualSaperateSC(nn.Module):
         feature_out = feature_out ** 2
         feature_out = torch.mean(feature_out)
         return class_out, domain_out, feature_out
+
+
 
 
 
