@@ -72,25 +72,25 @@ class Decoder(nn.Module):
 
             outputs = self.dec2word(dec_h)
 
-        else:
-            batch_size = content.size(0)
-            target     = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
-            outputs    = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
+        # else:
+        #     batch_size = content.size(0)
+        #     target     = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
+        #     outputs    = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
 
-            if torch.cuda.is_available():
-                target  = target.cuda()
-                outputs = outputs.cuda()
+        #     if torch.cuda.is_available():
+        #         target  = target.cuda()
+        #         outputs = outputs.cuda()
                 
-            for i in range(self.max_len):
-                target = self.embed(target).squeeze(1)              
-                # ctx            = self.attention(enc_h, prev_s)                 
-                # prev_s         = self.decodercell(target, prev_s, ctx)
-                output, hidden = nn.lstm(output, hidden)
-                output         = self.dec2word(prev_s)
-                outputs[:, i, :] = output
-                target           = output.topk(1)[1]
+        #     for i in range(self.max_len):
+        #         target = self.embed(target).squeeze(1)              
+        #         # ctx            = self.attention(enc_h, prev_s)                 
+        #         # prev_s         = self.decodercell(target, prev_s, ctx)
+        #         output, hidden = nn.lstm(output, hidden)
+        #         output         = self.dec2word(prev_s)
+        #         outputs[:, i, :] = output
+        #         target           = output.topk(1)[1]
             
-            return outputs
+        return outputs
 
 
 class DecoderCell(nn.Module):
