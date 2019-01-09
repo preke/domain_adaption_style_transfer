@@ -79,6 +79,8 @@ def  trainRGL():
             target = Variable(torch.LongTensor(label).cuda())
             mask = Variable(torch.FloatTensor(mask).cuda())
             rgl_net.zero_grad()
+            
+            class_out,domain_out,out = rgl_net(feature,lenth,alpha,mask)
             class_out,domain_out,out = rgl_net(feature,lenth,alpha,mask)
     
             err_label = loss_class(class_out,target)

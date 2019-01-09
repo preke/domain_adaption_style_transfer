@@ -89,7 +89,7 @@ class LSTMSC(nn.Module):
         #print(mask.size())
         feature = torch.sum(output01 * mask, 1) / torch.sum(mask, 1)
         out = self.linear(feature)
-        return out,None,None
+        return out, None, None
         
 class RGLIndividualSaperateSC(nn.Module):
     def __init__(self,embedding_num,embedding_size,num_class,hidden_size,pre_embedding):
