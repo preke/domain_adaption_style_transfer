@@ -50,7 +50,7 @@ class Decoder(nn.Module):
         self.dec2word = nn.Linear(hidden_dim, vocab_size)
 
 
-    def forward(self, content, sentiment, target=None):
+    def forward(self, content, sentiment, target=None, length):
 
         # '''
         # enc_h  : B x S x 2*H 
