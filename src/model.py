@@ -66,16 +66,15 @@ class Decoder(nn.Module):
                 dec_h = dec_h.cuda()
 
             target = self.embed(target)
-            print 'Target'
-            for sentence in target:
-                print [self.trg_soi(i) for i in sentence]
             for i in range(target_len):
-                ctx          = self.attention(enc_h, prev_s)                     
-                prev_s       = self.decodercell(target[:, i], prev_s, ctx)
+                ctx          = self.attention(content, sentiment)                     
+                prev_s       = self.decodercell(target[:, i], sentiment, ctx)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
-
+            
+            print prev_s.size()
+            print dec_h.size()
             outputs = self.dec2word(dec_h)
-
+            print outputs.size()
         # else:
         #     batch_size = content.size(0)
         #     target     = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
@@ -269,7 +268,7 @@ class LSTMSC(nn.Module):
         return out,None,None
         
 class RGLIndividualSaperateSC(nn.Module):
-    def __init__(self,embedding_num,embedding_size,num_class,hidden_size,pre_embedding, w2i):
+    def __init__(self, embedding_num, embedding_size, num_class, hidden_size, pre_embedding, w2i):
         super(RGLIndividualSaperateSC, self).__init__()
         self.embedding_num  = embedding_num
         self.embedding_size = embedding_size
@@ -372,7 +371,7 @@ class RGLIndividualSaperateSC(nn.Module):
         return (h0_encoder_bi01.cuda(), c0_encoder_bi01.cuda()), (h0_encoder_bi02.cuda(), c0_encoder_bi02.cuda()),\
             (h0_encoder01.cuda(), c0_encoder01.cuda()),(h0_encoder02.cuda(), c0_encoder02.cuda())
     
-    def extractFeature(self, input_line,lenth,mask):
+    def extractFeature(self, input_line, lenth, mask):
         embed = self.embedding (input_line)
         hidden_bi01,hidden_bi02, hidden_01,hidden_02 = self.get_state(input_line)
         
@@ -409,7 +408,7 @@ class RGLIndividualSaperateSC(nn.Module):
         pass
 
 
-    def forward(self,input_line,lenth,alpha,mask):
+    def forward(self, input_line, lenth, alpha, mask):
         feature01, feature02 = self.extractFeature(input_line, lenth, mask)
         
         reconstruction_loss = self.reconstruct(feature01, feature02, input_line, lenth)
@@ -419,7 +418,7 @@ class RGLIndividualSaperateSC(nn.Module):
         class_out = self.class_classifier(feature02)
         
         # before 
-        reverse_feature = ReverseLayerF.apply(feature01,alpha)
+        reverse_feature = ReverseLayerF.apply(feature01, alpha)
         class_out = self.class_classifier(feature02)
         #domain_out = self.class_classifier(reverse_feature)
         domain_out = self.domain_classifier(reverse_feature)
