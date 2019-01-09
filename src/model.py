@@ -80,12 +80,12 @@ class Decoder(nn.Module):
                 outputs = outputs.cuda()
             
             for i in range(self.max_len):
-                target = self.embed(target).squeeze(1)              
-                ctx = self.attention(enc_h, prev_s)                 
-                prev_s = self.decodercell(target, prev_s, ctx)
-                output = self.dec2word(prev_s)
+                target         = self.embed(target).squeeze(1)              
+                ctx            = self.attention(enc_h, prev_s)                 
+                prev_s         = self.decodercell(target, prev_s, ctx)
+                output         = self.dec2word(prev_s)
                 outputs[:,i,:] = output
-                target = output.topk(1)[1]
+                target         = output.topk(1)[1]
             
         return outputs
 
@@ -392,8 +392,8 @@ class RGLIndividualSaperateSC(nn.Module):
     
     def forward(self,input_line,lenth,alpha,mask):
         feature01, feature02 = self.extractFeature(input_line, lenth, mask)
-        print feature01.shape()
-        print feature02.shape()
+        print feature01.size()
+        print feature02.size()
         class_out = self.class_classifier(feature02)
         domain_out = self.domain_classifier(reverse_feature)
         
