@@ -56,9 +56,7 @@ class Decoder(nn.Module):
         # enc_h  : B x S x 2*H 
         # prev_s : B x H
         # '''
-        print 'Target'
-        for sentence in target:
-            print sentence
+        
 
         if target is not None:
             batch_size, target_len = target.size(0), target.size(1)
@@ -67,7 +65,10 @@ class Decoder(nn.Module):
             if torch.cuda.is_available():
                 dec_h = dec_h.cuda()
 
-            target = self.embed(target)  
+            target = self.embed(target)
+            print 'Target'
+            for sentence in target:
+                print sentence  
             for i in range(target_len):
                 ctx          = self.attention(enc_h, prev_s)                     
                 prev_s       = self.decodercell(target[:, i], prev_s, ctx)
