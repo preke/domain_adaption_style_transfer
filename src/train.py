@@ -98,7 +98,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             print(reconstruct_out.size())
 
             
-            loss = loss_reconstruct(reconstruct_out, feature)
+            loss = loss_reconstruct(reconstruct_out.float(), feature)
             
 
             logger.info('loss is '+ str(loss))          
