@@ -92,9 +92,10 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             # reconstruct parts
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
             batch_size      = len(train_samples_batch)
-            feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1).float()).cuda()
-            reconstruct_out = Variable(reconstruct_out.float().cuda())
-
+            #feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1).float()).cuda()
+            reconstruct_out = Variable(reconstruct_out.view(batch_size, max(len), -1).cuda())
+            print(reconstruct_out.size())
+            print(feature_iow.size())
             
             loss = F.pairwise_distance(reconstruct_out, feature_iow)
             logger.info('loss is '+ str(loss))          
