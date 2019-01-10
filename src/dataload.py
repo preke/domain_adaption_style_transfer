@@ -10,15 +10,18 @@ from nltk.tokenize import word_tokenize
 import codecs
 import random
 
+# logging
+import logging
+import logging.config
+config_file = 'logging.ini'
+logging.config.fileConfig(config_file, disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
+
 
 
 Average = True
 
 def clean_str(string):
-    """
-    Tokenization/string cleaning for all datasets except for SST.
-    Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data.py
-    """
     string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
     string = re.sub(r"\'s", " \'s", string)
     string = re.sub(r"\'ve", " \'ve", string)
@@ -67,6 +70,7 @@ def buildVocab(train_sent):
         vocab.update(sent[0])
     
     vocab = list(vocab)
+    logger.info('size of vocab: ' + str(len(vocab)))
     vocab = ["<pad>"] + vocab
     w2i = {}
     i2w = {}

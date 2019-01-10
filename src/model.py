@@ -51,11 +51,6 @@ class Decoder(nn.Module):
 
 
     def forward(self, content, sentiment, target, length):
-
-        # '''
-        # enc_h  : B x S x 2*H 
-        # prev_s : B x H
-        # '''
         
         if target is not None:
             batch_size, target_len = target.size(0), target.size(1)
