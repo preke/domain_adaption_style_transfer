@@ -49,8 +49,8 @@ def readSent(fileName,flag):
     
     lenth = int(0.1 * len(sent_list))
     train = sent_list[:8 * lenth]
-    dev = sent_list[8 * lenth : 9 * lenth]
-    test = sent_list[9 * lenth :]
+    dev   = sent_list[8 * lenth :]
+    test  = sent_list[8 * lenth :]
     return train, dev, test
 
 def sortSamples(sentence,w2i):
@@ -121,7 +121,7 @@ def get_batches(POS_PATH, NEG_PATH):
     original:  getMRBatch()
     Get batches of 32
     '''
-    batch_length = 10
+    batch_length = 5
     train_pos,dev_pos,test_pos = readSent(POS_PATH,1)
     train_neg,dev_neg,test_neg = readSent(NEG_PATH,0)
 
