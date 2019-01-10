@@ -93,6 +93,10 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             batch_size      = len(train_samples_batch)
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
             reconstruct_out = Variable(reconstruct_out).cuda()
+            
+            print class_out.size()
+            print target.size()
+            
             print type(reconstruct_out)
             print type(feature_iow)
             try:
