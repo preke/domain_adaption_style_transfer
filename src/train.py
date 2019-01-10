@@ -84,18 +84,18 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             feature = Variable(torch.LongTensor(sample).cuda())
             target  = Variable(torch.LongTensor(label).cuda())
             mask    = Variable(torch.FloatTensor(mask).cuda())
-            print feature.size()
-            print feature
+            # print feature.size()
+            # print feature
 
             rgl_net.zero_grad()
             # reconstruct parts
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
-            print reconstruct_out.size()
-            print reconstruct_out
+            # print reconstruct_out.size()
+            # print reconstruct_out
             batch_size = 32
             pred = reconstruct_out.view(batch_size, max(lenth), -1)
-            print pred.size()
-            print pred
+            # print pred.size()
+            # print pred
             
             loss = loss_reconstruct(reconstruct_out, trg_output.contiguous().view(-1))
 
