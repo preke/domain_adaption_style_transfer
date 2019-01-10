@@ -1,8 +1,11 @@
-
+# coding = utf-8
 import re
 from nltk.tokenize import word_tokenize
 import codecs
 import random
+import torch
+import torchtext.data as data
+import torchtext.datasets as datasets
 
 # logging
 import logging
