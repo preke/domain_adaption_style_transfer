@@ -61,7 +61,7 @@ def load_glove_as_dict(filepath):
             word_vec[word] = vec
     return word_vec
 
-def get_pretrained_word_embed(glova_path, args, text_field):
+def get_pretrained_word_embed(glove_path, args, text_field):
     embedding_dict = load_glove_as_dict(glove_path)
     word_vec_list = []
     for idx, word in enumerate(text_field.vocab.itos):
