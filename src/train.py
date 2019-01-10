@@ -92,12 +92,15 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
             batch_size      = len(train_samples_batch)
             feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1)).cuda()
-            reconstruct_out = Variable(torch.LongTensor(reconstruct_out)).cuda()
+            reconstruct_out = Variable(reconstruct_out).cuda()
             print type(reconstruct_out)
             print type(feature_iow)
-            loss = F.cross_entropy(Variable(reconstruct_out), Variable(feature_iow))
-            
-            
+            try:
+                loss = F.cross_entropy(reconstruct_out, feature_iow)
+                print 'F.cross_entropy'
+            except:
+                loss = loss_class(reconstruct_out, feature_iow)
+                print 'loss_class'
 
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
