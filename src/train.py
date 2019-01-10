@@ -94,17 +94,10 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
             reconstruct_out = Variable(reconstruct_out).cuda()
             
-            print class_out.size()
-            print target.size()
-
             
-            try:
-                loss = F.cosine_similarity(reconstruct_out, feature_iow)
-                print 'F.cross_entropy'
-            except:
-                loss = loss_class(reconstruct_out, feature_iow)
-                print 'loss_class'
-
+            loss = F.nll_loss(reconstruct_out, feature_iow)
+            
+            
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
