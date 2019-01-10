@@ -51,6 +51,15 @@ def preprocess_write(in_path, out_path):
                 writer.write(text.split(': ')[1].lower())                
     writer.close()
 
+def load_glove_as_dict(filepath):
+    word_vec = {}
+    with open(filepath) as fr:
+        for line in fr:
+            line = line.split()
+            word = line[0]
+            vec = line[1:]
+            word_vec[word] = vec
+    return word_vec
 
 def get_pretrained_word_embed(glova_path, args, text_field):
     embedding_dict = load_glove_as_dict(glove_path)
