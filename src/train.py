@@ -91,6 +91,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             rgl_net.zero_grad()
             # reconstruct parts
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
+            print(train_samples_batch.shape())
             batch_size      = len(train_samples_batch)
             #feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1).float()).cuda()
             print(feature.size())
