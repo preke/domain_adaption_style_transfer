@@ -70,7 +70,7 @@ class Decoder(nn.Module):
                 prev_s       = self.decodercell(target[:, i], content, sentiment)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
             # outputs = self.dec2word(dec_h)
-            
+            outputs = dec_h
         return outputs
 
 
