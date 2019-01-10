@@ -339,7 +339,7 @@ class RGLIndividualSaperateSC(nn.Module):
     def reconstruct(self, content, style, input_line, length):
         out = self.decoder(content, style, input_line, length)
         print out.size()
-        print out.contiguous().size()
+        print out.contiguous().view(-1, self.embedding_num).size()
         out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
         print out.size()
         return out
