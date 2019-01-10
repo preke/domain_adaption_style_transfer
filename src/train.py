@@ -37,11 +37,11 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
     corrects, avg_loss = 0, 0
     size = 0
     for s,le,l,m in zip(samples,lenth,labels,masks):
-        feature   = Variable(torch.LongTensor(s).cuda())
-        target    = Variable(torch.LongTensor(l).cuda())
-        mask      = Variable(torch.FloatTensor(m).cuda())
-        logit,_,_ = model(feature,le,alpha,mask)
-        loss      = F.cross_entropy(logit, target, size_average=False)
+        feature                   = Variable(torch.LongTensor(s).cuda())
+        target                    = Variable(torch.LongTensor(l).cuda())
+        mask                      = Variable(torch.FloatTensor(m).cuda())
+        logit,_,_,reconstruct_out = model(feature,le,alpha,mask)
+        loss                      = F.cross_entropy(logit, target, size_average=False)
 
         avg_loss += loss.data
         corrects += (torch.max(logit, 1)
@@ -93,23 +93,18 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
             batch_size      = len(lenth)
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
-            print(feature_iow.size())
             # reconstruct_out = Variable(reconstruct_out.view(batch_size, max(lenth)).cuda())
             # print(reconstruct_out.size())
 
             
             loss = loss_reconstruct(reconstruct_out, feature_iow)
             
-
-            logger.info('loss is '+ str(loss))          
+   
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
             #domain_out = F.log_softmax(domain_out)
-            err = err_domain + err_label + lamda * out#  + loss
-            logger.info('type of err ' + str(type(err)))
-            logger.info(err)
-            logger.info('size of err ' + str(err.size()))
+            err = err_domain + err_label + lamda * out + loss
             #err = err_label
             err.backward()
             optimizer.step()
