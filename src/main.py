@@ -62,7 +62,7 @@ vocab, w2i = get_batches(small_pos_path, small_neg_path)
 
 # Initial word embedding
 logger.info('Initial word embedding begin...')
-embedding = initialWordEmbedding(GLOVE_PATH, w2i)    
+embedding = initialWordEmbedding(small_glove, w2i)    
 
 # Train RGL()
 logger.info('Training RGL begin...')
