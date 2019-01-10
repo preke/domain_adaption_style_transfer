@@ -73,7 +73,7 @@ def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask
             vocab, w2i, embedding):
 '''
 def trainRGL(train_iter, dev_iter, model, args):    
-    optimizer        = optim.Adam(model.parameters(), lr=lr)
+    optimizer        = optim.Adam(model.parameters(), lr=args.lr)
     loss_class       = nn.CrossEntropyLoss().cuda()
     loss_domain      = nn.CrossEntropyLoss().cuda()
     loss_reconstruct = nn.NLLLoss()
