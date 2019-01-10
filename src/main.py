@@ -97,7 +97,7 @@ if args.snapshot is not None:
 else:
     logger.info('Train model begin...')
     try:
-        trainRGL(train_iter=train_iter, vali_iter=vali_iter, model=rgl_net, args=args)
+        trainRGL(train_iter=train_iter, dev_iter=dev_iter, model=rgl_net, args=args)
     except KeyboardInterrupt:
         print(traceback.print_exc())
         print('\n' + '-' * 89)
