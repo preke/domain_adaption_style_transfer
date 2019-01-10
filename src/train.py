@@ -94,7 +94,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             batch_size      = len(lenth)
             #feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1).float()).cuda()
             print(feature.size())
-            reconstruct_out = Variable(reconstruct_out.view(batch_size, max(lenth)).cuda())
+            # reconstruct_out = Variable(reconstruct_out.view(batch_size, max(lenth)).cuda())
             print(reconstruct_out.size())
 
             
