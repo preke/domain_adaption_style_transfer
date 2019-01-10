@@ -92,6 +92,8 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
             batch_size = len(train_samples_batch)
             feature_iow = feature.contiguous().view(-1).unsqueeze(1)
+            print type(reconstruct_out)
+            print type(feature_iow)
             loss = F.cross_entropy(Variable(reconstruct_out), Variable(feature_iow))
             
             
