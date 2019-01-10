@@ -14,6 +14,7 @@ import codecs
 import torch.optim as optim
 from torch.autograd import Variable
 import torch.nn.functional as F
+import traceback
 
 import dataload
 from model import *
@@ -91,12 +92,22 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             # reconstruct parts
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
             batch_size      = len(train_samples_batch)
-            feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
+            feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1)).cuda()
             reconstruct_out = Variable(reconstruct_out).cuda()
             
-            
-            loss = F.nll_loss(reconstruct_out, feature_iow)
-            
+            print reconstruct_out.size()
+            print reconstruct_out
+            print feature_iow.size()
+            print feature_iow
+
+            try:
+                loss = F.nll_loss(reconstruct_out, feature_iow)
+            except:
+                print traceback.print_exc()
+                try:
+                    loss = F.cosine_similarity(reconstruct_out, feature_iow)
+                except:
+                    print traceback.print_exc()
             
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
