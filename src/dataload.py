@@ -47,10 +47,10 @@ def readSent(fileName,flag):
         words = word_tokenize(line)
         sent_list.append((words,flag))
     
-    lenth = int(0.1 * len(sent_list))
-    train = sent_list[:8 * lenth]
-    dev   = sent_list[8 * lenth :]
-    test  = sent_list[8 * lenth :]
+    lenth = 
+    train = sent_list[:int(0.8 * len(sent_list))]
+    dev   = sent_list[int(0.8 * len(sent_list)) :]
+    test  = sent_list[int(0.8 * len(sent_list)) :]
     return train, dev, test
 
 def sortSamples(sentence,w2i):
@@ -121,7 +121,7 @@ def get_batches(POS_PATH, NEG_PATH):
     original:  getMRBatch()
     Get batches of 32
     '''
-    batch_length = 5
+    batch_length = 3
     train_pos,dev_pos,test_pos = readSent(POS_PATH,1)
     train_neg,dev_neg,test_neg = readSent(NEG_PATH,0)
 
