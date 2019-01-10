@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 # self define
-from utils import preprocess_write
+from utils import preprocess_write, get_pretrained_word_embed
 from dataload import load_data
 from train import eval, trainRGL, demo_model
 from model import RGLIndividualSaperateSC
