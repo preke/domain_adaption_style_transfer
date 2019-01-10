@@ -47,7 +47,7 @@ def readSent(fileName,flag):
         words = word_tokenize(line)
         sent_list.append((words,flag))
     
-    lenth = 
+    # lenth = 
     train = sent_list[:int(0.8 * len(sent_list))]
     dev   = sent_list[int(0.8 * len(sent_list)) :]
     test  = sent_list[int(0.8 * len(sent_list)) :]
