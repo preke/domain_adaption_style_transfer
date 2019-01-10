@@ -92,8 +92,8 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
             print reconstruct_out.size()
             print reconstruct_out
-            batch_size = 32
-            print feature.size()
+            batch_size = len(train_samples_batch)
+            print feature.contiguous().view(-1).size()
             # feature_i2w = Variable(torch.FloatTensor([i2w[i] for i in j]) for j in feature.contiguous().view(-1))
             # pred = reconstruct_out.view(batch_size, max(lenth), -1)
             # print pred.size()

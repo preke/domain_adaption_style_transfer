@@ -342,7 +342,7 @@ class RGLIndividualSaperateSC(nn.Module):
         print self.embedding_num
         print out.contiguous().view(-1, self.embedding_num).size()
         out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
-        out = torch.argmax(out, dim=1)
+        out = torch.argmax(out, dim=1).unsqueeze(1)
         print out.size()
         return out
 
