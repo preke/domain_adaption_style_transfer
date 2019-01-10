@@ -79,7 +79,6 @@ def trainRGL(train_iter, dev_iter, model, args):
     loss_reconstruct = nn.NLLLoss()
     n_epoch          = args.num_epoch
     lamda            = args.lamda
-    len_iter         = len(train_iter)
     # len_iter         = len(train_samples_batch)
     
     for epoch in range(n_epoch):
@@ -90,8 +89,8 @@ def trainRGL(train_iter, dev_iter, model, args):
             print sample.size()
             label  = label.label            
             model.train()
-            p       = float(i + epoch * len_iter) / n_epoch / len_iter
-            alpha   = 2. / (1. + np.exp(-10 * p)) - 1
+            # p       = float(i + epoch * len_iter) / n_epoch / len_iter
+            #alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(torch.LongTensor(sample).cuda())
             target  = Variable(torch.LongTensor(label).cuda())
             
