@@ -66,9 +66,11 @@ class Decoder(nn.Module):
                 dec_h = dec_h.cuda()
 
             target = self.embed(target)
+            print '*****'
             print content.size()
             print sentiment.size()
             print target.size()
+            print '.........'
             for i in range(target_len):                     
                 prev_s       = self.decodercell(target[:, i], sentiment)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
