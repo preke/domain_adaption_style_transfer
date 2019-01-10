@@ -93,12 +93,12 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
             batch_size      = len(train_samples_batch)
             #feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1).float()).cuda()
-            print(feature_iow.size())
+            print(feature.size())
             reconstruct_out = Variable(reconstruct_out.view(batch_size, max(lenth), -1).cuda())
             print(reconstruct_out.size())
 
             
-            loss = F.pairwise_distance(reconstruct_out, feature_iow)
+            loss = F.pairwise_distance(reconstruct_out, feature)
             logger.info('loss is '+ str(loss))          
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
