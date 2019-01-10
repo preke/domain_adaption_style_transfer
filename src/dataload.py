@@ -121,21 +121,22 @@ def get_batches(POS_PATH, NEG_PATH):
     original:  getMRBatch()
     Get batches of 32
     '''
+    batch_length = 10
     train_pos,dev_pos,test_pos = readSent(POS_PATH,1)
     train_neg,dev_neg,test_neg = readSent(NEG_PATH,0)
 
     train_sentence = train_pos + train_neg
     vocab, w2i, i2w = buildVocab(train_sentence)
     train_sentence = sortSamples(train_sentence,w2i)
-    train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch = generateBatch(train_sentence, w2i, 32)
+    train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch = generateBatch(train_sentence, w2i, batch_length)
     
     dev_sent = dev_pos + dev_neg
     dev_sentence = sortSamples(dev_sent,w2i)
-    dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch = generateBatch(dev_sentence,w2i,32)
+    dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch = generateBatch(dev_sentence,w2i,batch_length)
     
     test_sent = test_pos + test_neg
     test_sentence = sortSamples(test_sent,w2i)
-    test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch = generateBatch(test_sentence,w2i,32)
+    test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch = generateBatch(test_sentence,w2i,batch_length)
     
     return train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
             dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
@@ -149,7 +150,7 @@ def load_data():
     train_sent = train_pos + train_neg
     vocab,w2i,i2w = buildVocab(train_sent)
     train_sentence = sortSamples(train_sent,w2i)
-    samples_batch,lenth_batch,labels_batch = generateBatch(train_sentence,w2i,32)
+    samples_batch,lenth_batch,labels_batch = generateBatch(train_sentence,w2i,batch_length)
     dev_sent = dev_pos + dev_neg
     dev_sentence = sortSamples(dev_sent,w2i)
     #samples_batch,lenth_batch,labels_batch = generateBatch(dev_sentence,w2i,32)
