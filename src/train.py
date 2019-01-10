@@ -97,7 +97,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             # print pred.size()
             # print pred
             
-            loss = loss_reconstruct(reconstruct_out, trg_output.contiguous().view(-1))
+            # loss = loss_reconstruct(reconstruct_out, trg_output.contiguous().view(-1))
 
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
