@@ -101,7 +101,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             print feature_iow
 
             try:
-                loss = F.nll_loss(reconstruct_out, feature_iow)
+                loss = F.binary_cross_entropy(reconstruct_out, feature_iow)
             except:
                 print traceback.print_exc()            
             err_label   = loss_class(class_out, target)
