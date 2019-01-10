@@ -97,13 +97,13 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
 
             
             loss = F.pairwise_distance(reconstruct_out, feature_iow)
-            logger.info('loss is ', loss)          
+            logger.info('loss is '+ str(loss))          
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
             #domain_out = F.log_softmax(domain_out)
             err = err_domain + err_label + lamda * out#  + loss
-            logger.info('size of err ', err.size())
+            logger.info('size of err ' + str(err.size()))
             #err = err_label
             err.backward()
             optimizer.step()
