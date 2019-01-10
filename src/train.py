@@ -68,13 +68,14 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
     # rgl_net = RGL.RGLCommonSaperateSC(len(vocab),300,2,300,embedding).cuda()
     # rgl_net = RGL.RGLIndividualSingleSC(len(vocab),300,2,300,embedding).cuda()
     # rgl_net = RGL.RGLCommonSingleSC(len(vocab),300,2,300,embedding).cuda()
-    optimizer   = optim.Adam(rgl_net.parameters(), lr=lr)
-    loss_class  = nn.CrossEntropyLoss().cuda()
-    loss_domain = nn.CrossEntropyLoss().cuda() #nn.MSELoss().cuda()  #nn.KLDivLoss().cuda() #nn.CrossEntropyLoss().cuda()
+    optimizer        = optim.Adam(rgl_net.parameters(), lr=lr)
+    loss_class       = nn.CrossEntropyLoss().cuda()
+    loss_domain      = nn.CrossEntropyLoss().cuda() #nn.MSELoss().cuda()  #nn.KLDivLoss().cuda() #nn.CrossEntropyLoss().cuda()
+    loss_reconstruct = nn.NLLLoss().cuda()
+    n_epoch          = 100
+    lamda            = 1.0
+    len_iter         = len(train_samples_batch)
     
-    n_epoch  = 100
-    lamda    = 1.0
-    len_iter = len(train_samples_batch)
     for epoch in range(n_epoch):
         for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
             rgl_net.train()
@@ -83,10 +84,16 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             feature = Variable(torch.LongTensor(sample).cuda())
             target  = Variable(torch.LongTensor(label).cuda())
             mask    = Variable(torch.FloatTensor(mask).cuda())
-            
+            print feature.size()
+            print feature
+
             rgl_net.zero_grad()
-            class_out, domain_out, out = rgl_net(feature,lenth,alpha,mask)
-            
+            # reconstruct parts
+            class_out, domain_out, out, reconstruct_out = rgl_net(feature,lenth,alpha,mask)
+            batch_size = 32
+            pred = reconstruct_out.view(batch_size, lenth, -1)
+            loss = loss_reconstruct(reconstruct_out, trg_output.contiguous().view(-1))
+
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             

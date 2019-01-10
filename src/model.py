@@ -401,15 +401,15 @@ class RGLIndividualSaperateSC(nn.Module):
         return feature01,feature02
     
     def reconstruct(self, content, style, input_line, length):
-        self.decoder(content, style, input_line, length)
-
-        pass
+        out = self.decoder(content, style, input_line, length)
+        out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
+        return out
 
 
     def forward(self, input_line, lenth, alpha, mask):
         feature01, feature02 = self.extractFeature(input_line, lenth, mask)
         
-        reconstruction_loss = self.reconstruct(feature01, feature02, input_line, lenth)
+        reconstruction_out = self.reconstruct(feature01, feature02, input_line, lenth)
         
 
         
@@ -426,7 +426,7 @@ class RGLIndividualSaperateSC(nn.Module):
         feature_out = feature01.mm(feature02.t())
         feature_out = feature_out ** 2
         feature_out = torch.mean(feature_out)
-        return class_out, domain_out, feature_out
+        return class_out, domain_out, feature_out, reconstruction_out
 
 
 
