@@ -51,38 +51,57 @@ args = parser.parse_args()
 
 
 # Parameters setting
-args.embedding_dim = 300
-args.embedding_num = 0
-args.hidden_dim    = 200
-args.batch_size    = 32
-args.device = torch.device('cuda')
+args.embed_dim  = 300
+args.hidden_dim = 200
+args.batch_size = 32
+args.lr         = 0.0001
+args.num_epoch  = 20
+args.num_class  = 2
+args.max_length = 200
+args.lamda      = 1.0
+args.device     = torch.device('cuda')
+
 
 # Preprocess
 if not os.path.exists(small_pre_path):
     logger.info('Preprocessing begin...')
     preprocess_write(small_path, small_pre_path)
-    # preprocess(TRAIN_PATH, POS_TRAIN_PATH, NEG_TRAIN_PATH)
-    # preprocess(TEST_PATH, POS_TEST_PATH, NEG_TEST_PATH)
 else:
     logger.info('No need to preprocess!')
 
 # Load data
 logger.info('Loading data begin...')
 text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(small_pre_path, small_pre_path, args)
-logger.info('Loading data Done!')
-# Load data
-# logger.info('Loading data begin...')
-# train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
-# dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
-# test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
-# vocab, w2i = get_batches(POS_TEST_PATH, NEG_TEST_PATH)
+text_field.build_vocab(train_data, min_freq=5)
+logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
+
+args.vocab_size = len(text_field.vocab)
+
+args.word_2_index = text_field.vocab.stoi
+args.index_2_word = text_field.vocab.itos
 
 
 
-# # Initial word embedding
-# logger.info('Initial word embedding begin...')
-# embedding = initialWordEmbedding(small_glove_path, w2i)    
-# # embedding = initialWordEmbedding(GLOVE_PATH, w2i)    
+# Initial word embedding
+logger.info('Getting pre-trained word embedding ...')
+args.pretrained_weight = get_pretrained_word_embed(GLOVE_PATH, args, text_field)  
+
+
+# Build model and train
+rgl_net = RGLIndividualSaperateSC(args.vocab_size, args.embed_dim, args.num_class, 
+    args.hidden_dim, args.pretrained_weight, args.word_2_index).cuda()
+
+if args.snapshot is not None:
+    logger.info('Load model from' + args.snapshot)
+    pass
+else:
+    logger.info('Train model begin...')
+    try:
+        trainRGL(train_iter=train_iter, vali_iter=vali_iter, model=rgl_net, args=args)
+    except KeyboardInterrupt:
+        print(traceback.print_exc())
+        print('\n' + '-' * 89)
+        print('Exiting from training early')
 
 # # Train RGL()
 # if args.train:

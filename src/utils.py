@@ -52,16 +52,24 @@ def preprocess_write(in_path, out_path):
     writer.close()
 
 
-def initialWordEmbedding(fileName, stoi):
-    embedding = np.random.random((len(stoi),300))
-    with codecs.open(fileName, encoding="utf-8") as f:
-        lines = f.readlines()
-        for i,line in enumerate(lines):
-            #print("The " + str(i) + " line: " + line)
-            line = line.strip().split()
-            if len(line) < 10:
-                continue
-            if line[0] in stoi:
-                embedding[stoi[line[0]]] = np.array([float(val) for val in line[-300:]])
-    return embedding
+def get_pretrained_word_embed(glova_path, args, text_field):
+    embedding_dict = load_glove_as_dict(glove_path)
+    word_vec_list = []
+    for idx, word in enumerate(text_field.vocab.itos):
+        if word in embedding_dict:
+            try:
+                vector = np.array(embedding_dict[word], dtype=float).reshape(1, args.embed_dim)
+            except:
+                vector = np.random.rand(1, args.embed_dim)
+        else:
+            vector = np.random.rand(1, args.embed_dim)
+        word_vec_list.append(torch.from_numpy(vector))
+    wordvec_matrix = torch.cat(word_vec_list)
+    return wordvec_matrix
+
+
+
+
+
+
 

@@ -301,7 +301,7 @@ class RGLIndividualSaperateSC(nn.Module):
             (h0_encoder01.cuda(), c0_encoder01.cuda()),(h0_encoder02.cuda(), c0_encoder02.cuda())
     
     def extractFeature(self, input_line, lenth, mask):
-        embed = self.embedding (input_line)
+        embed = self.embedding(input_line)
         hidden_bi01,hidden_bi02, hidden_01,hidden_02 = self.get_state(input_line)
         
         pack_embed = torch.nn.utils.rnn.pack_padded_sequence(embed,lenth,batch_first = True)

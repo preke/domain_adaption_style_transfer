@@ -28,8 +28,7 @@ logging.config.fileConfig(config_file, disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
 best_results = 0
-KL           = True
-lr           = 1e-3
+
 
 def eval(samples,lenth,labels, model,alpha, masks, test = False):
     flag = 0
@@ -61,29 +60,41 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
                                                                            size))
     return accuracy,flag
 
+
+
+def generate_mask(data_iter):
+    mask_batch = []
+    masks = [[1] * len(sent) + [0] * (max_lenth - len(sent)) for sent in batch_sentence]
+    return masks
+'''
 def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
             dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
             test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
             vocab, w2i, embedding):
-    rgl_net = RGLIndividualSaperateSC(len(vocab), 300, 2, 200, embedding, w2i).cuda()
-    # rgl_net = RGL.RGLCommonSaperateSC(len(vocab),300,2,300,embedding).cuda()
-    # rgl_net = RGL.RGLIndividualSingleSC(len(vocab),300,2,300,embedding).cuda()
-    # rgl_net = RGL.RGLCommonSingleSC(len(vocab),300,2,300,embedding).cuda()
+'''
+def trainRGL(train_iter=train_iter, vali_iter=vali_iter, model=rgl_net, args=args):    
     optimizer        = optim.Adam(rgl_net.parameters(), lr=lr)
     loss_class       = nn.CrossEntropyLoss().cuda()
-    loss_domain      = nn.CrossEntropyLoss().cuda() #nn.MSELoss().cuda()  #nn.KLDivLoss().cuda() #nn.CrossEntropyLoss().cuda()
+    loss_domain      = nn.CrossEntropyLoss().cuda()
     loss_reconstruct = nn.NLLLoss()
-    n_epoch          = 20
-    lamda            = 1.0
+    n_epoch          = args.num_epuch
+    lamda            = args.lamda
     len_iter         = len(train_samples_batch)
     
     for epoch in range(n_epoch):
-        for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
+        # for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
+        i = 0
+        for batch in train_iter:
+            sample = batch.text
+            print sample.size()
+            label  = label.label            
             rgl_net.train()
             p       = float(i + epoch * len_iter) / n_epoch / len_iter
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(torch.LongTensor(sample).cuda())
             target  = Variable(torch.LongTensor(label).cuda())
+            
+            '''
             mask    = Variable(torch.FloatTensor(mask).cuda())
             # print feature.size()
             # print feature
@@ -121,14 +132,11 @@ def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask
                   % (epoch, i, len_iter, err_label.cpu().data.numpy(),
                      err_domain.cpu().data.numpy(), out))
                 
-                '''
-                print('epoch: %d, [iter: %d / all %d], err_s_label: %f' \
-                  % (epoch, i, len_iter, err_label.cpu().data.numpy()))
-                '''
+                
                 acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, rgl_net,alpha, test_mask_batch, True)
                 logger.info("The test accuracy is " + str(acc))
             i += 1
-
+            '''
 def demo_model(sent1, sent2, model, w2i):
     '''
     '''
