@@ -57,7 +57,6 @@ class Decoder(nn.Module):
         # prev_s : B x H
         # '''
         
-
         if target is not None:
             batch_size, target_len = target.size(0), target.size(1)
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
@@ -70,25 +69,7 @@ class Decoder(nn.Module):
             for i in range(target_len):                     
                 prev_s       = self.decodercell(target[:, i], content, sentiment)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
-            print dec_h.size()
-            outputs = self.dec2word(dec_h)
-        # else:
-        #     batch_size = content.size(0)
-        #     target     = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
-        #     outputs    = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
-
-        #     if torch.cuda.is_available():
-        #         target  = target.cuda()
-        #         outputs = outputs.cuda()
-                
-        #     for i in range(self.max_len):
-        #         target = self.embed(target).squeeze(1)              
-        #         # ctx            = self.attention(enc_h, prev_s)                 
-        #         # prev_s         = self.decodercell(target, prev_s, ctx)
-        #         output, hidden = nn.lstm(output, hidden)
-        #         output         = self.dec2word(prev_s)
-        #         outputs[:, i, :] = output
-        #         target           = output.topk(1)[1]
+            # outputs = self.dec2word(dec_h)
             
         return outputs
 
@@ -127,51 +108,6 @@ class DecoderCell(nn.Module):
         
 
 
-
-
-class lstm(nn.Module):
-    def __init__(self, args):
-        super(lstm, self).__init__()
-        self.args = args
-
-        # for word embeddings
-
-        self.V = args.word_embedding_num
-        self.D = args.word_embedding_length
-        self.word_embedding = nn.Embedding(self.V, self.D)
-        self.bidirectional = False
-        # use pre-trained
-        if args.word_Embedding:
-            pretrained_weight = np.array(args.pretrained_weight)
-            self.word_embedding.weight.data.copy_(torch.from_numpy(pretrained_weight))
-
-        self.hidden_dim = args.lstm_hidden_dim
-        self.num_layers = args.lstm_num_layers
-        self.lstm = nn.LSTM(input_size=self.D,
-                            hidden_size=self.hidden_dim,
-                            batch_first=True,
-                            num_layers=self.num_layers)
-        # In train function, set args.batch_size as ba.size()[0]
-        self.hidden = self.init_hidden(self.num_layers, args.batch_size)
-
-    def init_hidden(self, batch_size, device):
-        '''
-            Initialize hidden layers with random nums
-        '''
-        layer_num = 2 if self.bidirectional else 1
-        if device == -1:
-            return (Variable(torch.randn(layer_num, batch_size, self.hidden_dim // layer_num)), \
-                    Variable(torch.randn(layer_num, batch_size, self.hidden_dim // layer_num)))
-        else:
-            return (Variable(torch.randn(layer_num, batch_size, self.hidden_dim // layer_num).cuda()), \
-                    Variable(torch.randn(layer_num, batch_size, self.hidden_dim // layer_num).cuda()))
-
-    def forward(self, sentence, hidden):
-        sentence = self.word_embedding(sentence)
-        # Outputs: output, (h_n, c_n)
-
-        lstm_out, (lstm_h, lstm_c) = self.lstm(sentence, hidden)
-        return lstm_h
 
 
 class ReverseLayerF(Function):
@@ -402,7 +338,9 @@ class RGLIndividualSaperateSC(nn.Module):
     
     def reconstruct(self, content, style, input_line, length):
         out = self.decoder(content, style, input_line, length)
+        print out.size()
         out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
+        print out.size()
         return out
 
 

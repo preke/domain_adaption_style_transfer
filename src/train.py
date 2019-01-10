@@ -63,7 +63,7 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
 def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
             dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
             test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
-            vocab, w2i, embedding):
+            vocab, w2i, i2w, embedding):
     rgl_net = RGLIndividualSaperateSC(len(vocab), 300, 2, 200, embedding, w2i).cuda()
     # rgl_net = RGL.RGLCommonSaperateSC(len(vocab),300,2,300,embedding).cuda()
     # rgl_net = RGL.RGLIndividualSingleSC(len(vocab),300,2,300,embedding).cuda()
@@ -90,10 +90,12 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             rgl_net.zero_grad()
             # reconstruct parts
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
-            # print reconstruct_out.size()
-            # print reconstruct_out
+            print reconstruct_out.size()
+            print reconstruct_out
             batch_size = 32
-            pred = reconstruct_out.view(batch_size, max(lenth), -1)
+            print feature.size()
+            # feature_i2w = Variable(torch.FloatTensor([i2w[i] for i in j]) for j in feature.contiguous().view(-1))
+            # pred = reconstruct_out.view(batch_size, max(lenth), -1)
             # print pred.size()
             # print pred
             
