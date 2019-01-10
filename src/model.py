@@ -112,7 +112,7 @@ class DecoderCell(nn.Module):
         content   : B x H 
         sentiment      : B x H
         '''
-        prev_s = torch.concat((content, sentiment), 1)
+        prev_s = torch.cat((content, sentiment), 1)
         print content.size()
         print sentiment.size()
         print prev_s.size()
