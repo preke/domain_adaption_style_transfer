@@ -93,7 +93,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
             batch_size      = len(train_samples_batch)
             feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1)).cuda()
-            reconstruct_out = Variable(reconstruct_out).cuda()
+            reconstruct_out = Variable(reconstruct_out.dtype(torch.FloatTensor())).cuda()
             
             print reconstruct_out.size()
             print reconstruct_out
@@ -103,12 +103,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             try:
                 loss = F.nll_loss(reconstruct_out, feature_iow)
             except:
-                print traceback.print_exc()
-                try:
-                    loss = F.cosine_similarity(reconstruct_out, feature_iow)
-                except:
-                    print traceback.print_exc()
-            
+                print traceback.print_exc()            
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
