@@ -72,7 +72,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
     optimizer        = optim.Adam(rgl_net.parameters(), lr=lr)
     loss_class       = nn.CrossEntropyLoss().cuda()
     loss_domain      = nn.CrossEntropyLoss().cuda() #nn.MSELoss().cuda()  #nn.KLDivLoss().cuda() #nn.CrossEntropyLoss().cuda()
-    # loss_reconstruct = F.cross_entropy()
+    loss_reconstruct = nn.NLLLoss()
     n_epoch          = 100
     lamda            = 1.0
     len_iter         = len(train_samples_batch)
@@ -98,7 +98,9 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             print(reconstruct_out.size())
 
             
-            loss = loss_class(reconstruct_out, feature)
+            loss = loss_reconstruct(reconstruct_out, feature)
+            
+
             logger.info('loss is '+ str(loss))          
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
