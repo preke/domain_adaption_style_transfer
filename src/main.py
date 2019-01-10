@@ -68,7 +68,7 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(small_pre_path, Tsmall_pre_path, args)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(small_pre_path, small_pre_path, args)
 logger.info('Loading data Done!')
 # Load data
 # logger.info('Loading data begin...')
