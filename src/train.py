@@ -96,11 +96,10 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             
             print class_out.size()
             print target.size()
+
             
-            print type(reconstruct_out)
-            print type(feature_iow)
             try:
-                loss = F.cross_entropy(reconstruct_out, feature_iow)
+                loss = F.cosine_similarity(reconstruct_out, feature_iow)
                 print 'F.cross_entropy'
             except:
                 loss = loss_class(reconstruct_out, feature_iow)
