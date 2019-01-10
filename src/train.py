@@ -95,9 +95,9 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1).float()).cuda()
             reconstruct_out = Variable(reconstruct_out.float().cuda())
 
-            try:
-                loss = F.binary_cross_entropy(reconstruct_out, feature_iow)
-            except:            
+            
+            loss = F.binary_cross_entropy(reconstruct_out, feature_iow)
+                      
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
