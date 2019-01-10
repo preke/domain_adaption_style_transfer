@@ -102,7 +102,7 @@ class DecoderCell(nn.Module):
         # self.ctx_weights = nn.Linear(hidden_dim*2, hidden_dim*2)
 
         self.input_in = nn.Linear(embed_dim, hidden_dim)
-        self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
+        self.hidden_in = nn.Linear(hidden_dim*2, hidden_dim)
         # self.ctx_in = nn.Linear(hidden_dim*2, hidden_dim)
 
 
@@ -113,9 +113,6 @@ class DecoderCell(nn.Module):
         sentiment      : B x H
         '''
         prev_s = torch.cat((content, sentiment))
-        print content.size()
-        print sentiment.size()
-        print prev_s.size()
         gates = self.input_weights(trg_word) + self.hidden_weights(prev_s)
         reset_gate, update_gate = gates.chunk(2, 1)
 
