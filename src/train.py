@@ -72,7 +72,7 @@ def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask
             test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
             vocab, w2i, embedding):
 '''
-def trainRGL(train_iter=train_iter, vali_iter=vali_iter, model=rgl_net, args=args):    
+def trainRGL(train_iter, vali_iter, model, args):    
     optimizer        = optim.Adam(rgl_net.parameters(), lr=lr)
     loss_class       = nn.CrossEntropyLoss().cuda()
     loss_domain      = nn.CrossEntropyLoss().cuda()
