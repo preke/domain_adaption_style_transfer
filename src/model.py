@@ -68,7 +68,7 @@ class Decoder(nn.Module):
             target = self.embed(target)
             
             for i in range(target_len):                     
-                prev_s       = self.decodercell(target[:, i], content[i], sentiment[i])
+                prev_s       = self.decodercell(target[:, i], content, sentiment)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
             
             outputs = self.dec2word(dec_h)
@@ -111,7 +111,7 @@ class DecoderCell(nn.Module):
         content   : B x H 
         sentiment      : B x H
         '''
-        prev_s = torch.cat((content, sentiment))
+        prev_s = torch.cat((content, sentiment), 1)
         prev_s = self.combine_hidden(prev_s)
         gates = self.input_weights(trg_word) + self.hidden_weights(prev_s)
         reset_gate, update_gate = gates.chunk(2, 1)
