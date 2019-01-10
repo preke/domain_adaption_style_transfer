@@ -17,7 +17,6 @@ def preprocess(in_path, pos_output_paths, neg_output_paths):
     '''
     Remove labels and split data into 2 files(.pos and .neg)
     '''
-    
     pos_writer = open(pos_output_paths, 'w')
     neg_writer = open(neg_output_paths, 'w')
     with open(in_path, 'r') as reader:
@@ -35,7 +34,25 @@ def preprocess(in_path, pos_output_paths, neg_output_paths):
     pos_writer.close()
     neg_writer.close()
 
-def initialWordEmbedding(fileName,stoi):
+def preprocess_write(in_path, out_path):
+    '''
+    Generate tsv file to load easier
+    '''
+    writer = open(out_path, 'w')
+    with open(in_path, 'r') as reader:
+        for line in reader:
+            if line[9] == '1': # negative
+                text = line[11:]
+                writer.write('0\t')
+                writer.write(text.split(': ')[1].lower())
+            if line[9] == '2': # positive
+                text = line[11:]
+                writer.write('1\t')
+                writer.write(text.split(': ')[1].lower())                
+    writer.close()
+
+
+def initialWordEmbedding(fileName, stoi):
     embedding = np.random.random((len(stoi),300))
     with codecs.open(fileName, encoding="utf-8") as f:
         lines = f.readlines()

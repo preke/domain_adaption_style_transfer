@@ -1,10 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 21 15:40:08 2018
 
-@author: yangruosong
-"""
 import re
 from nltk.tokenize import word_tokenize
 import codecs
@@ -17,9 +11,6 @@ config_file = 'logging.ini'
 logging.config.fileConfig(config_file, disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
-
-
-Average = True
 
 def clean_str(string):
     string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
@@ -36,6 +27,39 @@ def clean_str(string):
     string = re.sub(r"\?", " \? ", string)
     string = re.sub(r"\s{2,}", " ", string)
     return string.strip()
+
+def gen_iter(path, text_field, label_field, args):
+    '''
+    Load TabularDataset from path,
+    then convert it into a iterator
+    return TabularDataset and iterator
+    '''
+    tmp_data = data.TabularDataset(path=path, format='tsv', fields=[('label', label_field), ('text', text_field)])
+    tmp_iter = data.BucketIterator(tmp_data,
+                    batch_size = args.batch_size,
+                    sort_key   = lambda x: len(x.text),
+                    device     = args.device,
+                    repeat     = False)
+    return tmp_data, tmp_iter
+
+def load_data(train_path, dev_path, args):
+    text_field  = data.Field(sequential=True, use_vocab=True, batch_first=True, 
+            lower=True, include_lengths=True, preprocessing=data.Pipeline(clean_str)
+            pad_token='<PAD>', unk_token='<UNK>', init_token='<SOS>', eos_token='<EOS>')
+    label_field = data.Field()
+    
+    train_data, train_iter = gen_iter(train_path, text_field, label_field, args)
+    dev_data, dev_iter = gen_iter(dev_path, text_field, label_field, args)
+    text_field.build_vocab(train_data, min_freq=5)
+    logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
+    return text_field, label_field, train_data, train_iter, dev_data, dev_iter
+
+
+
+
+Average = True
+
+
 
 def readSent(fileName,flag):
     sent_list = []
@@ -126,7 +150,8 @@ def get_batches(POS_PATH, NEG_PATH):
     train_neg,dev_neg,test_neg = readSent(NEG_PATH,0)
 
     train_sentence = train_pos + train_neg
-    vocab, w2i, i2w = buildVocab(train_sentence)
+    # vocab, w2i, i2w = buildVocab(train_sentence)
+    vocab, w2i, i2w = torchtext.build_vocab(train_sentence)
     train_sentence = sortSamples(train_sentence,w2i)
     train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch = generateBatch(train_sentence, w2i, batch_length)
     
@@ -144,14 +169,21 @@ def get_batches(POS_PATH, NEG_PATH):
             vocab, w2i
     
     
-def load_data():
-    train_pos,dev_pos,test_pos = readSent("rt-polarity.pos",1)
-    train_neg,dev_neg,test_neg = readSent("rt-polarity.neg",0)
-    train_sent = train_pos + train_neg
-    vocab,w2i,i2w = buildVocab(train_sent)
-    train_sentence = sortSamples(train_sent,w2i)
-    samples_batch,lenth_batch,labels_batch = generateBatch(train_sentence,w2i,batch_length)
-    dev_sent = dev_pos + dev_neg
-    dev_sentence = sortSamples(dev_sent,w2i)
-    #samples_batch,lenth_batch,labels_batch = generateBatch(dev_sentence,w2i,32)
-    print(samples_batch[1],lenth_batch[1],labels_batch[1])
+# def load_data():
+#     train_pos,dev_pos,test_pos = readSent("rt-polarity.pos",1)
+#     train_neg,dev_neg,test_neg = readSent("rt-polarity.neg",0)
+#     train_sent = train_pos + train_neg
+#     vocab,w2i,i2w = buildVocab(train_sent)
+#     train_sentence = sortSamples(train_sent,w2i)
+#     samples_batch,lenth_batch,labels_batch = generateBatch(train_sentence,w2i,batch_length)
+#     dev_sent = dev_pos + dev_neg
+#     dev_sentence = sortSamples(dev_sent,w2i)
+#     #samples_batch,lenth_batch,labels_batch = generateBatch(dev_sentence,w2i,32)
+#     print(samples_batch[1],lenth_batch[1],labels_batch[1])
+
+
+
+
+
+
+
