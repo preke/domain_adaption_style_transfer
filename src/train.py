@@ -73,7 +73,7 @@ def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask
             vocab, w2i, embedding):
 '''
 def trainRGL(train_iter, dev_iter, model, args):    
-    optimizer        = optim.Adam(rgl_net.parameters(), lr=lr)
+    optimizer        = optim.Adam(model.parameters(), lr=lr)
     loss_class       = nn.CrossEntropyLoss().cuda()
     loss_domain      = nn.CrossEntropyLoss().cuda()
     loss_reconstruct = nn.NLLLoss()
@@ -88,7 +88,7 @@ def trainRGL(train_iter, dev_iter, model, args):
             sample = batch.text
             print sample.size()
             label  = label.label            
-            rgl_net.train()
+            model.train()
             p       = float(i + epoch * len_iter) / n_epoch / len_iter
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(torch.LongTensor(sample).cuda())
@@ -99,9 +99,9 @@ def trainRGL(train_iter, dev_iter, model, args):
             # print feature.size()
             # print feature
 
-            rgl_net.zero_grad()
+            model.zero_grad()
             # reconstruct parts
-            class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
+            class_out, domain_out, out, reconstruct_out = model(feature, lenth, alpha, mask)
             batch_size      = len(lenth)
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
             # reconstruct_out = Variable(reconstruct_out.view(batch_size, max(lenth)).cuda())
@@ -119,21 +119,21 @@ def trainRGL(train_iter, dev_iter, model, args):
             #err = err_label
             err.backward()
             optimizer.step()
-            acc, flag = eval(dev_samples_batch, dev_lenth_batch, dev_labels_batch, rgl_net, alpha, dev_mask_batch)
+            acc, flag = eval(dev_samples_batch, dev_lenth_batch, dev_labels_batch, model, alpha, dev_mask_batch)
             
             save_path = "RGLModel/IndSep/"
             if not os.path.exists(save_path):
                 os.mkdir(save_path)
             save_path += " epoch " + str(epoch) + " batch " + str(i) + " bestmodel.pt"
             if flag:
-                torch.save(rgl_net.state_dict(), save_path)
+                torch.save(model.state_dict(), save_path)
                 
                 logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f' \
                   % (epoch, i, len_iter, err_label.cpu().data.numpy(),
                      err_domain.cpu().data.numpy(), out))
                 
                 
-                acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, rgl_net,alpha, test_mask_batch, True)
+                acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, model,alpha, test_mask_batch, True)
                 logger.info("The test accuracy is " + str(acc))
             i += 1
             '''
