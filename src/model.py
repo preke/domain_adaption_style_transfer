@@ -339,9 +339,10 @@ class RGLIndividualSaperateSC(nn.Module):
     def reconstruct(self, content, style, input_line, length):
         out = self.decoder(content, style, input_line, length)
         print out.size()
-        print self.embedding_size
+        print self.embedding_num
         print out.contiguous().view(-1, self.embedding_num).size()
         out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
+        out = torch.Tensor([np.argmax(i) for i in out])
         print out.size()
         return out
 
