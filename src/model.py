@@ -70,7 +70,7 @@ class Decoder(nn.Module):
             for i in range(target_len):                     
                 prev_s       = self.decodercell(target[:, i], content, sentiment)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
-            
+            print dec_h.size()
             outputs = self.dec2word(dec_h)
         # else:
         #     batch_size = content.size(0)
