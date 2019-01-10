@@ -103,7 +103,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             
             #domain_out = F.log_softmax(domain_out)
             err = err_domain + err_label + lamda * out# + loss
-            print err.size()
+            print(err.size())
             #err = err_label
             err.backward()
             optimizer.step()
