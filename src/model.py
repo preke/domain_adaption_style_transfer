@@ -247,10 +247,10 @@ class RGLIndividualSaperateSC(nn.Module):
             dropout=0.2
         )
         self.class_classifier = nn.Linear(hidden_size,num_class)
-        self.class_classifier.weight.data.normal_(0,0.01)
+        self.class_classifier.weight.data.normal_(0, 0.01)
         self.class_classifier.bias.data.fill_(0)
         self.domain_classifier = nn.Linear(hidden_size,num_class)
-        self.domain_classifier.weight.data.normal_(0,0.01)
+        self.domain_classifier.weight.data.normal_(0, 0.01)
         self.domain_classifier.bias.data.fill_(0)
         self.decoder = Decoder(self.embedding_num, self.embedding_size, self.hidden_size, 50, self.w2i, pre_embedding)
 

@@ -73,7 +73,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
     loss_class       = nn.CrossEntropyLoss().cuda()
     loss_domain      = nn.CrossEntropyLoss().cuda() #nn.MSELoss().cuda()  #nn.KLDivLoss().cuda() #nn.CrossEntropyLoss().cuda()
     loss_reconstruct = nn.NLLLoss()
-    n_epoch          = 100
+    n_epoch          = 20
     lamda            = 1.0
     len_iter         = len(train_samples_batch)
     
@@ -129,4 +129,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
                 logger.info("The test accuracy is " + str(acc))
             i += 1
 
-
+def demo_model(sent1, sent2, model, w2i):
+    '''
+    '''
+    pass

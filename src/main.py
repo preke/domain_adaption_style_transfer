@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 # self define
 from utils import preprocess, initialWordEmbedding
 from dataload import get_batches
-from train import eval, trainRGL
-
+from train import eval, trainRGL, demo_model
+from model import RGLIndividualSaperateSC
 
 # paths
 TRAIN_PATH     = '../data/train.ft.txt'
@@ -38,9 +38,14 @@ GLOVE_PATH     = '../data/glove.42B.300d.txt'
 small_pos_path   = '../data/small.pos'
 small_neg_path   = '../data/small.neg'
 small_glove_path = '../data/small_glove.txt'
-# parser = argparse.ArgumentParser(description='')
-# parser.add_argument('-test', action='store_true', default=False, help='train or test')
-# args = parser.parse_args()
+
+
+
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('-test', action='store_true', default=False, help='train or test')
+parser.add_argument('-train', action='store_true', default=True, help='train or test')
+parser.add_argument('-snapshot', type=str, default=None, help='filename of model snapshot [default: None]')
+args = parser.parse_args()
 
 
 
@@ -58,8 +63,8 @@ logger.info('Loading data begin...')
 train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
 dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
 test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
-vocab, w2i = get_batches(POS_TRAIN_PATH, NEG_TRAIN_PATH)
-# vocab, w2i = get_batches(small_pos_path, small_neg_path)
+# vocab, w2i = get_batches(POS_TRAIN_PATH, NEG_TRAIN_PATH)
+vocab, w2i = get_batches(small_pos_path, small_neg_path)
 
 
 # Initial word embedding
@@ -68,13 +73,17 @@ logger.info('Initial word embedding begin...')
 embedding = initialWordEmbedding(GLOVE_PATH, w2i)    
 
 # Train RGL()
-logger.info('Training RGL begin...')
-trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
-        dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
-        test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
-        vocab, w2i, embedding)
-
-
+if args.train:
+    logger.info('Training begin...')
+    trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
+            dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
+            test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
+            vocab, w2i, embedding)
+else:
+    logger.info('Test begin...')
+    model = RGLIndividualSaperateSC(len(vocab), 300, 2, 200, embedding, w2i).cuda()
+    model = load_state_dict(torch.load(args.snapshot))
+    demo_model(sent1, sent2, model, w2i)
 
 
 
