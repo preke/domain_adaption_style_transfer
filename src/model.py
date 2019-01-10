@@ -66,15 +66,14 @@ class Decoder(nn.Module):
                 dec_h = dec_h.cuda()
 
             target = self.embed(target)
-            for i in range(target_len):
-                ctx          = self.attention(content, sentiment)                     
-                prev_s       = self.decodercell(target[:, i], sentiment, ctx)
+            print content.size()
+            print sentiment.size()
+            print target.size()
+            for i in range(target_len):                     
+                prev_s       = self.decodercell(target[:, i], sentiment)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
             
-            print prev_s.size()
-            print dec_h.size()
             outputs = self.dec2word(dec_h)
-            print outputs.size()
         # else:
         #     batch_size = content.size(0)
         #     target     = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
@@ -102,26 +101,26 @@ class DecoderCell(nn.Module):
 
         self.input_weights = nn.Linear(embed_dim, hidden_dim*2)
         self.hidden_weights = nn.Linear(hidden_dim, hidden_dim*2)
-        self.ctx_weights = nn.Linear(hidden_dim*2, hidden_dim*2)
+        # self.ctx_weights = nn.Linear(hidden_dim*2, hidden_dim*2)
 
         self.input_in = nn.Linear(embed_dim, hidden_dim)
         self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
-        self.ctx_in = nn.Linear(hidden_dim*2, hidden_dim)
+        # self.ctx_in = nn.Linear(hidden_dim*2, hidden_dim)
 
 
-    def forward(self, trg_word, prev_s, ctx):
+    def forward(self, trg_word, prev_s):
         '''
         trg_word : B x E
         prev_s   : B x H 
         ctx      : B x 2*H
         '''
-        gates = self.input_weights(trg_word) + self.hidden_weights(prev_s) + self.ctx_weights(ctx)
+        gates = self.input_weights(trg_word) + self.hidden_weights(prev_s)#  + self.ctx_weights(ctx)
         reset_gate, update_gate = gates.chunk(2, 1)
 
         reset_gate = F.sigmoid(reset_gate)
         update_gate = F.sigmoid(update_gate)
 
-        prev_s_tilde = self.input_in(trg_word) + self.hidden_in(prev_s) + self.ctx_in(ctx)
+        prev_s_tilde = self.input_in(trg_word) + self.hidden_in(prev_s) # + self.ctx_in(ctx)
         prev_s_tilde = F.tanh(prev_s_tilde)
 
         prev_s = torch.mul((1-reset_gate), prev_s) + torch.mul(reset_gate, prev_s_tilde)
