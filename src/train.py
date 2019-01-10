@@ -94,11 +94,6 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             batch_size      = len(train_samples_batch)
             feature_iow     = Variable(feature.contiguous().view(-1).unsqueeze(1).float()).cuda()
             reconstruct_out = Variable(reconstruct_out.float().cuda())
-            
-            print reconstruct_out.size()
-            print reconstruct_out
-            print feature_iow.size()
-            print feature_iow
 
             try:
                 loss = F.binary_cross_entropy(reconstruct_out, feature_iow)
@@ -107,7 +102,8 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             err_domain  = loss_domain(class_out, target)
             
             #domain_out = F.log_softmax(domain_out)
-            err = err_domain + err_label + lamda * out + loss
+            err = err_domain + err_label + lamda * out# + loss
+            print err.size()
             #err = err_label
             err.backward()
             optimizer.step()
