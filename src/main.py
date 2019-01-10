@@ -63,8 +63,8 @@ logger.info('Loading data begin...')
 train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
 dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
 test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
-# vocab, w2i = get_batches(POS_TRAIN_PATH, NEG_TRAIN_PATH)
-vocab, w2i = get_batches(small_pos_path, small_neg_path)
+vocab, w2i = get_batches(POS_TEST_PATH, NEG_TEST_PATH)
+# vocab, w2i = get_batches(small_pos_path, small_neg_path)
 
 
 # Initial word embedding
