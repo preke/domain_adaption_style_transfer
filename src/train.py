@@ -77,9 +77,10 @@ def trainRGL(train_iter, dev_iter, model, args):
     loss_class       = nn.CrossEntropyLoss().cuda()
     loss_domain      = nn.CrossEntropyLoss().cuda()
     loss_reconstruct = nn.NLLLoss()
-    n_epoch          = args.num_epuch
+    n_epoch          = args.num_epoch
     lamda            = args.lamda
-    len_iter         = len(train_samples_batch)
+    len_iter         = len(train_iter)
+    # len_iter         = len(train_samples_batch)
     
     for epoch in range(n_epoch):
         # for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
