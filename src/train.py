@@ -90,22 +90,17 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             rgl_net.zero_grad()
             # reconstruct parts
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
-            print reconstruct_out.size()
-            print reconstruct_out
             batch_size = len(train_samples_batch)
-            print feature.contiguous().view(-1).size()
-            # feature_i2w = Variable(torch.FloatTensor([i2w[i] for i in j]) for j in feature.contiguous().view(-1))
-            # pred = reconstruct_out.view(batch_size, max(lenth), -1)
-            # print pred.size()
-            # print pred
+            feature_iow = feature.contiguous().view(-1).unsqueeze(1)
+            loss = loss_reconstruct(reconstruct_out, feature_iow)
             
-            # loss = loss_reconstruct(reconstruct_out, trg_output.contiguous().view(-1))
+            
 
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
             #domain_out = F.log_softmax(domain_out)
-            err = err_domain + err_label + lamda * out
+            err = err_domain + err_label + lamda * out + loss
             #err = err_label
             err.backward()
             optimizer.step()
