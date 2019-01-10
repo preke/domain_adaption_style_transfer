@@ -92,7 +92,7 @@ def  trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mas
             class_out, domain_out, out, reconstruct_out = rgl_net(feature, lenth, alpha, mask)
             batch_size = len(train_samples_batch)
             feature_iow = feature.contiguous().view(-1).unsqueeze(1)
-            loss = loss_reconstruct(reconstruct_out, feature_iow)
+            loss = loss_reconstruct(reconstruct_out.cuda(), feature_iow.cuda())
             
             
 
