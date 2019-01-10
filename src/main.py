@@ -40,6 +40,7 @@ small_pos_path   = '../data/small.pos'
 small_neg_path   = '../data/small.neg'
 small_glove_path = '../data/small_glove.txt'
 small_path       = '../data/small.txt'
+small_pre_path   = '../data/small_preprocess.txt'
 
 
 parser = argparse.ArgumentParser(description='')
@@ -57,9 +58,9 @@ args.batch_size    = 32
 args.device = torch.device('cuda')
 
 # Preprocess
-if not os.path.exists(TEST_PRE_PATH):
+if not os.path.exists(small_pre_path):
     logger.info('Preprocessing begin...')
-    preprocess_write(TEST_PATH, TEST_PRE_PATH)
+    preprocess_write(small_path, small_pre_path)
     # preprocess(TRAIN_PATH, POS_TRAIN_PATH, NEG_TRAIN_PATH)
     # preprocess(TEST_PATH, POS_TEST_PATH, NEG_TEST_PATH)
 else:
@@ -67,8 +68,8 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(TEST_PRE_PATH, TEST_PRE_PATH, args)
-
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(small_pre_path, Tsmall_pre_path, args)
+logger.info('Loading data Done!')
 # Load data
 # logger.info('Loading data begin...')
 # train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
