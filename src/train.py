@@ -136,7 +136,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                 acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, model,alpha, test_mask_batch, True)
                 logger.info("The test accuracy is " + str(acc))
             i += 1
-            '''
+
+
 def demo_model(sent1, sent2, model, w2i):
     '''
     '''
