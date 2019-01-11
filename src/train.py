@@ -63,10 +63,7 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
 
 
 def generate_mask(max_length, length):
-    print list(length)
-    print max_length
-    print
-    mask_batch = [ [1]*i+[0]*(max_length-i) for i in list(length)]
+    mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
     return mask_batch
 '''
 def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
