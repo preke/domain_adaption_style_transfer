@@ -52,12 +52,11 @@ def eval(dev_iter, model, alpha):
         size += len(sample)
     avg_loss /= size
     accuracy = 100.0 * float(corrects)/float(size)
-    if not test:
-        global best_results
-        if accuracy > best_results:
-            flag = 1
-            best_results = accuracy
-            logger.info('\nEvaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) \n'.format(avg_loss, 
+    global best_results
+    if accuracy > best_results:
+        flag = 1
+        best_results = accuracy
+        logger.info('\nEvaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) \n'.format(avg_loss, 
                                                                            accuracy, 
                                                                            corrects, 
                                                                            size))
