@@ -99,7 +99,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             print length
             print label
             print feature.size()
-            print target.size()
+            print target.view(-1).unsqueeze(1).size()
             print mask.size()
             # print feature.size()
             # print feature
