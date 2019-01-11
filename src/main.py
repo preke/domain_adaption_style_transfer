@@ -29,7 +29,8 @@ from model import RGLIndividualSaperateSC
 # paths
 TRAIN_PATH     = '../data/train.ft.txt'
 TEST_PATH      = '../data/test.ft.txt'
-TEST_PRE_PATH  = '../data/test_preprocess.tsv'
+# TEST_PRE_PATH  = '../data/test_preprocess.tsv'
+TEST_PRE_PATH  = '../data/t.tsv'
 POS_TEST_PATH  = '../data/test.pos'
 NEG_TEST_PATH  = '../data/test.neg'
 POS_TRAIN_PATH = '../data/train.pos'

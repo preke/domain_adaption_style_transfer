@@ -51,7 +51,9 @@ def load_data(train_path, dev_path, args):
             lower=True, include_lengths=True, preprocessing=data.Pipeline(clean_str),
             pad_token='<PAD>', unk_token='<UNK>', init_token='<SOS>', eos_token='<EOS>')
     label_field = data.Field(batch_first=True, sequential=False, pad_token=None, unk_token=None)
+    logger.info('Loading Train data begin...')
     train_data, train_iter = gen_iter(train_path, text_field, label_field, args)
+    logger.info('Loading Validation data begin...')
     dev_data, dev_iter = gen_iter(dev_path, text_field, label_field, args)
     return text_field, label_field, train_data, train_iter, dev_data, dev_iter
 
