@@ -91,8 +91,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             label   = batch.label            
             p       = float(i + epoch * len_iter) / n_epoch / len_iter
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
-            feature = Variable(torch.LongTensor(sample).cuda())
-            target  = Variable(torch.LongTensor(label).cuda())
+            feature = Variable(torch.LongTensor(sample))
+            target  = Variable(torch.LongTensor(label))
             mask    = generate_mask(sample.size()[1], length)
             mask    = Variable(torch.FloatTensor(mask).cuda())
             
