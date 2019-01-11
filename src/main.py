@@ -73,7 +73,7 @@ else:
 # Load data
 logger.info('Loading data begin...')
 text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(TEST_PRE_PATH, small_pre_path, args)
-text_field.build_vocab(train_data, min_freq=5)
+text_field.build_vocab(train_data, min_freq=10)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
 
