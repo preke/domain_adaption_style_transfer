@@ -80,15 +80,17 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
     lamda            = args.lamda
     len_iter         = int(len(train_data)/args.batch_size) + 1
     
+
     for epoch in range(n_epoch):
+        
         # for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
         i = 0
         for batch in train_iter:
+            logger.info('Batch ' + str(i))
             model.train()
             sample  = batch.text[0]
             length  = batch.text[1]
-            label   = batch.label   
-            print label         
+            label   = batch.label            
             p       = float(i + epoch * len_iter) / n_epoch / len_iter
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(sample)
