@@ -91,8 +91,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             label   = batch.label            
             p       = float(i + epoch * len_iter) / n_epoch / len_iter
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
-            feature = Variable(torch.LongTensor(sample))
-            target  = Variable(torch.LongTensor(label))
+            feature = Variable(sample)
+            target  = Variable(label)
             mask    = generate_mask(sample.size()[1], length)
             mask    = Variable(torch.FloatTensor(mask).cuda())
             
@@ -102,7 +102,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             model.zero_grad()
             # reconstruct parts
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
-            batch_size      = len(lenth)
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
             # reconstruct_out = Variable(reconstruct_out.view(batch_size, max(lenth)).cuda())
             # print(reconstruct_out.size())
