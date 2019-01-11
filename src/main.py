@@ -73,11 +73,11 @@ else:
 logger.info('Loading data begin...')
 text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(small_pre_path, small_pre_path, args)
 text_field.build_vocab(train_data, min_freq=5)
+label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
 
-print(len(train_data))
-args.vocab_size = len(text_field.vocab)
 
+args.vocab_size = len(text_field.vocab)
 args.word_2_index = text_field.vocab.stoi
 args.index_2_word = text_field.vocab.itos
 
@@ -99,7 +99,7 @@ else:
     logger.info('Train model begin...')
 
     try:
-        trainRGL(train_iter=train_iter, dev_iter=dev_iter, model=rgl_net, args=args)
+        trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args)
     except KeyboardInterrupt:
         print(traceback.print_exc())
         print('\n' + '-' * 89)

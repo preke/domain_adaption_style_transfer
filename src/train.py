@@ -72,14 +72,14 @@ def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask
             test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
             vocab, w2i, embedding):
 '''
-def trainRGL(train_iter, dev_iter, model, args):    
+def trainRGL(train_iter, dev_iter, train_data, model, args):    
     optimizer        = optim.Adam(model.parameters(), lr=args.lr)
     loss_class       = nn.CrossEntropyLoss().cuda()
     loss_domain      = nn.CrossEntropyLoss().cuda()
     loss_reconstruct = nn.NLLLoss()
     n_epoch          = args.num_epoch
     lamda            = args.lamda
-    # len_iter         = len(train_samples_batch)
+    len_iter         = int(len(train_data)/args.batch_size) + 1
     
     for epoch in range(n_epoch):
         # for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
