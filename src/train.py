@@ -30,23 +30,26 @@ logger = logging.getLogger(__name__)
 best_results = 0
 
 
-def eval(samples,lenth,labels, model,alpha, masks, test = False):
+def eval(dev_iter, model, alpha):
     flag = 0
     model.eval()
     corrects, avg_loss = 0, 0
     size = 0
-    for s,le,l,m in zip(samples,lenth,labels,masks):
-        feature                   = Variable(torch.LongTensor(s).cuda())
-        target                    = Variable(torch.LongTensor(l).cuda())
-        mask                      = Variable(torch.FloatTensor(m).cuda())
-        logit,_,_,reconstruct_out = model(feature,le,alpha,mask)
-        loss                      = F.cross_entropy(logit, target, size_average=False)
 
+    for batch in dev_iter:
+        sample  = batch.text[0]
+        length  = batch.text[1]
+        label   = batch.label         
+        mask    = generate_mask(sample.size()[1], length)
+        mask    = Variable(torch.FloatTensor(mask).cuda())
+        feature = Variable(sample)
+        target  = Variable(label)
+        logit,_,_,reconstruct_out = model(feature,length,alpha,mask)
+        loss                      = F.cross_entropy(logit, target, size_average=False)
         avg_loss += loss.data
         corrects += (torch.max(logit, 1)
                      [1].view(target.size()).data == target.data).sum()
-        size += len(s)
-
+        size += len(sample)
     avg_loss /= size
     accuracy = 100.0 * float(corrects)/float(size)
     if not test:
@@ -54,7 +57,7 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
         if accuracy > best_results:
             flag = 1
             best_results = accuracy
-            print('\nEvaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) \n'.format(avg_loss, 
+            logger.info('\nEvaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) \n'.format(avg_loss, 
                                                                            accuracy, 
                                                                            corrects, 
                                                                            size))
@@ -98,16 +101,10 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             
             mask    = generate_mask(sample.size()[1], length)
             mask    = Variable(torch.FloatTensor(mask).cuda())
-            # print feature.size()
-            # print feature
 
             model.zero_grad()
-            # reconstruct parts
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
-            # reconstruct_out = Variable(reconstruct_out.view(batch_size, max(lenth)).cuda())
-            # print(reconstruct_out.size())
-
             
             loss = loss_reconstruct(reconstruct_out, feature_iow)
             
@@ -115,27 +112,25 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
-            #domain_out = F.log_softmax(domain_out)
             err = err_domain + err_label + lamda * out + loss
-            # #err = err_label
-            # err.backward()
-            # optimizer.step()
-            # acc, flag = eval(dev_samples_batch, dev_lenth_batch, dev_labels_batch, model, alpha, dev_mask_batch)
+            err.backward()
+            optimizer.step()
+            acc, flag = eval(dev_iter, model, alpha)
             
-            # save_path = "RGLModel/IndSep/"
-            # if not os.path.exists(save_path):
-            #     os.mkdir(save_path)
-            # save_path += " epoch " + str(epoch) + " batch " + str(i) + " bestmodel.pt"
-            # if flag:
-            #     torch.save(model.state_dict(), save_path)
+            save_path = "RGLModel/IndSep/"
+            if not os.path.exists(save_path):
+                os.mkdir(save_path)
+            save_path += " epoch " + str(epoch) + " batch " + str(i) + " bestmodel.pt"
+            if flag:
+                torch.save(model.state_dict(), save_path)
                 
-            #     logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f' \
-            #       % (epoch, i, len_iter, err_label.cpu().data.numpy(),
-            #          err_domain.cpu().data.numpy(), out))
+                logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f' \
+                  % (epoch, i, len_iter, err_label.cpu().data.numpy(),
+                     err_domain.cpu().data.numpy(), out))
                 
                 
-            #     acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, model,alpha, test_mask_batch, True)
-            #     logger.info("The test accuracy is " + str(acc))
+                # acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, model,alpha, test_mask_batch, True)
+                # logger.info("The test accuracy is " + str(acc))
             i += 1
 
 
