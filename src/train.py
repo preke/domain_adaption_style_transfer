@@ -58,7 +58,7 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
                                                                            accuracy, 
                                                                            corrects, 
                                                                            size))
-    return accuracy,flag
+    return accuracy, flag
 
 
 
@@ -116,25 +116,25 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             
             #domain_out = F.log_softmax(domain_out)
             err = err_domain + err_label + lamda * out + loss
-            #err = err_label
-            err.backward()
-            optimizer.step()
-            acc, flag = eval(dev_samples_batch, dev_lenth_batch, dev_labels_batch, model, alpha, dev_mask_batch)
+            # #err = err_label
+            # err.backward()
+            # optimizer.step()
+            # acc, flag = eval(dev_samples_batch, dev_lenth_batch, dev_labels_batch, model, alpha, dev_mask_batch)
             
-            save_path = "RGLModel/IndSep/"
-            if not os.path.exists(save_path):
-                os.mkdir(save_path)
-            save_path += " epoch " + str(epoch) + " batch " + str(i) + " bestmodel.pt"
-            if flag:
-                torch.save(model.state_dict(), save_path)
+            # save_path = "RGLModel/IndSep/"
+            # if not os.path.exists(save_path):
+            #     os.mkdir(save_path)
+            # save_path += " epoch " + str(epoch) + " batch " + str(i) + " bestmodel.pt"
+            # if flag:
+            #     torch.save(model.state_dict(), save_path)
                 
-                logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f' \
-                  % (epoch, i, len_iter, err_label.cpu().data.numpy(),
-                     err_domain.cpu().data.numpy(), out))
+            #     logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f' \
+            #       % (epoch, i, len_iter, err_label.cpu().data.numpy(),
+            #          err_domain.cpu().data.numpy(), out))
                 
                 
-                acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, model,alpha, test_mask_batch, True)
-                logger.info("The test accuracy is " + str(acc))
+            #     acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, model,alpha, test_mask_batch, True)
+            #     logger.info("The test accuracy is " + str(acc))
             i += 1
 
 
