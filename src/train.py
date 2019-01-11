@@ -62,10 +62,15 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
 
 
 
-def generate_mask(data_iter):
+def generate_mask(sample, length):
+    print sample.size()
+    print length.size()
     mask_batch = []
-    masks = [[1] * len(sent) + [0] * (max_lenth - len(sent)) for sent in batch_sentence]
-    return masks
+
+    return mask_batch
+    # mask_batch = []
+    # masks = [[1] * len(sent) + [0] * (max_lenth - len(sent)) for sent in batch_sentence]
+    # return masks
 '''
 def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
             dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
@@ -85,9 +90,10 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
         # for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
         i = 0
         for batch in train_iter:
-            sample = batch.text
-            print sample
-            label  = label.label            
+            sample = batch.text[0]
+            length = batch.text[1]
+            label  = batch.label            
+            mask_batch = generate_mask(sample, length)
             model.train()
             p       = float(i + epoch * len_iter) / n_epoch / len_iter
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
