@@ -75,6 +75,7 @@ text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(
 text_field.build_vocab(train_data, min_freq=5)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
 
+print(len(train_data))
 args.vocab_size = len(text_field.vocab)
 
 args.word_2_index = text_field.vocab.stoi
@@ -96,6 +97,7 @@ if args.snapshot is not None:
     pass
 else:
     logger.info('Train model begin...')
+
     try:
         trainRGL(train_iter=train_iter, dev_iter=dev_iter, model=rgl_net, args=args)
     except KeyboardInterrupt:

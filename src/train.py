@@ -89,8 +89,8 @@ def trainRGL(train_iter, dev_iter, model, args):
             print sample.size()
             label  = label.label            
             model.train()
-            # p       = float(i + epoch * len_iter) / n_epoch / len_iter
-            #alpha   = 2. / (1. + np.exp(-10 * p)) - 1
+            p       = float(i + epoch * len_iter) / n_epoch / len_iter
+            alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(torch.LongTensor(sample).cuda())
             target  = Variable(torch.LongTensor(label).cuda())
             
