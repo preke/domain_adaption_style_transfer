@@ -39,10 +39,12 @@ def gen_iter(path, text_field, label_field, args):
     '''
     tmp_data = data.TabularDataset(path=path, format='tsv', fields=[('label', label_field), ('text', text_field)])
     tmp_iter = data.BucketIterator(tmp_data,
-                    batch_size = args.batch_size,
-                    sort_key   = lambda x: len(x.text),
-                    device     = args.device,
-                    repeat     = False)
+                    batch_size        = args.batch_size,
+                    sort_key          = lambda x: len(x.text),
+                    sort              = True,
+                    sort_within_batch = True,
+                    device            = args.device,
+                    repeat            = False)
     return tmp_data, tmp_iter
 
 def load_data(train_path, dev_path, args):
