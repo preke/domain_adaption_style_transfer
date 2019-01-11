@@ -62,15 +62,10 @@ def eval(samples,lenth,labels, model,alpha, masks, test = False):
 
 
 
-def generate_mask(sample, length):
-    print sample.size()
+def generate_mask(max_length, length):
     print length.size()
-    mask_batch = []
-
+    mask_batch = [i*[1] + (max_length-i)*[0] for i in length]
     return mask_batch
-    # mask_batch = []
-    # masks = [[1] * len(sent) + [0] * (max_lenth - len(sent)) for sent in batch_sentence]
-    # return masks
 '''
 def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
             dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
@@ -90,24 +85,23 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
         # for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
         i = 0
         for batch in train_iter:
-            sample = batch.text[0]
-            length = batch.text[1]
-            label  = batch.label            
-            mask_batch = generate_mask(sample, length)
             model.train()
+            sample  = batch.text[0]
+            length  = batch.text[1]
+            label   = batch.label            
             p       = float(i + epoch * len_iter) / n_epoch / len_iter
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(torch.LongTensor(sample).cuda())
             target  = Variable(torch.LongTensor(label).cuda())
-            
-            '''
+            mask    = generate_mask(sample.size()[1], length)
             mask    = Variable(torch.FloatTensor(mask).cuda())
+            
             # print feature.size()
             # print feature
 
             model.zero_grad()
             # reconstruct parts
-            class_out, domain_out, out, reconstruct_out = model(feature, lenth, alpha, mask)
+            class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
             batch_size      = len(lenth)
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
             # reconstruct_out = Variable(reconstruct_out.view(batch_size, max(lenth)).cuda())
