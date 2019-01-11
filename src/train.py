@@ -86,7 +86,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
         i = 0
         for batch in train_iter:
             sample = batch.text
-            print sample.size()
+            print sample
             label  = label.label            
             model.train()
             p       = float(i + epoch * len_iter) / n_epoch / len_iter
