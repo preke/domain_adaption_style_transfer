@@ -88,7 +88,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
         # for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
         i = 0
         for batch in train_iter:
-            logger.info('Batch ' + str(i))
             model.train()
             sample  = batch.text[0]
             length  = batch.text[1]
@@ -105,13 +104,13 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
             
-            loss = loss_reconstruct(reconstruct_out, feature_iow)
+            reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             
    
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
-            err = err_domain + err_label + lamda * out + loss
+            err = err_domain + err_label + lamda * out + reconstruct_loss
             err.backward()
             optimizer.step()
             acc, flag = eval(dev_iter, model, alpha)
@@ -123,9 +122,9 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             if flag:
                 torch.save(model.state_dict(), save_path)
                 
-                logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f' \
+                logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
                   % (epoch, i, len_iter, err_label.cpu().data.numpy(),
-                     err_domain.cpu().data.numpy(), out))
+                     err_domain.cpu().data.numpy(), out, reconstruct_loss))
                 
                 
                 # acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, model,alpha, test_mask_batch, True)

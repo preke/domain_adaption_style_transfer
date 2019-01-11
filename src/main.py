@@ -63,15 +63,15 @@ args.device     = torch.device('cuda')
 
 
 # Preprocess
-if not os.path.exists(small_pre_path):
+if not os.path.exists(TEST_PRE_PATH):
     logger.info('Preprocessing begin...')
-    preprocess_write(small_path, small_pre_path)
+    preprocess_write(TEST_PATH, TEST_PRE_PATH)
 else:
     logger.info('No need to preprocess!')
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(small_pre_path, small_pre_path, args)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(TEST_PRE_PATH, small_pre_path, args)
 text_field.build_vocab(train_data, min_freq=5)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
