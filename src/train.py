@@ -95,12 +95,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             
             mask    = generate_mask(sample.size()[1], length)
             mask    = Variable(torch.FloatTensor(mask).cuda())
-            print sample
-            print length
-            print label
-            print feature.size()
-            print target.view(-1).unsqueeze(1).size()
-            print mask.size()
             # print feature.size()
             # print feature
 
