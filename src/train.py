@@ -67,12 +67,7 @@ def eval(dev_iter, model, alpha):
 def generate_mask(max_length, length):
     mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
     return mask_batch
-'''
-def trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
-            dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
-            test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
-            vocab, w2i, embedding):
-'''
+
 def trainRGL(train_iter, dev_iter, train_data, model, args):    
     optimizer        = optim.Adam(model.parameters(), lr=args.lr)
     loss_class       = nn.CrossEntropyLoss().cuda()
@@ -84,8 +79,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
     
 
     for epoch in range(n_epoch):
-        
-        # for i, sample, lenth, label, mask in zip(range(len_iter),train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch):
         i = 0
         for batch in train_iter:
             model.train()
@@ -101,6 +94,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             mask    = Variable(torch.FloatTensor(mask).cuda())
 
             model.zero_grad()
+            logger.info()
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
             
@@ -125,10 +119,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                 logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
                   % (epoch, i, len_iter, err_label.cpu().data.numpy(),
                      err_domain.cpu().data.numpy(), out, reconstruct_loss))
-                
-                
-                # acc, flag = eval(test_samples_batch, test_lenth_batch, test_labels_batch, model,alpha, test_mask_batch, True)
-                # logger.info("The test accuracy is " + str(acc))
             i += 1
 
 
