@@ -56,7 +56,7 @@ def eval(dev_iter, model, alpha):
     if accuracy > best_results:
         flag = 1
         best_results = accuracy
-        logger.info('\nEvaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) \n'.format(avg_loss, 
+        logger.info('Evaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) \n'.format(avg_loss, 
                                                                            accuracy, 
                                                                            corrects, 
                                                                            size))
@@ -69,6 +69,11 @@ def generate_mask(max_length, length):
     return mask_batch
 
 def trainRGL(train_iter, dev_iter, train_data, model, args):    
+    save_path = "RGLModel/IndSep/"
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
+
+
     optimizer        = optim.Adam(model.parameters(), lr=args.lr)
     loss_class       = nn.CrossEntropyLoss().cuda()
     loss_domain      = nn.CrossEntropyLoss().cuda()
@@ -95,8 +100,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
 
             model.zero_grad()
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
-            feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
-            
+            feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             
    
@@ -106,22 +110,22 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err = err_domain + err_label + lamda * out + reconstruct_loss
             err.backward()
             optimizer.step()
-            acc, flag = eval(dev_iter, model, alpha)
-            
-            save_path = "RGLModel/IndSep/"
-            if not os.path.exists(save_path):
-                os.mkdir(save_path)
-            save_path += " epoch " + str(epoch) + " batch " + str(i) + "acc_" + str(acc) +" bestmodel.pt"
-            if flag:
-                torch.save(model.state_dict(), save_path)
-                
-                logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
-                  % (epoch, i, len_iter, err_label.cpu().data.numpy(),
-                     err_domain.cpu().data.numpy(), out, reconstruct_loss))
+            if i % 100 == 0:
+                acc, flag = eval(dev_iter, model, alpha)
+                save_path += " epoch " + str(epoch) + " batch " + str(i) + "acc_" + str(acc) +" bestmodel.pt"
+                if flag:
+                    torch.save(model.state_dict(), save_path)
+                    
+                    logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
+                      % (epoch, i, len_iter, err_label.cpu().data.numpy(),
+                         err_domain.cpu().data.numpy(), out, reconstruct_loss))
             i += 1
 
 
 def demo_model(sent1, sent2, model, w2i):
     '''
+        Input sent1 and sent2,
+        Then get the generated sentence with sent1's semantic feature and sent2's style.
     '''
+    # content_1, style_1 = model.extract_feature
     pass

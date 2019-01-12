@@ -291,8 +291,6 @@ class RGLIndividualSaperateSC(nn.Module):
             batch_size,
             self.hidden_size
         ))
-        #h0_encoder_bi = Variable(torch.zeros(4,batch_size,self.hidden_size // 2).cuda())
-        #c0_encoder_bi = Variable(torch.zeros(4,batch_size,self.hidden_size // 2).cuda())
         return (h0_encoder_bi01.cuda(), c0_encoder_bi01.cuda()), (h0_encoder_bi02.cuda(), c0_encoder_bi02.cuda()),\
             (h0_encoder01.cuda(), c0_encoder01.cuda()),(h0_encoder02.cuda(), c0_encoder02.cuda())
     
@@ -313,25 +311,19 @@ class RGLIndividualSaperateSC(nn.Module):
         output01,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output01,batch_first = True)
         
         mask = mask.unsqueeze(2)
-        #print(mask.size())
         feature01 = torch.sum(output01 * mask, 1) / torch.sum(mask, 1)
         
-        #bilstm_output02, (_, _) = self.bi_encoder02(embed, hidden_bi02)
         pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output02,unpacked_len,batch_first = True)
         output02, (src_h_t02, src_c_t) = self.encoder02(pack_output, hidden_02)
         output02,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output02,batch_first = True)
-
-         #output01.mean(dim = 1) # feature01  learn no sentiment feature
         
-        feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) #output02.mean(dim = 1) #feature02 learn sentiment feature
+        feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
 
         return feature01,feature02
     
     def reconstruct(self, content, style, input_line, length):
         out = self.decoder(content, style, input_line, length)
         out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
-        # print(out.size())
-        # out = torch.argmax(out, dim=1).unsqueeze(1)
         return out
 
 
@@ -344,14 +336,9 @@ class RGLIndividualSaperateSC(nn.Module):
         
         class_out = self.class_classifier(feature02)
         
-        # before 
         reverse_feature = ReverseLayerF.apply(feature01, alpha)
         class_out = self.class_classifier(feature02)
-        #domain_out = self.class_classifier(reverse_feature)
         domain_out = self.domain_classifier(reverse_feature)
-
-        # 2 classifier, no need to reverse first
-
         feature_out = feature01.mm(feature02.t())
         feature_out = feature_out ** 2
         feature_out = torch.mean(feature_out)
