@@ -94,7 +94,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             mask    = Variable(torch.FloatTensor(mask).cuda())
 
             model.zero_grad()
-            logger.info()
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
             feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
             
