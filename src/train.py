@@ -69,9 +69,9 @@ def generate_mask(max_length, length):
     return mask_batch
 
 def trainRGL(train_iter, dev_iter, train_data, model, args):    
-    save_path = "RGLModel/IndSep/"
-    if not os.path.exists(save_path):
-        os.mkdir(save_path)
+    save_dir = "RGLModel/IndSep/"
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
 
 
     optimizer        = optim.Adam(model.parameters(), lr=args.lr)
@@ -112,7 +112,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             optimizer.step()
             if i % 100 == 0:
                 acc, flag = eval(dev_iter, model, alpha)
-                save_path += " epoch " + str(epoch) + " batch " + str(i) + "acc_" + str(acc) +" bestmodel.pt"
+                save_path = save_dir + " epoch " + str(epoch) + " batch " + str(i) + "acc_" + str(acc) +" bestmodel.pt"
                 if flag:
                     torch.save(model.state_dict(), save_path)
                     
