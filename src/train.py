@@ -112,7 +112,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             optimizer.step()
             if i % 100 == 0:
                 acc, flag = eval(dev_iter, model, alpha)
-                save_path = save_dir + " epoch " + str(epoch) + " batch " + str(i) + "acc_" + str(acc) +" bestmodel.pt"
+                save_path = save_dir + "_epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
                 if flag:
                     torch.save(model.state_dict(), save_path)
                     
