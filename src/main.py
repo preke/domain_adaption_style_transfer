@@ -29,8 +29,8 @@ from model import RGLIndividualSaperateSC
 # paths
 TRAIN_PATH     = '../data/train.ft.txt'
 TEST_PATH      = '../data/test.ft.txt'
-# TEST_PRE_PATH  = '../data/test_preprocess.tsv'
-TEST_PRE_PATH  = '../data/t.tsv'
+TEST_PRE_PATH  = '../data/test_preprocess.tsv'
+# TEST_PRE_PATH  = '../data/t.tsv'
 POS_TEST_PATH  = '../data/test.pos'
 NEG_TEST_PATH  = '../data/test.neg'
 POS_TRAIN_PATH = '../data/train.pos'
@@ -54,7 +54,7 @@ args = parser.parse_args()
 # Parameters setting
 args.embed_dim  = 300
 args.hidden_dim = 200
-args.batch_size = 20
+args.batch_size = 32
 args.lr         = 0.001
 args.num_epoch  = 20
 args.num_class  = 2
@@ -86,7 +86,7 @@ args.index_2_word = text_field.vocab.itos
 
 # Initial word embedding
 logger.info('Getting pre-trained word embedding ...')
-args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_field)  
+args.pretrained_weight = get_pretrained_word_embed(GLOVE_PATH, args, text_field)  
 
 
 # Build model and train
