@@ -111,7 +111,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             save_path = "RGLModel/IndSep/"
             if not os.path.exists(save_path):
                 os.mkdir(save_path)
-            save_path += " epoch " + str(epoch) + " batch " + str(i) + " bestmodel.pt"
+            save_path += " epoch " + str(epoch) + " batch " + str(i) + "acc_" + str(acc) +" bestmodel.pt"
             if flag:
                 torch.save(model.state_dict(), save_path)
                 
