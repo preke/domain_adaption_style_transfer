@@ -95,6 +95,7 @@ rgl_net = RGLIndividualSaperateSC(args.vocab_size, args.embed_dim, args.num_clas
 
 if args.snapshot is not None:
     logger.info('Load model from' + args.snapshot)
+    rgl_net.load_state_dict(torch.load(args.snapshot))
     pass
 else:
     logger.info('Train model begin...')

@@ -47,8 +47,11 @@ def gen_iter(path, text_field, label_field, args):
     return tmp_data, tmp_iter
 
 def load_data(train_path, dev_path, args):
+    '''
+        fix length might cause problems currently
+    '''
     text_field  = data.Field(sequential=True, use_vocab=True, batch_first=True, 
-            lower=True, include_lengths=True, preprocessing=data.Pipeline(clean_str), fix_length=100,
+            lower=True, include_lengths=True, preprocessing=data.Pipeline(clean_str),
             pad_token='<PAD>', unk_token='<UNK>', init_token='<SOS>', eos_token='<EOS>')
     label_field = data.Field(batch_first=True, sequential=False, pad_token=None, unk_token=None)
     logger.info('Loading Train data begin...')
