@@ -98,6 +98,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(sample)
             target  = Variable(label)
+            logger.info('Batch:' + str(i))
             print length
             mask    = generate_mask(torch.max(length), length)
             mask    = Variable(torch.FloatTensor(mask).cuda())
