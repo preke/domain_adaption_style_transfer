@@ -126,5 +126,5 @@ def demo_model(sent1, sent2, model, w2i):
         Input sent1 and sent2,
         Then get the generated sentence with sent1's semantic feature and sent2's style.
     '''
-    # content_1, style_1 = model.extract_feature
+    # content_1, style_1 = model.extract_feature()
     pass
