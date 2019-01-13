@@ -94,7 +94,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                 print example
                 cnt = 0
                 if example[i] != '<PAD>':
-                    cnt ++
+                    cnt += 1
                 print cnt
             print length
             label   = batch.label            
