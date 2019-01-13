@@ -98,9 +98,11 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(sample)
             target  = Variable(label)
-            
+            print length
             mask    = generate_mask(torch.max(length), length)
             mask    = Variable(torch.FloatTensor(mask).cuda())
+            print mask
+            print mask.size()
             model.zero_grad()
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
             feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
