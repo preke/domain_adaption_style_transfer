@@ -40,7 +40,7 @@ def eval(dev_iter, model, alpha):
         sample  = batch.text[0]
         length  = batch.text[1]
         label   = batch.label         
-        mask    = generate_mask(sample.size()[1], length)
+        mask    = generate_mask(torch.max(length), length)
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         target  = Variable(label)
@@ -99,11 +99,9 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             feature = Variable(sample)
             target  = Variable(label)
             logger.info('Batch:' + str(i))
-            print length
             mask    = generate_mask(torch.max(length), length)
             mask    = Variable(torch.FloatTensor(mask).cuda())
-            print mask
-            print mask.size()
+            
             model.zero_grad()
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
             feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
