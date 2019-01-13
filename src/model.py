@@ -300,11 +300,11 @@ class RGLIndividualSaperateSC(nn.Module):
         
         pack_embed = torch.nn.utils.rnn.pack_padded_sequence(embed,lenth,batch_first = True)
         packed_output01, (_, _) = self.bi_encoder01(pack_embed, hidden_bi01)
-        unpacked_output01,unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01,batch_first = True)
+        unpacked_output01,unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01, batch_first = True)
         
         pack_embed = torch.nn.utils.rnn.pack_padded_sequence(embed,lenth,batch_first = True)
         packed_output02, (_, _) = self.bi_encoder02(pack_embed, hidden_bi02)
-        unpacked_output02,unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02,batch_first = True)
+        unpacked_output02,unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
         
         pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output01,unpacked_len,batch_first = True)
         output01, (src_h_t01, src_c_t) = self.encoder01(pack_output, hidden_01)
