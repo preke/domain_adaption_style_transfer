@@ -310,7 +310,7 @@ class RGLIndividualSaperateSC(nn.Module):
         output01, (src_h_t01, src_c_t) = self.encoder01(pack_output, hidden_01)
         output01,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output01,batch_first = True)
         print output01.size()
-        print unpacked_lenth
+        print uppacked_lenth
         mask = mask.unsqueeze(2)
         print mask.size()
         feature01 = torch.sum(output01 * mask, 1) / torch.sum(mask, 1)
