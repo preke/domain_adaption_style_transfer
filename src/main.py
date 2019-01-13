@@ -86,7 +86,7 @@ args.index_2_word = text_field.vocab.itos
 
 # Initial word embedding
 logger.info('Getting pre-trained word embedding ...')
-args.pretrained_weight = get_pretrained_word_embed(GLOVE_PATH, args, text_field)  
+args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_field)  
 
 
 # Build model and train

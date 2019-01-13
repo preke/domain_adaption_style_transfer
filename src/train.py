@@ -89,6 +89,13 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             model.train()
             sample  = batch.text[0]
             length  = batch.text[1]
+            print sample
+            for example in sample:
+                print example
+                cnt = 0
+                if example[i] != '<PAD>':
+                    cnt ++
+                print cnt
             print length
             label   = batch.label            
             p       = float(i + epoch * len_iter) / n_epoch / len_iter
@@ -116,7 +123,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                 save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
                 if flag:
                     torch.save(model.state_dict(), save_path)
-                    
+                    logger.info('Save model to ' + save_path)
                     logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
                       % (epoch, i, len_iter, err_label.cpu().data.numpy(),
                          err_domain.cpu().data.numpy(), out, reconstruct_loss))
