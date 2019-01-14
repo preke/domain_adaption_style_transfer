@@ -106,7 +106,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             
             ## begin print reconstruct result
             print reconstruct_out.size()
-            reconstruct_out = reconstruct_out.view(args.batch_size,torch.max(length), args.vocab_size).size()
+            reconstruct_out = reconstruct_out.view(args.batch_size, args.max_length, args.vocab_size)
             print args.index_2_word(reconstruct_out)
             ## end
 
