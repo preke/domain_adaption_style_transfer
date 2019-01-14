@@ -193,8 +193,9 @@ class LSTMSC(nn.Module):
         return out,None,None
         
 class RGLIndividualSaperateSC(nn.Module):
-    def __init__(self, embedding_num, embedding_size, num_class, hidden_size, pre_embedding, w2i):
+    def __init__(self, embedding_num, embedding_size, num_class, hidden_size, pre_embedding, w2i, args):
         super(RGLIndividualSaperateSC, self).__init__()
+        self.args           = args
         self.embedding_num  = embedding_num
         self.embedding_size = embedding_size
         self.embedding      = nn.Embedding(embedding_num,embedding_size)
@@ -322,8 +323,14 @@ class RGLIndividualSaperateSC(nn.Module):
     
     def reconstruct(self, content, style, input_line, length):
         out = self.decoder(content, style, input_line, length)
-        out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
-        return out
+        out_total = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
+        out_in_batch = out_total.view(out.size()[0], out.size()[1], self.embedding_num)
+        print out.size()
+        print out_in_batch.size()
+        for i in out_in_batch:
+            print [self.args.index_to_word[j] for j in i]
+        
+        return out_total
 
 
     def forward(self, input_line, lenth, alpha, mask):
