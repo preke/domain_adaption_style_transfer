@@ -328,8 +328,8 @@ class RGLIndividualSaperateSC(nn.Module):
         print out.size()
         print out_in_batch.size()
         for i in out_in_batch:
-            print i
-            print [self.args.index_2_word[int(j)] for j in i]
+            print torch.argmax(i)
+            print [self.args.index_2_word[int(j)] for j in torch.argmax(i)]
         
         return out_total
 
