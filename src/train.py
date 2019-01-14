@@ -60,6 +60,7 @@ def eval(dev_iter, model, alpha):
                                                                            accuracy, 
                                                                            corrects, 
                                                                            size))
+
     return accuracy, flag
 
 
@@ -102,29 +103,33 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             
-   
+            
+            ## begin print reconstruct result
+            print reconstruct_out.size()
+            ## end
+
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
-            err = err_domain + err_label + lamda * out + reconstruct_loss
-            err.backward()
-            optimizer.step()
-            if i % 100 == 0:
-                acc, flag = eval(dev_iter, model, alpha)
-                save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
-                if flag:
-                    torch.save(model.state_dict(), save_path)
-                    logger.info('Save model to ' + save_path)
-                    logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
-                      % (epoch, i, len_iter, err_label.cpu().data.numpy(),
-                         err_domain.cpu().data.numpy(), out, reconstruct_loss))
+            # err = err_domain + err_label + lamda * out + reconstruct_loss
+            # err.backward()
+            # optimizer.step()
+            # if i % 100 == 0:
+            #     acc, flag = eval(dev_iter, model, alpha)
+            #     save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
+            #     if flag:
+            #         torch.save(model.state_dict(), save_path)
+            #         logger.info('Save model to ' + save_path)
+            #         logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
+            #           % (epoch, i, len_iter, err_label.cpu().data.numpy(),
+            #              err_domain.cpu().data.numpy(), out, reconstruct_loss))
             i += 1
 
 
-def demo_model(sent1, sent2, model, w2i):
-    '''
-        Input sent1 and sent2,
-        Then get the generated sentence with sent1's semantic feature and sent2's style.
-    '''
-    # content_1, style_1 = model.extract_feature()
-    pass
+# def demo_model(sent1, sent2, model, w2i):
+#     '''
+#         Input sent1 and sent2,
+#         Then get the generated sentence with sent1's semantic feature and sent2's style.
+#     '''
+#     content_1, style_1 = model.extract_feature()
+#     pass
