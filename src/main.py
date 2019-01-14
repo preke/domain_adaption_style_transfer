@@ -82,6 +82,7 @@ args.vocab_size = len(text_field.vocab)
 args.word_2_index = text_field.vocab.stoi
 args.index_2_word = text_field.vocab.itos
 
+print args.index_2_word
 
 
 # Initial word embedding
