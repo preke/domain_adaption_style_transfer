@@ -328,7 +328,8 @@ class RGLIndividualSaperateSC(nn.Module):
         print out.size()
         print out_in_batch.size()
         for i in out_in_batch:
-            print [self.args.index_2_word[j] for j in i]
+            print i
+            print [self.args.index_2_word[int(j)] for j in i]
         
         return out_total
 
