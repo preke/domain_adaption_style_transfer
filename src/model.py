@@ -336,8 +336,8 @@ class RGLIndividualSaperateSC(nn.Module):
         class_out = self.class_classifier(feature02)
         
         reverse_feature = ReverseLayerF.apply(feature01, alpha)
-        class_out = self.class_classifier(feature02)
-        domain_out = self.domain_classifier(reverse_feature)
+        class_out   = self.class_classifier(feature02)
+        domain_out  = self.domain_classifier(reverse_feature)
         feature_out = feature01.mm(feature02.t())
         feature_out = feature_out ** 2
         feature_out = torch.mean(feature_out)

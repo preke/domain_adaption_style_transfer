@@ -79,12 +79,8 @@ logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
 
 
 args.vocab_size = len(text_field.vocab)
-args.word_2_index = text_field.vocab.stoi
-args.index_2_word = text_field.vocab.itos
-print args.word_2_index
-print '=========================='
-print args.index_2_word
-
+args.word_2_index = text_field.vocab.stoi # tuple of dict({word: index})
+args.index_2_word = text_field.vocab.itos # only list of words
 
 # Initial word embedding
 logger.info('Getting pre-trained word embedding ...')
