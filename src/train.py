@@ -141,7 +141,7 @@ def show_reconstruct_results(dev_iter, model, args):
             writer.write('\n')
             writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
             writer.write('************\n')
-        
+        k = k + 1
     writer.close()
 
 def demo_model(sent1, sent2, model, args):

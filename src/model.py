@@ -324,7 +324,9 @@ class RGLIndividualSaperateSC(nn.Module):
     def reconstruct(self, content, style, input_line, length):
         out = self.decoder(content, style, input_line, length)
         out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
+        
         return out
+
 
     def forward(self, input_line, lenth, alpha, mask):
         feature01, feature02 = self.extractFeature(input_line, lenth, mask)
