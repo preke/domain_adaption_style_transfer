@@ -2,6 +2,7 @@ import os
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torchtext.data as data
 import torchtext.datasets as datasets
 import RGL
@@ -10,6 +11,7 @@ import codecs
 from nltk.corpus import sentiwordnet as swn
 import pickle
 import numpy as np
+import pandas as pd
 import codecs
 import torch.optim as optim
 from torch.autograd import Variable
@@ -148,25 +150,38 @@ def show_reconstruct_results(dev_iter, model, args):
     writer.close()
 
 
-def style_transfer(pos_iter, neg_iter, model, args):
+def style_transfer(pos_iter, model, args):
+    
+    pos_df = [] # id, length, feature, feature1, feature2
+    neg_df = [] # id, length, feature, feature1, feature2
+    total_cnt = 0
     for batch in pos_iter:
         logger.info('In ' + str(cnt_batch) + '  batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
-        mask    = generate_mask(torch.max(length), length)
-        mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         feature01, feature02 = model.extractFeature(feature, length, mask)
-        reconstruct_out = model.reconstruct(feature01, feature02, feature, length)
-        out_in_batch = reconstruct_out.view(len(length), args.max_length, args.vocab_size)
-        k = 0 
-        for i in out_in_batch:
-            writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
-            writer.write('\n')
-            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
-            writer.write('\n************\n')
-        k = k + 1
+        for i in len(length):
+            pos_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
+            total_cnt += 1
+    
 
+    # for batch in neg_iter:
+    #     logger.info('In ' + str(cnt_batch) + '  batch...')
+    #     sample  = batch.text[0]
+    #     length  = batch.text[1]
+    #     feature = Variable(sample)
+    #     feature01, feature02 = model.extractFeature(feature, length, mask)
+    #     for i in len(length):
+    #         neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
+    #         total_cnt += 1
+
+    pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
+    # neg_df = pd.DataFrame(neg_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
+    # writer = open('pos2neg_log.txt', 'w')
+    # for pos_example in pos_df[:100]:
+    #     pos_example['feature1'].to_numpy()
+    # writer.close()
     pass
 
 def demo_style_transfer(sent1, sent2, model, args):
