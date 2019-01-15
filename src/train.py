@@ -163,7 +163,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
     <class 'torch.Tensor'>;  torch.Size([200])
     <class 'torch.Tensor'>;  torch.Size([200])
     '''
+    cnt_batch = 0
     for batch in pos_iter:
+        logger.info('In ' + str(cnt_batch) + '  pos batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
         mask    = generate_mask(torch.max(length), length)
@@ -173,8 +175,10 @@ def style_transfer(pos_iter, neg_iter, model, args):
         for i in range(len(length)):
             pos_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
             total_cnt += 1
+        cnt_batch += 1
     
     for batch in neg_iter:
+        logger.info('In ' + str(cnt_batch) + '  batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
         feature = Variable(sample)
@@ -184,16 +188,15 @@ def style_transfer(pos_iter, neg_iter, model, args):
         for i in range(len(length)):
             neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
             total_cnt += 1
+        cnt_batch += 1
 
     pos_df = pd.DataFrame(pos_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
     neg_df = pd.DataFrame(neg_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
 
     print pos_df.shape
     print neg_df.shape
-    print pos_df[:10]    
     writer = open('pos_neg_log.txt', 'w')
-    for pos_example in pos_df[:10]:
-        print pos_example
+    for pos_example in pos_df.iterrows():
         pos = pos_example['feature1']
         sim = []
         for neg in neg_df['feature1']:
