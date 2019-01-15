@@ -197,11 +197,11 @@ def style_transfer(pos_iter, neg_iter, model, args):
     print neg_df.shape
     writer = open('pos_neg_log.txt', 'w')
     for index, row in pos_df.iterrows():
-        print row
         pos = row['feature1']
         sim = []
         for neg in neg_df['feature1']:
-            sim.append(F.cosine_similarity(pos, neg))
+            print neg
+            sim.append(F.cosine_similarity(pos.unsqueeze(0), neg.unsqueeze(0)))
         max_index = int(np.argmax(np.array(sim)))
         reconstruct_out = model.reconstruct(
                             pos.unsqueeze(0), 
