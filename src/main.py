@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 # self define
-from utils import preprocess_write, get_pretrained_word_embed
+from utils import preprocess_write, get_pretrained_word_embed, preprocess_pos_neg
 from dataload import load_data, load_pos_neg_data
 from train import eval, trainRGL, show_reconstruct_results, style_transfer
 from model import RGLIndividualSaperateSC
@@ -39,6 +39,9 @@ GLOVE_PATH     = '../data/glove.42B.300d.txt'
 
 small_pos_path   = '../data/small.pos'
 small_neg_path   = '../data/small.neg'
+small_pos   = '../data/small_pos.tsv'
+small_neg   = '../data/small_neg.tsv'
+
 small_glove_path = '../data/small_glove.txt'
 small_path       = '../data/small.txt'
 small_pre_path   = '../data/small_preprocess.txt'
@@ -95,7 +98,10 @@ if args.snapshot is not None:
     logger.info('Load model from' + args.snapshot)
     rgl_net.load_state_dict(torch.load(args.snapshot))
     # show_reconstruct_results(dev_iter, rgl_net, args)
-    pos_iter, neg_iter = load_pos_neg_data(small_pos_path, small_neg_path, text_field, args)
+    if not os.path.exists(small_pos):
+        preprocess_pos_neg(small_pos_path, small_pos)
+        preprocess_pos_neg(small_neg_path, small_neg)
+    pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
     style_transfer(pos_iter, neg_iter, rgl_net, args)
 else:
     logger.info('Train model begin...')

@@ -34,6 +34,14 @@ def preprocess(in_path, pos_output_paths, neg_output_paths):
     pos_writer.close()
     neg_writer.close()
 
+def preprocess_pos_neg(in_path, out_path):
+    writer = open(out_path, 'w')
+    with open(in_path, 'r') as reader:
+        for line in reader:
+            writer.write(text.split('\t')[1].lower())
+    writer.close()
+
+
 def preprocess_write(in_path, out_path):
     '''
     Generate tsv file to load easier

@@ -197,6 +197,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
     print neg_df.shape
     writer = open('pos_neg_log.txt', 'w')
     for pos_example in pos_df.iterrows():
+        print pos_example
         pos = pos_example['feature1']
         sim = []
         for neg in neg_df['feature1']:
