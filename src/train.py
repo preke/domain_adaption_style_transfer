@@ -193,6 +193,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
         print neg_df.shape
         
         for pos_example in pos_df[:100]:
+            print pos_example
             pos = pos_example['feature1']
             sim = []
             for neg in neg_df['feature1']:
