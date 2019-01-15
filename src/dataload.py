@@ -73,10 +73,7 @@ def gen_pos_neg_iter(path, text_field, args):
                     repeat            = False)
     return tmp_iter
 
-def load_pos_neg_data(pos_path, neg_path, args):
-    text_field  = data.Field(sequential=True, use_vocab=True, batch_first=True, 
-            lower=True, include_lengths=True, preprocessing=data.Pipeline(clean_str), fix_length=args.max_length,
-            pad_token='<PAD>', unk_token='<UNK>', init_token='<SOS>', eos_token='<EOS>')
+def load_pos_neg_data(pos_path, neg_path, text_field, args):
     logger.info('Loading pos data begin...')
     pos_iter = gen_pos_neg_iter(pos_path, text_field, args)
     logger.info('Loading Validation data begin...')

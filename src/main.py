@@ -95,7 +95,7 @@ if args.snapshot is not None:
     logger.info('Load model from' + args.snapshot)
     rgl_net.load_state_dict(torch.load(args.snapshot))
     # show_reconstruct_results(dev_iter, rgl_net, args)
-    pos_iter, neg_iter = load_pos_neg_data(small_pos_path, small_neg_path, args)
+    pos_iter, neg_iter = load_pos_neg_data(small_pos_path, small_neg_path, text_field, args)
     style_transfer(pos_iter, neg_iter, rgl_net, args)
 else:
     logger.info('Train model begin...')
