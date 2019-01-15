@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 # self define
 from utils import preprocess_write, get_pretrained_word_embed
 from dataload import load_data
-from train import eval, trainRGL, demo_model
+from train import eval, trainRGL, demo_model, show_reconstruct_results
 from model import RGLIndividualSaperateSC
 
 # paths
@@ -72,7 +72,7 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(small_pre_path, small_pre_path, args)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(TEST_PRE_PATH, small_pre_path, args)
 text_field.build_vocab(train_data, min_freq=20)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
@@ -84,7 +84,7 @@ args.index_2_word = text_field.vocab.itos # only list of words
 
 # Initial word embedding
 logger.info('Getting pre-trained word embedding ...')
-args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_field)  
+args.pretrained_weight = get_pretrained_word_embed(GLOVE_PATH, args, text_field)  
 
 
 # Build model and train
@@ -94,7 +94,7 @@ rgl_net = RGLIndividualSaperateSC(args.vocab_size, args.embed_dim, args.num_clas
 if args.snapshot is not None:
     logger.info('Load model from' + args.snapshot)
     rgl_net.load_state_dict(torch.load(args.snapshot))
-    pass
+    show_reconstruct_results(dev_iter, rgl_net, args)
 else:
     logger.info('Train model begin...')
 
@@ -104,6 +104,9 @@ else:
         print(traceback.print_exc())
         print('\n' + '-' * 89)
         print('Exiting from training early')
+
+
+
 
 # # Train RGL()
 # if args.train:

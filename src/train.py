@@ -44,7 +44,7 @@ def eval(dev_iter, model, alpha):
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         target  = Variable(label)
-        logit,_,_,reconstruct_out = model(feature,length,alpha,mask)
+        logit,_,_,reconstruct_out = model(feature, length, alpha, mask)
         loss                      = F.cross_entropy(logit, target, size_average=False)
         avg_loss += loss.data
         corrects += (torch.max(logit, 1)
@@ -60,7 +60,6 @@ def eval(dev_iter, model, alpha):
                                                                            accuracy, 
                                                                            corrects, 
                                                                            size))
-
     return accuracy, flag
 
 
@@ -73,7 +72,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
     save_dir = "RGLModel/IndSep/"
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
-
 
     optimizer        = optim.Adam(model.parameters(), lr=args.lr)
     loss_class       = nn.CrossEntropyLoss().cuda()
@@ -110,22 +108,47 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
-            # err = err_domain + err_label + lamda * out + reconstruct_loss
-            # err.backward()
-            # optimizer.step()
-            # if i % 100 == 0:
-            #     acc, flag = eval(dev_iter, model, alpha)
-            #     save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
-            #     if flag:
-            #         torch.save(model.state_dict(), save_path)
-            #         logger.info('Save model to ' + save_path)
-            #         logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
-            #           % (epoch, i, len_iter, err_label.cpu().data.numpy(),
-            #              err_domain.cpu().data.numpy(), out, reconstruct_loss))
+            err = err_domain + err_label + lamda * out + reconstruct_loss
+            err.backward()
+            optimizer.step()
+            if i % 100 == 0:
+                acc, flag = eval(dev_iter, model, alpha)
+                save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
+                if flag:
+                    torch.save(model.state_dict(), save_path)
+                    logger.info('Save model to ' + save_path)
+                    logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
+                      % (epoch, i, len_iter, err_label.cpu().data.numpy(),
+                         err_domain.cpu().data.numpy(), out, reconstruct_loss))
             i += 1
 
 
-def demo_model(sent1, sent2, model, w2i):
+
+def show_reconstruct_results(dev_iter, model, args):
+    # writer = open('logs.txt', 'wb')
+    for batch in dev_iter:
+        sample  = batch.text[0]
+        length  = batch.text[1]
+        mask    = generate_mask(torch.max(length), length)
+        mask    = Variable(torch.FloatTensor(mask).cuda())
+        feature = Variable(sample)
+        feature01, feature02 = model.extractFeature(feature, length, mask)
+        reconstruct_out = model.reconstruct(feature01, feature02, feature, length)
+        print reconstruct_out.size()
+        # reconstruct_out = reconstruct_out.view(out.size()[0], out.size()[1], self.embedding_num)
+
+        # out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
+        # out_in_batch = out_total.view(out.size()[0], out.size()[1], self.embedding_num)
+        # print out.size()
+        # print out_in_batch.size()
+        # for i in out_in_batch:
+        #     print i
+        #     print i.size()
+        #     print torch.argmax(i, dim=1)
+        #     print [self.args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]
+    # writer.close()
+
+def demo_model(sent1, sent2, model, args):
     '''
         Input sent1 and sent2,
         Then get the generated sentence with sent1's semantic feature and sent2's style.

@@ -323,18 +323,8 @@ class RGLIndividualSaperateSC(nn.Module):
     
     def reconstruct(self, content, style, input_line, length):
         out = self.decoder(content, style, input_line, length)
-        out_total = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
-        out_in_batch = out_total.view(out.size()[0], out.size()[1], self.embedding_num)
-        print out.size()
-        print out_in_batch.size()
-        for i in out_in_batch:
-            print i
-            print i.size()
-            print torch.argmax(i, dim=1)
-            print [self.args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]
-        
-        return out_total
-
+        out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
+        return out
 
     def forward(self, input_line, lenth, alpha, mask):
         feature01, feature02 = self.extractFeature(input_line, lenth, mask)
