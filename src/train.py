@@ -164,7 +164,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
     <class 'torch.Tensor'>;  torch.Size([200])
     '''
     for batch in pos_iter:
-        
+
         sample  = batch.text[0]
         length  = batch.text[1]
         mask    = generate_mask(torch.max(length), length)
@@ -186,8 +186,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
             neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
             total_cnt += 1
 
-        pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
-        neg_df = pd.DataFrame(neg_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
+        pos_df = pd.DataFrame(pos_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
+        neg_df = pd.DataFrame(neg_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
 
         print pos_df.shape
         print neg_df.shape
