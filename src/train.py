@@ -156,7 +156,6 @@ def style_transfer(pos_iter, model, args):
     neg_df = [] # id, length, feature, feature1, feature2
     total_cnt = 0
     for batch in pos_iter:
-        logger.info('In ' + str(cnt_batch) + '  batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
         feature = Variable(sample)
@@ -166,22 +165,25 @@ def style_transfer(pos_iter, model, args):
             total_cnt += 1
     
 
-    # for batch in neg_iter:
-    #     logger.info('In ' + str(cnt_batch) + '  batch...')
-    #     sample  = batch.text[0]
-    #     length  = batch.text[1]
-    #     feature = Variable(sample)
-    #     feature01, feature02 = model.extractFeature(feature, length, mask)
-    #     for i in len(length):
-    #         neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
-    #         total_cnt += 1
+    for batch in neg_iter:
+        sample  = batch.text[0]
+        length  = batch.text[1]
+        feature = Variable(sample)
+        feature01, feature02 = model.extractFeature(feature, length, mask)
+        for i in len(length):
+            neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
+            total_cnt += 1
 
-    pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
-    # print pos_df.head()
+    # pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
     # neg_df = pd.DataFrame(neg_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
-    # writer = open('pos2neg_log.txt', 'w')
+    for pos_example in pos_df[0]:
+        print type(pos_example)
+        print pos_example
+        print '***'
     # for pos_example in pos_df[:100]:
     #     pos_example['feature1'].to_numpy()
+
+    # writer = open('pos2neg_log.txt', 'w')
     # writer.close()
     pass
 
