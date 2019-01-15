@@ -162,9 +162,6 @@ def style_transfer(dev_iter, model, args):
         mask    = generate_mask(torch.max(length), length)
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
-        print feature.size()
-        print length
-        print mask.size()
         feature01, feature02 = model.extractFeature(feature, length, mask)
         for i in range(len(length)):
             pos_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
@@ -185,9 +182,15 @@ def style_transfer(dev_iter, model, args):
     # pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
     # neg_df = pd.DataFrame(neg_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
     for pos_example in pos_df[0]:
-        print type(pos_example)
-        print pos_example
-        print '***'
+        writer = open('pos2neg_log.txt', 'w')
+        
+        writer.write(type(pos_example))
+        writer.write('\n')
+        writer.write(pos_example.size())
+        writer.write('\n')
+        writer.write('***')
+        writer.write('\n')
+        writer.close()
     # for pos_example in pos_df[:100]:
     #     pos_example['feature1'].to_numpy()
 
