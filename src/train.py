@@ -181,9 +181,8 @@ def style_transfer(dev_iter, model, args):
 
     # pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
     # neg_df = pd.DataFrame(neg_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
-    for pos_example in pos_df[0]:
-        writer = open('pos2neg_log.txt', 'w')
-        
+    writer = open('pos2neg_log.txt', 'w')
+    for pos_example in pos_df[0]:        
         writer.write(str(type(pos_example)))
         writer.write('\n')
         try:
@@ -198,7 +197,7 @@ def style_transfer(dev_iter, model, args):
         writer.write('\n')
         writer.write('***')
         writer.write('\n')
-        writer.close()
+    writer.close()
     # for pos_example in pos_df[:100]:
     #     pos_example['feature1'].to_numpy()
 
