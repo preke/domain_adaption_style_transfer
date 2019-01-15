@@ -186,9 +186,15 @@ def style_transfer(dev_iter, model, args):
         
         writer.write(str(type(pos_example)))
         writer.write('\n')
-        writer.write(str(pos_example.size()))
+        try:
+            writer.write(str(pos_example.size()))
+        except:
+            writer.write('No size')
         writer.write('\n')
-        writer.write(str(pos_example.size()))
+        try:
+            writer.write(str(pos_example))
+        except:
+            writer.write('No entity')
         writer.write('\n')
         writer.write('***')
         writer.write('\n')
