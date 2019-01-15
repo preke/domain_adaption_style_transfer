@@ -126,7 +126,9 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
 
 def show_reconstruct_results(dev_iter, model, args):
     writer = open('logs.txt', 'w')
+    cnt_batch = 0
     for batch in dev_iter:
+        logger.info('In ' + str(cnt_batch) + '  batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
         mask    = generate_mask(torch.max(length), length)
@@ -142,6 +144,7 @@ def show_reconstruct_results(dev_iter, model, args):
             writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
             writer.write('\n************\n')
         k = k + 1
+    cnt_batch += 1
     writer.close()
 
 def demo_model(sent1, sent2, model, args):
