@@ -177,7 +177,7 @@ def style_transfer(pos_iter, model, args):
     #         total_cnt += 1
 
     pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
-    print pos_df.head()
+    # print pos_df.head()
     # neg_df = pd.DataFrame(neg_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
     # writer = open('pos2neg_log.txt', 'w')
     # for pos_example in pos_df[:100]:
