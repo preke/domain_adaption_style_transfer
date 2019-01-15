@@ -125,7 +125,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
 
 
 def show_reconstruct_results(dev_iter, model, args):
-    # writer = open('logs.txt', 'wb')
+    writer = open('logs.txt', 'wb')
     for batch in dev_iter:
         sample  = batch.text[0]
         length  = batch.text[1]
@@ -134,19 +134,15 @@ def show_reconstruct_results(dev_iter, model, args):
         feature = Variable(sample)
         feature01, feature02 = model.extractFeature(feature, length, mask)
         reconstruct_out = model.reconstruct(feature01, feature02, feature, length)
-        print reconstruct_out.size()
-        # reconstruct_out = reconstruct_out.view(out.size()[0], out.size()[1], self.embedding_num)
-
-        # out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
-        # out_in_batch = out_total.view(out.size()[0], out.size()[1], self.embedding_num)
-        # print out.size()
-        # print out_in_batch.size()
-        # for i in out_in_batch:
-        #     print i
-        #     print i.size()
-        #     print torch.argmax(i, dim=1)
-        #     print [self.args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]
-    # writer.close()
+        out_in_batch = reconstruct_out.view(args.batch_size, args.max_length, args.embedding_num)
+        k = 0 
+        for i in out_in_batch:
+            writer.write(' '.join([self.args.index_2_word[int(l)] for l in sample[k]]))
+            writer.write('\n')
+            writer.write(' '.join([self.args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
+            writer.write('************\n')
+        
+    writer.close()
 
 def demo_model(sent1, sent2, model, args):
     '''

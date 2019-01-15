@@ -108,6 +108,8 @@ else:
 
 
 
+### python main.py -snapshot RGLModel/IndSep/epoch_18_batch_1900_acc_99.9005634736_bestmodel.pt
+
 # # Train RGL()
 # if args.train:
 #     logger.info('Training begin...')
