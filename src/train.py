@@ -184,9 +184,11 @@ def style_transfer(dev_iter, model, args):
     for pos_example in pos_df[0]:
         writer = open('pos2neg_log.txt', 'w')
         
-        writer.write(type(pos_example))
+        writer.write(str(type(pos_example)))
         writer.write('\n')
-        writer.write(pos_example.size())
+        writer.write(str(pos_example.size()))
+        writer.write('\n')
+        writer.write(str(pos_example.size()))
         writer.write('\n')
         writer.write('***')
         writer.write('\n')
