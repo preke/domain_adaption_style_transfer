@@ -137,9 +137,9 @@ def show_reconstruct_results(dev_iter, model, args):
         out_in_batch = reconstruct_out.view(args.batch_size, args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
-            writer.write(' '.join([self.args.index_2_word[int(l)] for l in sample[k]]))
+            writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
             writer.write('\n')
-            writer.write(' '.join([self.args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
+            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
             writer.write('************\n')
         
     writer.close()
