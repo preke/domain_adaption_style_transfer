@@ -150,13 +150,21 @@ def show_reconstruct_results(dev_iter, model, args):
     writer.close()
 
 
-def style_transfer(dev_iter, model, args):
+def style_transfer(pos_iter, neg_iter, model, args):
     
-    pos_df = [] # id, length, feature, feature1, feature2
-    neg_df = [] # id, length, feature, feature1, feature2
     total_cnt = 0
     model.eval()
-    for batch in dev_iter:
+    pos_df = [] # id, length, feature, feature1, feature2
+    neg_df = [] # id, length, feature, feature1, feature2
+    '''
+    <type 'int'>
+    <class 'torch.Tensor'>;  tensor(65, device='cuda:0')
+    <class 'torch.Tensor'>;  torch.Size([100])
+    <class 'torch.Tensor'>;  torch.Size([200])
+    <class 'torch.Tensor'>;  torch.Size([200])
+    '''
+    for batch in pos_iter:
+        
         sample  = batch.text[0]
         length  = batch.text[1]
         mask    = generate_mask(torch.max(length), length)
@@ -167,43 +175,47 @@ def style_transfer(dev_iter, model, args):
             pos_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
             total_cnt += 1
     
+    for batch in neg_iter:
+        sample  = batch.text[0]
+        length  = batch.text[1]
+        feature = Variable(sample)
+        mask    = generate_mask(torch.max(length), length)
+        mask    = Variable(torch.FloatTensor(mask).cuda())
+        feature01, feature02 = model.extractFeature(feature, length, mask)
+        for i in range(len(length)):
+            neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
+            total_cnt += 1
 
-    # for batch in neg_iter:
-    #     sample  = batch.text[0]
-    #     length  = batch.text[1]
-    #     feature = Variable(sample)
-    #     mask    = generate_mask(torch.max(length), length)
-    #     mask    = Variable(torch.FloatTensor(mask).cuda())
-    #     feature01, feature02 = model.extractFeature(feature, length, mask)
-    #     for i in range(len(length)):
-    #         neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
-    #         total_cnt += 1
+        pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
+        neg_df = pd.DataFrame(neg_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
 
-    # pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
-    # neg_df = pd.DataFrame(neg_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
-    writer = open('pos2neg_log.txt', 'w')
-    for pos_example in pos_df[0]:        
-        writer.write(str(type(pos_example)))
-        writer.write('\n')
-        try:
-            writer.write(str(pos_example.size()))
-        except:
-            writer.write('No size')
-        writer.write('\n')
-        try:
-            writer.write(str(pos_example))
-        except:
-            writer.write('No entity')
-        writer.write('\n')
-        writer.write('***')
-        writer.write('\n')
-    writer.close()
-    # for pos_example in pos_df[:100]:
-    #     pos_example['feature1'].to_numpy()
+        print pos_df.shape
+        print neg_df.shape
+        
+        for pos_example in pos_df[:100]:
+            pos = pos_example['feature1']
+            sim = []
+            for neg in neg_df['feature1']:
+                sim.append(F.cosine_similarity(pos, neg))
+            max_index = int(np.argmax(np.array(sim)))
+            reconstruct_out = model.reconstruct(
+                                pos.unsqueeze(0), 
+                                neg_df['feature2'][max_index].unsqueeze(0), 
+                                pos_example['feature'].unsqueeze(0), 
+                                pos_example['length'].unsqueeze(0))
+            out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
+            k = 0 
+            for i in out_in_batch:
+                writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+                writer.write('\n')
+                writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
+                writer.write('\n************\n')
+                k = k + 1
+        cnt_batch += 1
 
     # writer = open('pos2neg_log.txt', 'w')
+    
     # writer.close()
-    pass
 
 def demo_style_transfer(sent1, sent2, model, args):
     '''

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 # self define
 from utils import preprocess_write, get_pretrained_word_embed
-from dataload import load_data
+from dataload import load_data, load_pos_neg_data
 from train import eval, trainRGL, show_reconstruct_results, style_transfer
 from model import RGLIndividualSaperateSC
 
@@ -95,7 +95,8 @@ if args.snapshot is not None:
     logger.info('Load model from' + args.snapshot)
     rgl_net.load_state_dict(torch.load(args.snapshot))
     # show_reconstruct_results(dev_iter, rgl_net, args)
-    style_transfer(dev_iter, rgl_net, args)
+    pos_iter, neg_iter = load_pos_neg_data(small_pos_path, small_neg_path, args):
+    style_transfer(pos_iter, neg_iter, rgl_net, args)
 else:
     logger.info('Train model begin...')
 
