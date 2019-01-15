@@ -136,7 +136,29 @@ def show_reconstruct_results(dev_iter, model, args):
         feature = Variable(sample)
         feature01, feature02 = model.extractFeature(feature, length, mask)
         reconstruct_out = model.reconstruct(feature01, feature02, feature, length)
-        out_in_batch = reconstruct_out.view(args.batch_size, args.max_length, args.vocab_size)
+        out_in_batch = reconstruct_out.view(len(length), args.max_length, args.vocab_size)
+        k = 0 
+        for i in out_in_batch:
+            writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+            writer.write('\n')
+            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
+            writer.write('\n************\n')
+            k = k + 1
+        cnt_batch += 1
+    writer.close()
+
+
+def style_transfer(pos_iter, neg_iter, model, args):
+    for batch in pos_iter:
+        logger.info('In ' + str(cnt_batch) + '  batch...')
+        sample  = batch.text[0]
+        length  = batch.text[1]
+        mask    = generate_mask(torch.max(length), length)
+        mask    = Variable(torch.FloatTensor(mask).cuda())
+        feature = Variable(sample)
+        feature01, feature02 = model.extractFeature(feature, length, mask)
+        reconstruct_out = model.reconstruct(feature01, feature02, feature, length)
+        out_in_batch = reconstruct_out.view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
@@ -144,13 +166,17 @@ def show_reconstruct_results(dev_iter, model, args):
             writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
             writer.write('\n************\n')
         k = k + 1
-    cnt_batch += 1
-    writer.close()
 
-def demo_model(sent1, sent2, model, args):
+    pass
+
+def demo_style_transfer(sent1, sent2, model, args):
     '''
         Input sent1 and sent2,
         Then get the generated sentence with sent1's semantic feature and sent2's style.
     '''
     # content_1, style_1 = model.extract_feature()
     pass
+
+
+
+
