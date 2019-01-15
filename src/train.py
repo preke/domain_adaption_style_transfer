@@ -125,7 +125,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
 
 
 def show_reconstruct_results(dev_iter, model, args):
-    writer = open('logs.txt', 'wb')
+    writer = open('logs.txt', 'w')
     for batch in dev_iter:
         sample  = batch.text[0]
         length  = batch.text[1]
