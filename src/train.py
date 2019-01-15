@@ -190,15 +190,15 @@ def style_transfer(pos_iter, neg_iter, model, args):
             total_cnt += 1
         cnt_batch += 1
 
-    pos_df = pd.DataFrame(pos_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
-    neg_df = pd.DataFrame(neg_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
+    pos_df = pd.DataFrame(pos_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'], index=False)
+    neg_df = pd.DataFrame(neg_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'], index=False)
 
     print pos_df.shape
     print neg_df.shape
     writer = open('pos_neg_log.txt', 'w')
-    for pos_example in pos_df.iterrows():
-        print pos_example
-        pos = pos_example['feature1']
+    for index, row in pos_df.iterrows():
+        print row
+        pos = row['feature1']
         sim = []
         for neg in neg_df['feature1']:
             sim.append(F.cosine_similarity(pos, neg))
@@ -206,8 +206,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
         reconstruct_out = model.reconstruct(
                             pos.unsqueeze(0), 
                             neg_df['feature2'][max_index].unsqueeze(0), 
-                            pos_example['feature'].unsqueeze(0), 
-                            pos_example['length'].unsqueeze(0))
+                            row['feature'].unsqueeze(0), 
+                            row['length'].unsqueeze(0))
         out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
