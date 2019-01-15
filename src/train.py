@@ -210,6 +210,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
                             row['length'].unsqueeze(0))
         out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
         k = 0 
+        '''
+         Still have problems
+        '''
         for i in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
             writer.write('\n')

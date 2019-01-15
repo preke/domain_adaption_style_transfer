@@ -44,7 +44,7 @@ small_neg   = '../data/small_neg.tsv'
 
 small_glove_path = '../data/small_glove.txt'
 small_path       = '../data/small.txt'
-small_pre_path   = '../data/small_preprocess.txt'
+small_pre_path   = '../data/small_preprocess.tsv'
 
 
 parser = argparse.ArgumentParser(description='')
@@ -87,7 +87,7 @@ args.index_2_word = text_field.vocab.itos # only list of words
 
 # Initial word embedding
 logger.info('Getting pre-trained word embedding ...')
-args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_field)  
+args.pretrained_weight = get_pretrained_word_embed(GLOVE_PATH, args, text_field)  
 
 
 # Build model and train
