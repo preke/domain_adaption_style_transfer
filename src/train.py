@@ -190,8 +190,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
             total_cnt += 1
         cnt_batch += 1
 
-    pos_df = pd.DataFrame(pos_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'], index=False)
-    neg_df = pd.DataFrame(neg_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'], index=False)
+    pos_df = pd.DataFrame(pos_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
+    neg_df = pd.DataFrame(neg_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
 
     print pos_df.shape
     print neg_df.shape
