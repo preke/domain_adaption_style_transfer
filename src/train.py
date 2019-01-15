@@ -158,6 +158,8 @@ def style_transfer(pos_iter, model, args):
     for batch in pos_iter:
         sample  = batch.text[0]
         length  = batch.text[1]
+        mask    = generate_mask(torch.max(length), length)
+        mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         feature01, feature02 = model.extractFeature(feature, length, mask)
         for i in len(length):
@@ -169,6 +171,8 @@ def style_transfer(pos_iter, model, args):
         sample  = batch.text[0]
         length  = batch.text[1]
         feature = Variable(sample)
+        mask    = generate_mask(torch.max(length), length)
+        mask    = Variable(torch.FloatTensor(mask).cuda())
         feature01, feature02 = model.extractFeature(feature, length, mask)
         for i in len(length):
             neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
