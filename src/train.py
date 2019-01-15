@@ -150,33 +150,37 @@ def show_reconstruct_results(dev_iter, model, args):
     writer.close()
 
 
-def style_transfer(pos_iter, model, args):
+def style_transfer(dev_iter, model, args):
     
     pos_df = [] # id, length, feature, feature1, feature2
     neg_df = [] # id, length, feature, feature1, feature2
     total_cnt = 0
-    for batch in pos_iter:
+    model.eval()
+    for batch in dev_iter:
         sample  = batch.text[0]
         length  = batch.text[1]
         mask    = generate_mask(torch.max(length), length)
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
+        print feature.size()
+        print length
+        print mask.size()
         feature01, feature02 = model.extractFeature(feature, length, mask)
         for i in range(len(length)):
             pos_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
             total_cnt += 1
     
 
-    for batch in neg_iter:
-        sample  = batch.text[0]
-        length  = batch.text[1]
-        feature = Variable(sample)
-        mask    = generate_mask(torch.max(length), length)
-        mask    = Variable(torch.FloatTensor(mask).cuda())
-        feature01, feature02 = model.extractFeature(feature, length, mask)
-        for i in range(len(length)):
-            neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
-            total_cnt += 1
+    # for batch in neg_iter:
+    #     sample  = batch.text[0]
+    #     length  = batch.text[1]
+    #     feature = Variable(sample)
+    #     mask    = generate_mask(torch.max(length), length)
+    #     mask    = Variable(torch.FloatTensor(mask).cuda())
+    #     feature01, feature02 = model.extractFeature(feature, length, mask)
+    #     for i in range(len(length)):
+    #         neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
+    #         total_cnt += 1
 
     # pos_df = pd.DataFrame(pos_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
     # neg_df = pd.DataFrame(neg_df, names=['id', 'length', 'feature', 'feature1', 'feature2'])
