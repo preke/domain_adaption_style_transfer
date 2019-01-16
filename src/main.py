@@ -92,7 +92,7 @@ args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_
 
 # Build model and train
 rgl_net = RGLIndividualSaperateSC(args.vocab_size, args.embed_dim, args.num_class, 
-    args.hidden_dim, args.pretrained_weight.numpy(), args.word_2_index, args).cuda()
+    args.hidden_dim, args.pretrained_weight.numpy(), args.word_2_index['<SOS>'], args).cuda()
 
 if args.snapshot is not None:
     logger.info('Load model from' + args.snapshot)
