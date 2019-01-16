@@ -51,7 +51,7 @@ class Decoder(nn.Module):
 
 
     def forward(self, content, sentiment, target, length, is_train=True):
-        
+        logger.info('Is train: ' + str(is_train))
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
@@ -80,7 +80,6 @@ class Decoder(nn.Module):
                 output = self.dec2word(prev_s)
                 outputs[:,i,:] = output
                 target = output.topk(1)[1]
-            
         return outputs
 
 
