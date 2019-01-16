@@ -50,9 +50,9 @@ class Decoder(nn.Module):
         self.dec2word = nn.Linear(hidden_dim, vocab_size)
 
 
-    def forward(self, content, sentiment, target, length):
+    def forward(self, content, sentiment, target, length, is_train=True):
         
-        if target is not None:
+        if is_train:
             batch_size, target_len = target.size(0), target.size(1)
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
 
@@ -81,7 +81,6 @@ class Decoder(nn.Module):
                 outputs[:,i,:] = output
                 target = output.topk(1)[1]
             
-        return outputs
         return outputs
 
 
@@ -337,19 +336,16 @@ class RGLIndividualSaperateSC(nn.Module):
 
         return feature01,feature02
     
-    def reconstruct(self, content, style, input_line, length):
-        out = self.decoder(content, style, input_line, length)
+    def reconstruct(self, content, style, input_line, length, is_train=True):
+        out = self.decoder(content, style, input_line, length, is_train)
         out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
-        
         return out
 
 
-    def forward(self, input_line, lenth, alpha, mask):
+    def forward(self, input_line, lenth, alpha, mask, is_train=True):
         feature01, feature02 = self.extractFeature(input_line, lenth, mask)
         
-        reconstruction_out = self.reconstruct(feature01, feature02, input_line, lenth)
-        
-
+        reconstruction_out = self.reconstruct(feature01, feature02, input_line, lenth, is_train)
         
         class_out = self.class_classifier(feature02)
         

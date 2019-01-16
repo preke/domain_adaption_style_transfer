@@ -46,7 +46,7 @@ def eval(dev_iter, model, alpha):
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         target  = Variable(label)
-        logit,_,_,reconstruct_out = model(feature, length, alpha, mask)
+        logit,_,_,reconstruct_out = model(feature, length, alpha, mask, is_train=False)
         loss                      = F.cross_entropy(logit, target, size_average=False)
         avg_loss += loss.data
         corrects += (torch.max(logit, 1)
@@ -137,7 +137,7 @@ def show_reconstruct_results(dev_iter, model, args):
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         feature01, feature02 = model.extractFeature(feature, length, mask)
-        reconstruct_out = model.reconstruct(feature01, feature02, feature, length)
+        reconstruct_out = model.reconstruct(feature01, feature02, feature, length, is_train=False)
         out_in_batch = reconstruct_out.view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
@@ -207,7 +207,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
                             pos.unsqueeze(0), 
                             neg_df['feature2'][max_index].unsqueeze(0), 
                             row['feature'].unsqueeze(0), 
-                            row['length'].unsqueeze(0))
+                            row['length'].unsqueeze(0),
+                            is_train=False)
         out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
         k = 0 
         '''
