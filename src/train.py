@@ -213,9 +213,10 @@ def style_transfer(pos_iter, neg_iter, model, args):
         '''
          Still have problems
         '''
+        sample = row['feature']
         for i in out_in_batch:
-            writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
-            writer.write('\n')
+            writer.write(' '.join([args.index_2_word[int(l)] for l in sample]))
+            writer.write('\n\n')
             writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
             writer.write('\n************\n')
             k = k + 1
