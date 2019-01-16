@@ -83,11 +83,13 @@ class Decoder(nn.Module):
                 outputs = outputs.cuda()
             
             for i in range(self.max_len):
+                print target.size()
                 target = self.embed(target).squeeze(1)                             
                 prev_s = self.decodercell(target, content, sentiment)
                 output = self.dec2word(prev_s)
                 outputs[:,i,:] = output
                 target = output.topk(1)[1]
+
         return outputs
 
 
