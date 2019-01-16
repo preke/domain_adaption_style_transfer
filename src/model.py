@@ -7,6 +7,14 @@ import numpy as np
 
 from utils import *
 
+# logging
+import logging
+import logging.config
+config_file = 'logging.ini'
+logging.config.fileConfig(config_file, disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
+
+
 
 class Attention(nn.Module):
     def __init__(self, hidden_dim):
