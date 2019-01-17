@@ -115,20 +115,21 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err.backward()
             optimizer.step()
             if i % 100 == 0:
-                acc, flag = eval(dev_iter, model, alpha)
-                save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
-                if flag:
-                    torch.save(model.state_dict(), save_path)
-                    logger.info('Save model to ' + save_path)
-                    logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
-                      % (epoch, i, len_iter, err_label.cpu().data.numpy(),
-                         err_domain.cpu().data.numpy(), out, reconstruct_loss))
+                show_reconstruct_results(dev_iter, model, args, i)
+                # acc, flag = eval(dev_iter, model, alpha)
+                # save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
+                # if flag:
+                #     torch.save(model.state_dict(), save_path)
+                #     logger.info('Save model to ' + save_path)
+                #     logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
+                #       % (epoch, i, len_iter, err_label.cpu().data.numpy(),
+                #          err_domain.cpu().data.numpy(), out, reconstruct_loss))
             i += 1
 
 
 
-def show_reconstruct_results(dev_iter, model, args):
-    writer = open('logs.txt', 'w')
+def show_reconstruct_results(dev_iter, model, args， cnt):
+    writer = open('logs_'+str(cnt)+'_.txt', 'w')
     cnt_batch = 0
     for batch in dev_iter:
         logger.info('In ' + str(cnt_batch) + '  batch...')
