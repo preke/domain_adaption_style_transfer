@@ -46,16 +46,16 @@ class Decoder(nn.Module):
     def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi, pre_embedding):
         super(Decoder, self).__init__()
         self.hidden_dim = hidden_dim
-        self.max_len = max_len
+        self.max_len    = max_len
         self.vocab_size = vocab_size
-        self.trg_soi = trg_soi
+        self.trg_soi    = trg_soi
         
         self.embed = nn.Embedding(vocab_size, embed_dim)
         self.embed.weight.data.copy_(torch.from_numpy(pre_embedding))
         
-        self.attention = Attention(hidden_dim) 
+        self.attention   = Attention(hidden_dim) 
         self.decodercell = DecoderCell(embed_dim, hidden_dim)
-        self.dec2word = nn.Linear(hidden_dim, vocab_size)
+        self.dec2word    = nn.Linear(hidden_dim, vocab_size)
 
 
     def forward(self, content, sentiment, target, length, is_train=True):
@@ -85,9 +85,9 @@ class Decoder(nn.Module):
             for i in range(int(torch.max(length))):
                 target = self.embed(target).squeeze(1)                             
                 prev_s = self.decodercell(target, content, sentiment)
-                output = self.dec2word(prev_s)
+                output = self.dec2word(prev_s) # b * v
                 outputs[:,i,:] = output
-                target = output.topk(1)[1]
+                target = output.topk(1)[0]
 
         return outputs
 
