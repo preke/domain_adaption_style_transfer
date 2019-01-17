@@ -88,6 +88,7 @@ class Decoder(nn.Module):
                 output = self.dec2word(prev_s) # b * v
                 outputs[:,i,:] = output
                 target = output.topk(1)[0]
+                print target
 
         return outputs
 
