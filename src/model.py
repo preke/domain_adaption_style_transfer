@@ -75,7 +75,7 @@ class Decoder(nn.Module):
             outputs = self.dec2word(dec_h)
         else:
             batch_size = len(length)
-            target = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
+            target = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
             outputs = Variable(torch.zeros(batch_size, int(torch.max(length)), self.vocab_size))
 
             if torch.cuda.is_available():
@@ -86,6 +86,7 @@ class Decoder(nn.Module):
                 target = self.embed(target).squeeze(1)                             
                 prev_s = self.decodercell(target, content, sentiment)
                 output = self.dec2word(prev_s)
+                print output
                 outputs[:,i,:] = output
                 target = output.topk(1)[1]
 

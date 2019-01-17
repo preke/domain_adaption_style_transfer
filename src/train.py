@@ -83,12 +83,13 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
     lamda            = args.lamda
     len_iter         = int(len(train_data)/args.batch_size) + 1
     
-
+    i = 0
+    cnt_epoch = 0
     for epoch in range(n_epoch):
-        i = 0
-        logger.info('In ' + str(i) + ' batch...')
+        cnt_batch = 0 
         for batch in train_iter:
             model.train()
+            logger.info('In ' + str(cnt_epoch) + ' epoch... In ' + str(cnt_batch) + ' batch...')
             sample  = batch.text[0]
             length  = batch.text[1]
             label   = batch.label            
@@ -125,6 +126,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                 #       % (epoch, i, len_iter, err_label.cpu().data.numpy(),
                 #          err_domain.cpu().data.numpy(), out, reconstruct_loss))
             i += 1
+            cnt_batch += 1
+        cnt_epoch += 1
 
 
 
