@@ -59,7 +59,7 @@ class Decoder(nn.Module):
 
 
     def forward(self, content, sentiment, target, length, is_train=True):
-        logger.info('Is train: ' + str(is_train))
+        # logger.info('Is train: ' + str(is_train))
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
@@ -83,7 +83,6 @@ class Decoder(nn.Module):
                 outputs = outputs.cuda()
             
             for i in range(int(torch.max(length))):
-                print outputs.size()
                 target = self.embed(target).squeeze(1)                             
                 prev_s = self.decodercell(target, content, sentiment)
                 output = self.dec2word(prev_s)

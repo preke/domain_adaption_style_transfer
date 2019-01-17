@@ -142,7 +142,8 @@ def show_reconstruct_results(dev_iter, model, args):
         k = 0 
         for i in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
-            writer.write('\n')
+            # writer.write('\n')
+            writer.write('\n=============\n')
             writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
             writer.write('\n************\n')
             k = k + 1
