@@ -86,6 +86,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
 
     for epoch in range(n_epoch):
         i = 0
+        logger.info('In ' + str(i) + ' batch...')
         for batch in train_iter:
             model.train()
             sample  = batch.text[0]
