@@ -132,7 +132,7 @@ def show_reconstruct_results(dev_iter, model, args， cnt):
     writer = open('logs_'+str(cnt)+'_.txt', 'w')
     cnt_batch = 0
     for batch in dev_iter:
-        logger.info('In ' + str(cnt_batch) + '  batch...')
+        # logger.info('In ' + str(cnt_batch) + '  batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
         mask    = generate_mask(torch.max(length), length)
