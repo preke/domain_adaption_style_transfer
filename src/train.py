@@ -142,7 +142,7 @@ def show_reconstruct_results(dev_iter, model, args, cnt):
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         feature01, feature02 = model.extractFeature(feature, length, mask)
-        reconstruct_out = model.reconstruct(feature01, feature02, feature, length, is_train=False)
+        reconstruct_out = model.reconstruct(feature01, feature02, feature, length)
         out_in_batch = reconstruct_out.view(len(length), torch.max(length), args.vocab_size)
         k = 0 
         for i in out_in_batch:

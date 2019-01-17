@@ -70,9 +70,6 @@ class Decoder(nn.Module):
             target = self.embed(target)
             
             for i in range(target_len):   
-                print 'train'
-                print target[:, i]
-
                 prev_s       = self.decodercell(target[:, i], content, sentiment)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
             outputs = self.dec2word(dec_h)
@@ -87,8 +84,6 @@ class Decoder(nn.Module):
             
             for i in range(int(torch.max(length))):
                 target = self.embed(target).squeeze(1)                             
-                print 'evaluate'
-                print target
                 prev_s = self.decodercell(target, content, sentiment)
                 output = self.dec2word(prev_s)
                 outputs[:,i,:] = output
