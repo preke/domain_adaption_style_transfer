@@ -9,7 +9,7 @@ class Decoder(nn.Module):
         self.embed.weight.data.copy_(torch.from_numpy(pre_embedding))
         
         self.hidden2word = nn.Linear(hidden_dim, vocab_size)
-        self.GRU = nn.GRU
+        self.GRU = nn.GRU()
 
 
     def forward(self, content, sentiment, target, length, is_train=True):
