@@ -87,7 +87,7 @@ class Decoder(nn.Module):
                 prev_s = self.decodercell(target, content, sentiment)
                 output = self.dec2word(prev_s) # b * v
                 outputs[:,i,:] = output
-                target = output.topk(2)[1] # the index of the most probable word
+                target = output.topk(2)[1][1] # the index of the most probable word
                 print target
 
         return outputs
