@@ -87,8 +87,10 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
     cnt_epoch = 0
     for epoch in range(n_epoch):
         cnt_batch = 0 
+        
         for batch in train_iter:
             model.train()
+            writer = open('logs_batch_'+str(cnt_batch)+'_.txt', 'w')
             logger.info('In ' + str(cnt_epoch) + ' epoch... In ' + str(cnt_batch) + ' batch...')
             sample  = batch.text[0]
             length  = batch.text[1]
@@ -105,6 +107,16 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             
+            out_in_batch = reconstruct_out.view(len(length), torch.max(length), args.vocab_size)
+            k = 0 
+            for i in out_in_batch:
+                writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+                # writer.write('\n')
+                writer.write('\n=============\n')
+                writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
+                writer.write('\n************\n')
+                k = k + 1
+            cnt_batch += 1
             
             ## begin print reconstruct result
             ## end
@@ -116,7 +128,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err.backward()
             optimizer.step()
             if i % 100 == 0:
-                show_reconstruct_results(dev_iter, model, args, i)
+                pass
+                # show_reconstruct_results(dev_iter, model, args, i)
                 # acc, flag = eval(dev_iter, model, alpha)
                 # save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
                 # if flag:
@@ -127,6 +140,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                 #          err_domain.cpu().data.numpy(), out, reconstruct_loss))
             i += 1
             cnt_batch += 1
+            writer.close()
         cnt_epoch += 1
 
 
