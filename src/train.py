@@ -86,9 +86,9 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
     cnt_epoch = 0
     cnt_batch = 0
     for epoch in range(n_epoch): 
+        logger.info('In ' + str(cnt_epoch) + ' epoch... ')
         for batch in train_iter:
             model.train()
-            logger.info('In ' + str(cnt_epoch) + ' epoch... In ' + str(cnt_batch) + ' batch...')
             sample  = batch.text[0]
             length  = batch.text[1]
             label   = batch.label            
@@ -113,7 +113,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err = err_domain + err_label + lamda * out + reconstruct_loss
             err.backward()
             optimizer.step()
-            if cnt_batch % 100 == 0:
+            if cnt_batch % 1000 == 0:
                 show_reconstruct_results(dev_iter, model, args, cnt_batch)
                 # acc, flag = eval(dev_iter, model, alpha)
                 # save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
