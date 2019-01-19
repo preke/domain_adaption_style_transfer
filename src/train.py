@@ -107,7 +107,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             
-            out_in_batch = reconstruct_out.view(len(length), torch.max(length), args.vocab_size)
+            out_in_batch = reconstruct_out.view(len(length), args.max_length, args.vocab_size)
             k = 0 
             for i in out_in_batch:
                 writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))

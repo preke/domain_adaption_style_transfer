@@ -62,7 +62,6 @@ class Decoder(nn.Module):
         # logger.info('Is train: ' + str(is_train))
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
-            print 'In decoder forward: ' + str(target_len)
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
 
             if torch.cuda.is_available():
@@ -352,7 +351,6 @@ class RGLIndividualSaperateSC(nn.Module):
 
 
     def forward(self, input_line, lenth, alpha, mask, is_train=True):
-        print 'In Model forward: ' + str(lenth)
         feature01, feature02 = self.extractFeature(input_line, lenth, mask)
         
         reconstruction_out = self.reconstruct(feature01, feature02, input_line, lenth, is_train)
