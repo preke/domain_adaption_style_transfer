@@ -84,9 +84,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
     len_iter         = int(len(train_data)/args.batch_size) + 1
     
     cnt_epoch = 0
-    for epoch in range(n_epoch):
-        cnt_batch = 0 
-        
+    cnt_batch = 0
+    for epoch in range(n_epoch): 
         for batch in train_iter:
             model.train()
             writer = open('logs_batch_'+str(cnt_batch)+'_.txt', 'w')
