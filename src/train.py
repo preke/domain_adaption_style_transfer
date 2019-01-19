@@ -83,7 +83,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
     lamda            = args.lamda
     len_iter         = int(len(train_data)/args.batch_size) + 1
     
-    ind_iter = 0
     cnt_epoch = 0
     for epoch in range(n_epoch):
         cnt_batch = 0 
@@ -95,8 +94,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             sample  = batch.text[0]
             length  = batch.text[1]
             label   = batch.label            
-            p       = float(ind_iter + epoch * len_iter) / n_epoch / len_iter
-            ind_iter += 1
+            p       = float(cnt_batch + epoch * len_iter) / n_epoch / len_iter
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(sample)
             target  = Variable(label)
