@@ -88,7 +88,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
     for epoch in range(n_epoch): 
         for batch in train_iter:
             model.train()
-            writer = open('logs_batch_'+str(cnt_batch)+'_.txt', 'w')
             logger.info('In ' + str(cnt_epoch) + ' epoch... In ' + str(cnt_batch) + ' batch...')
             sample  = batch.text[0]
             length  = batch.text[1]
@@ -125,7 +124,6 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                 #       % (epoch, i, len_iter, err_label.cpu().data.numpy(),
                 #          err_domain.cpu().data.numpy(), out, reconstruct_loss))
             cnt_batch += 1
-            writer.close()
         cnt_epoch += 1
 
 
