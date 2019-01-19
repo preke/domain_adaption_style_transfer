@@ -76,13 +76,13 @@ class Decoder(nn.Module):
         else:
             batch_size = len(length)
             target = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
-            outputs = Variable(torch.zeros(batch_size, int(torch.max(length)), self.vocab_size))
+            outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
 
             if torch.cuda.is_available():
                 target = target.cuda()
                 outputs = outputs.cuda()
             
-            for i in range(int(torch.max(length))):
+            for i in range(self.max_len):
                 target = self.embed(target).squeeze(1)                             
                 prev_s = self.decodercell(target, content, sentiment)
                 output = self.dec2word(prev_s) # b * v
@@ -267,7 +267,7 @@ class RGLIndividualSaperateSC(nn.Module):
         self.domain_classifier = nn.Linear(hidden_size,num_class)
         self.domain_classifier.weight.data.normal_(0, 0.01)
         self.domain_classifier.bias.data.fill_(0)
-        self.decoder = Decoder(self.embedding_num, self.embedding_size, self.hidden_size, 50, self.w2i, pre_embedding)
+        self.decoder = Decoder(self.embedding_num, self.embedding_size, self.hidden_size, args.max_length, self.w2i, pre_embedding)
 
     def get_state(self, input_line):
         batch_size = input_line.size(0)
