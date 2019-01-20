@@ -87,7 +87,8 @@ class Decoder(nn.Module):
                 prev_s = self.decodercell(target, content, sentiment)
                 output = self.dec2word(prev_s) # b * v
                 outputs[:,i,:] = output
-                target = output.topk(2)[1][:,1] # the index of the most probable word
+                target = output.topk(1)[1]
+                # target = output.topk(2)[1][:,1] # the index of the most probable word
                 print target
 
         return outputs
@@ -98,7 +99,7 @@ class DecoderCell(nn.Module):
         super(DecoderCell, self).__init__()
 
         self.input_weights = nn.Linear(embed_dim, hidden_dim*2)
-        self.hidden_weights = nn.Linear(hidden_dim, hidden_dim*2)
+        self.hidden_weights = nn.Linear(2*hidden_dim, hidden_dim*2)
 
         self.input_in = nn.Linear(embed_dim, hidden_dim)
         self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
@@ -112,7 +113,7 @@ class DecoderCell(nn.Module):
         sentiment      : B x H
         '''
         prev_s = torch.cat((content, sentiment), 1)
-        prev_s = self.combine_hidden(prev_s)
+        # prev_s = self.combine_hidden(prev_s)
         gates = self.input_weights(trg_word) + self.hidden_weights(prev_s)
         reset_gate, update_gate = gates.chunk(2, 1)
 
