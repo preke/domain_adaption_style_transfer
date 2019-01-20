@@ -93,7 +93,7 @@ class Decoder(nn.Module):
                 outputs[:,i,:] = output
                 target = output.topk(1)[1]
                 # target = output.topk(2)[1][:,1] # the index of the most probable word
-                print target
+                # print target
 
         return outputs
 
