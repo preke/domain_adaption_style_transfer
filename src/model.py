@@ -331,17 +331,21 @@ class RGLIndividualSaperateSC(nn.Module):
         
         pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output01,unpacked_len,batch_first = True)
         output01, (src_h_t01, src_c_t) = self.encoder01(pack_output, hidden_01)
-        output01,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output01,batch_first = True)
+        output01,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output01, batch_first = True)
         mask = mask.unsqueeze(2)
         feature01 = torch.sum(output01 * mask, 1) / torch.sum(mask, 1)
         
         pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output02,unpacked_len,batch_first = True)
         output02, (src_h_t02, src_c_t) = self.encoder02(pack_output, hidden_02)
-        output02,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output02,batch_first = True)
+        output02,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output02, batch_first = True)
         
         feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
+        print '@@@@@@@@@@@@@@@@@@@@'
+        print output01.size()
+        print output02.size()
 
-        return feature01,feature02
+        return feature01, feature02
+    
     
     def reconstruct(self, content, style, input_line, length, is_train=True):
         out = self.decoder(content, style, input_line, length, is_train)
