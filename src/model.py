@@ -56,10 +56,14 @@ class Decoder(nn.Module):
         self.attention   = Attention(hidden_dim) 
         self.decodercell = DecoderCell(embed_dim, hidden_dim)
         self.dec2word    = nn.Linear(hidden_dim, vocab_size)
-
+        self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
 
     def forward(self, content, sentiment, target, length, is_train=True):
         # logger.info('Is train: ' + str(is_train))
+        
+        prev_s = torch.cat((content, sentiment), 1)
+        prev_s = self.combine_hidden(prev_s)
+
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
@@ -70,7 +74,7 @@ class Decoder(nn.Module):
             target = self.embed(target)
             
             for i in range(target_len):   
-                prev_s       = self.decodercell(target[:, i], content, sentiment)
+                prev_s       = self.decodercell(target[:, i], prev_s)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
             outputs = self.dec2word(dec_h)
         else:
@@ -84,7 +88,7 @@ class Decoder(nn.Module):
             
             for i in range(self.max_len):
                 target = self.embed(target).squeeze(1)                             
-                prev_s = self.decodercell(target, content, sentiment)
+                prev_s = self.decodercell(target, prev_s)
                 output = self.dec2word(prev_s) # b * v
                 outputs[:,i,:] = output
                 target = output.topk(1)[1]
@@ -99,21 +103,14 @@ class DecoderCell(nn.Module):
         super(DecoderCell, self).__init__()
 
         self.input_weights = nn.Linear(embed_dim, hidden_dim*2)
-        self.hidden_weights = nn.Linear(2*hidden_dim, hidden_dim*2)
+        self.hidden_weights = nn.Linear(hidden_dim, hidden_dim*2)
 
         self.input_in = nn.Linear(embed_dim, hidden_dim)
         self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
 
-        self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
+        
 
-    def forward(self, trg_word, content, sentiment):
-        '''
-        trg_word : B x E
-        content   : B x H 
-        sentiment      : B x H
-        '''
-        prev_s = torch.cat((content, sentiment), 1)
-        # prev_s = self.combine_hidden(prev_s)
+    def forward(self, trg_word, prev_s):        
         gates = self.input_weights(trg_word) + self.hidden_weights(prev_s)
         reset_gate, update_gate = gates.chunk(2, 1)
 
