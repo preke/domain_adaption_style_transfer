@@ -265,6 +265,9 @@ class RGLIndividualSaperateSC(nn.Module):
             batch_first=True,
             dropout=0.2
         )
+
+
+
         self.class_classifier = nn.Linear(hidden_size,num_class)
         self.class_classifier.weight.data.normal_(0, 0.01)
         self.class_classifier.bias.data.fill_(0)
@@ -345,9 +348,17 @@ class RGLIndividualSaperateSC(nn.Module):
         output02,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output02, batch_first = True)
         
         feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
-        # print output01.size()
-        # print output02.size()
+        print output01.size()
+        print output02.size()
 
+
+        print src_h_t02.size()
+
+
+        print mask.size()
+
+        print uppacked_lenth
+        print feature02.size()
         return feature01, feature02, output01
     
     
