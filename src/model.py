@@ -110,7 +110,7 @@ class DecoderCell(nn.Module):
         
         self.input_in = nn.Linear(embed_dim, hidden_dim)
         self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
-        self.ctx_in = nn.Linear(hidden_dim*2, hidden_dim)
+        self.ctx_in = nn.Linear(hidden_dim, hidden_dim)
 
         
 
@@ -121,11 +121,18 @@ class DecoderCell(nn.Module):
         reset_gate = F.sigmoid(reset_gate)
         update_gate = F.sigmoid(update_gate)
 
+
         prev_s_tilde = self.input_in(trg_word) + self.hidden_in(prev_s) + self.ctx_in(ctx)
         prev_s_tilde = F.tanh(prev_s_tilde)
 
-        prev_s = torch.mul((1-reset_gate), prev_s) + torch.mul(reset_gate, prev_s_tilde)
-        return prev_s
+        try:
+            prev_s = torch.mul((1-reset_gate), prev_s) + torch.mul(reset_gate, prev_s_tilde)
+            return prev_s
+        except:
+            print reset_gate.size()
+            return 1
+
+        
         
 class ReverseLayerF(Function):
 
