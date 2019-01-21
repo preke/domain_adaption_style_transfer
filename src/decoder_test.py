@@ -1,50 +1,51 @@
-class Decoder(nn.Module):
-    def __init__(self, args):
-        super(Decoder, self).__init__()
-        self.hidden_dim  = args.hidden_dim
-        self.max_len     = args.max_len
-        self.vocab_size  = args.vocab_size
-        
-        self.embed       = nn.Embedding(vocab_size, embed_dim)
-        self.embed.weight.data.copy_(torch.from_numpy(pre_embedding))
-        
-        self.hidden2word = nn.Linear(hidden_dim, vocab_size)
-        self.GRU = nn.GRU()
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+import random
+from params import Params
+from utils import Vocab, Hypothesis, word_detector
+from typing import Union, List
+
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+eps = 1e-31
 
 
-    def forward(self, content, sentiment, target, length, is_train=True):
-        if is_train:
-            batch_size, target_len = target.size(0), target.size(1)
-            dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
+class EncoderRNN(nn.Module):
 
-            if torch.cuda.is_available():
-                dec_h = dec_h.cuda()
+  def __init__(self, embed_size, hidden_size, bidi=True, *, rnn_drop: float=0):
+    super(EncoderRNN, self).__init__()
+    self.hidden_size = hidden_size
+    self.num_directions = 2 if bidi else 1
+    self.gru = nn.GRU(embed_size, hidden_size, bidirectional=bidi, dropout=rnn_drop)
 
-            target = self.embed(target)
-            
-            for i in range(target_len):   
-                print 'train'
-                print target[:, i]
+  def forward(self, embedded, hidden, input_lengths=None):
+    """
+    :param embedded: (src seq len, batch size, embed size)
+    :param hidden: (num directions, batch size, encoder hidden size)
+    :param input_lengths: list containing the non-padded length of each sequence in this batch;
+                          if set, we use `PackedSequence` to skip the PAD inputs and leave the
+                          corresponding encoder states as zeros
+    :return: (src seq len, batch size, hidden size * num directions = decoder hidden size)
+    Perform multi-step encoding.
+    """
+    if input_lengths is not None:
+      embedded = pack_padded_sequence(embedded, input_lengths)
 
-                prev_s       = self.decodercell(target[:, i], content, sentiment)
-                dec_h[:,i,:] = prev_s # .unsqueeze(1)
-            outputs = self.dec2word(dec_h)
-        else:
-            batch_size = len(length)
-            target = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
-            outputs = Variable(torch.zeros(batch_size, int(torch.max(length)), self.vocab_size))
+    output, hidden = self.gru(embedded, hidden)
 
-            if torch.cuda.is_available():
-                target = target.cuda()
-                outputs = outputs.cuda()
-            
-            for i in range(int(torch.max(length))):
-                target = self.embed(target).squeeze(1)                             
-                print 'evaluate'
-                print target
-                prev_s = self.decodercell(target, content, sentiment)
-                output = self.dec2word(prev_s)
-                outputs[:,i,:] = output
-                target = output.topk(1)[1]
+    if input_lengths is not None:
+      output, _ = pad_packed_sequence(output)
 
-        return outputs
+    if self.num_directions > 1:
+      # hidden: (num directions, batch, hidden) => (1, batch, hidden * 2)
+      batch_size = hidden.size(1)
+      hidden = hidden.transpose(0, 1).contiguous().view(1, batch_size,
+                                                        self.hidden_size * self.num_directions)
+    return output, hidden
+
+  def init_hidden(self, batch_size):
+    return torch.zeros(self.num_directions, batch_size, self.hidden_size, device=DEVICE)
+
+
+

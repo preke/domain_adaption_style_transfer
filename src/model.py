@@ -26,7 +26,7 @@ class Attention(nn.Module):
         
     def forward(self, enc_h, prev_s):
         '''
-        enc_h  : B x S x 2*H 
+        enc_h  : B x S x H 
         prev_s : B x 1 x H 
         '''
         seq_len = enc_h.size(1) 
@@ -38,7 +38,7 @@ class Attention(nn.Module):
         h = self.linear(h)  # B x S x 1
 
         alpha = F.softmax(h)
-        ctx = torch.bmm(alpha.transpose(2,1), enc_h).squeeze(1) # B x 1 x 2*H
+        ctx = torch.bmm(alpha.transpose(2,1), enc_h).squeeze(1) # B x 1 x H
 
         return ctx 
 
@@ -109,11 +109,11 @@ class DecoderCell(nn.Module):
 
         self.input_weights = nn.Linear(embed_dim, hidden_dim*2)
         self.hidden_weights = nn.Linear(hidden_dim, hidden_dim*2)
-        self.ctx_weights = nn.Linear(hidden_dim*2, hidden_dim*2)
+        self.ctx_weights = nn.Linear(hidden_dim, hidden_dim)
         
         self.input_in = nn.Linear(embed_dim, hidden_dim)
         self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
-        self.ctx_in = nn.Linear(hidden_dim*2, hidden_dim)
+        self.ctx_in = nn.Linear(hidden_dim, hidden_dim)
 
         
 
