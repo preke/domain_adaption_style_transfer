@@ -58,11 +58,13 @@ class Decoder(nn.Module):
         self.dec2word    = nn.Linear(hidden_dim, vocab_size)
         self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
 
-    def forward(self, content, sentiment, target, length, is_train=True):
+    def forward(self, content, sentiment, hiddens, target, length, is_train=True):
         # logger.info('Is train: ' + str(is_train))
         
         prev_s = torch.cat((content, sentiment), 1)
         prev_s = self.combine_hidden(prev_s)
+
+        # print hiddens.size()
 
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
@@ -73,8 +75,9 @@ class Decoder(nn.Module):
 
             target = self.embed(target)
             
-            for i in range(target_len):   
-                prev_s       = self.decodercell(target[:, i], prev_s)
+            for i in range(target_len):
+                ctx = self.attention(hiddens, prev_s)   
+                prev_s       = self.decodercell(target[:, i], prev_s, ctx)
                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
             outputs = self.dec2word(dec_h)
         else:
@@ -87,8 +90,9 @@ class Decoder(nn.Module):
                 outputs = outputs.cuda()
             
             for i in range(self.max_len):
-                target = self.embed(target).squeeze(1)                             
-                prev_s = self.decodercell(target, prev_s)
+                target = self.embed(target).squeeze(1)     
+                ctx = self.attention(hiddens, prev_s)                        
+                prev_s = self.decodercell(target, prev_s, ctx)
                 output = self.dec2word(prev_s) # b * v
                 outputs[:,i,:] = output
                 target = output.topk(1)[1]
@@ -104,20 +108,23 @@ class DecoderCell(nn.Module):
 
         self.input_weights = nn.Linear(embed_dim, hidden_dim*2)
         self.hidden_weights = nn.Linear(hidden_dim, hidden_dim*2)
-
+        self.ctx_weights = nn.Linear(hidden_dim*2, hidden_dim*2)
+        
         self.input_in = nn.Linear(embed_dim, hidden_dim)
         self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
+        self.ctx_in = nn.Linear(hidden_dim*2, hidden_dim)
 
         
 
-    def forward(self, trg_word, prev_s):        
-        gates = self.input_weights(trg_word) + self.hidden_weights(prev_s)
+    def forward(self, trg_word, prev_s, ctx):        
+        
+        gates = self.input_weights(trg_word) + self.hidden_weights(prev_s) + self.ctx_weights(ctx)
         reset_gate, update_gate = gates.chunk(2, 1)
 
         reset_gate = F.sigmoid(reset_gate)
         update_gate = F.sigmoid(update_gate)
 
-        prev_s_tilde = self.input_in(trg_word) + self.hidden_in(prev_s)
+        prev_s_tilde = self.input_in(trg_word) + self.hidden_in(prev_s) + self.ctx_in(ctx)
         prev_s_tilde = F.tanh(prev_s_tilde)
 
         prev_s = torch.mul((1-reset_gate), prev_s) + torch.mul(reset_gate, prev_s_tilde)
@@ -340,23 +347,22 @@ class RGLIndividualSaperateSC(nn.Module):
         output02,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output02, batch_first = True)
         
         feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
-        print '@@@@@@@@@@@@@@@@@@@@'
-        print output01.size()
-        print output02.size()
+        # print output01.size()
+        # print output02.size()
 
-        return feature01, feature02
+        return feature01, feature02, output01
     
     
-    def reconstruct(self, content, style, input_line, length, is_train=True):
-        out = self.decoder(content, style, input_line, length, is_train)
+    def reconstruct(self, content, style, input_hiddens, input_line, length, is_train=True):
+        out = self.decoder(content, style, input_hiddens, input_line, length, is_train)
         out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
         return out
 
 
     def forward(self, input_line, lenth, alpha, mask, is_train=True):
-        feature01, feature02 = self.extractFeature(input_line, lenth, mask)
+        feature01, feature02, output01 = self.extractFeature(input_line, lenth, mask)
         
-        reconstruction_out = self.reconstruct(feature01, feature02, input_line, lenth, is_train)
+        reconstruction_out = self.reconstruct(feature01, feature02, output01, input_line, lenth, is_train)
         
         class_out = self.class_classifier(feature02)
         
