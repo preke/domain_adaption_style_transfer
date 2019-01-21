@@ -20,7 +20,7 @@ class Attention(nn.Module):
     def __init__(self, hidden_dim):
         super(Attention, self).__init__()
 
-        self.enc_h_in = nn.Linear(hidden_dim*2, hidden_dim)
+        self.enc_h_in = nn.Linear(hidden_dim, hidden_dim)
         self.prev_s_in = nn.Linear(hidden_dim, hidden_dim)
         self.linear = nn.Linear(hidden_dim, 1)
         
