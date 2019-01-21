@@ -64,7 +64,8 @@ class Decoder(nn.Module):
         prev_s = torch.cat((content, sentiment), 1)
         prev_s = self.combine_hidden(prev_s)
 
-        # print hiddens.size()
+        print hiddens.size()
+        print prev_s.size()
 
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
