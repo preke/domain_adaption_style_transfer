@@ -75,7 +75,7 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(TEST_PRE_PATH, small_pre_path, args)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(small_pre_path, small_pre_path, args)
 text_field.build_vocab(train_data, dev_data, min_freq=20)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
@@ -87,7 +87,7 @@ args.index_2_word = text_field.vocab.itos # only list of words
 
 # Initial word embedding
 logger.info('Getting pre-trained word embedding ...')
-args.pretrained_weight = get_pretrained_word_embed(GLOVE_PATH, args, text_field)  
+args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_field)  
 
 
 # Build model and train

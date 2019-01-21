@@ -236,6 +236,7 @@ class RGLIndividualSaperateSC(nn.Module):
         self.layers         = 4
         self.embedding.weight.data.copy_(torch.from_numpy(pre_embedding))
         self.w2i = w2i
+        
         self.bi_encoder01 = nn.LSTM(
             self.embedding_size,
             self.hidden_size // 2,
@@ -268,7 +269,7 @@ class RGLIndividualSaperateSC(nn.Module):
             batch_first=True,
             dropout=0.2
         )
-
+        
 
 
         self.class_classifier = nn.Linear(hidden_size,num_class)
@@ -330,28 +331,35 @@ class RGLIndividualSaperateSC(nn.Module):
     
     def extractFeature(self, input_line, lenth, mask):
         embed = self.embedding(input_line)
+
         hidden_bi01,hidden_bi02, hidden_01,hidden_02 = self.get_state(input_line)
         
         pack_embed = torch.nn.utils.rnn.pack_padded_sequence(embed,lenth,batch_first = True)
-        packed_output01, (_, _) = self.bi_encoder01(pack_embed, hidden_bi01)
-        unpacked_output01,unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01, batch_first = True)
+        packed_output01, (feature01, _) = self.bi_encoder01(pack_embed, hidden_bi01)
+        unpacked_output01, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01, batch_first = True)
         
         pack_embed = torch.nn.utils.rnn.pack_padded_sequence(embed,lenth,batch_first = True)
-        packed_output02, (_, _) = self.bi_encoder02(pack_embed, hidden_bi02)
-        unpacked_output02,unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
+        packed_output02, (feature02, _) = self.bi_encoder02(pack_embed, hidden_bi02)
+        unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
         
-        pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output01,unpacked_len,batch_first = True)
-        output01, (src_h_t01, src_c_t) = self.encoder01(pack_output, hidden_01)
-        output01,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output01, batch_first = True)
-        mask = mask.unsqueeze(2)
-        feature01 = torch.sum(output01 * mask, 1) / torch.sum(mask, 1)
         
-        pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output02,unpacked_len,batch_first = True)
-        output02, (src_h_t02, src_c_t) = self.encoder02(pack_output, hidden_02)
-        output02,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output02, batch_first = True)
+
+        # pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output01,unpacked_len,batch_first = True)
+        # output01, (src_h_t01, src_c_t) = self.encoder01(pack_output, hidden_01)
+        # output01,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output01, batch_first = True)
+        # mask = mask.unsqueeze(2)
+        # feature01 = torch.sum(output01 * mask, 1) / torch.sum(mask, 1)
         
-        feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
-        return feature01, feature02, output01
+        # pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output02,unpacked_len,batch_first = True)
+        # output02, (src_h_t02, src_c_t) = self.encoder02(pack_output, hidden_02)
+        # output02,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output02, batch_first = True)
+        
+        # feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
+        
+        print feature01.size()
+        print feature02.size()
+        print unpacked_output01.size()
+        return feature01, feature02, unpacked_output01
     
     
     def reconstruct(self, content, style, input_hiddens, input_line, length, is_train=True):
