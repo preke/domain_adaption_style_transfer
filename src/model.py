@@ -125,12 +125,9 @@ class DecoderCell(nn.Module):
         prev_s_tilde = self.input_in(trg_word) + self.hidden_in(prev_s) + self.ctx_in(ctx)
         prev_s_tilde = F.tanh(prev_s_tilde)
 
-        try:
-            prev_s = torch.mul((1-reset_gate), prev_s) + torch.mul(reset_gate, prev_s_tilde)
-            return prev_s
-        except:
-            print reset_gate.size()
-            return 1
+        print reset_gate.size()
+        prev_s = torch.mul((1-reset_gate), prev_s) + torch.mul(reset_gate, prev_s_tilde)
+        return prev_s
 
         
         
