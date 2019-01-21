@@ -106,16 +106,15 @@ class DecoderCell(nn.Module):
 
         self.input_weights = nn.Linear(embed_dim, hidden_dim*2)
         self.hidden_weights = nn.Linear(hidden_dim, hidden_dim*2)
-        self.ctx_weights = nn.Linear(hidden_dim, hidden_dim)
+        self.ctx_weights = nn.Linear(hidden_dim, hidden_dim*2)
         
         self.input_in = nn.Linear(embed_dim, hidden_dim)
         self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
-        self.ctx_in = nn.Linear(hidden_dim, hidden_dim)
+        self.ctx_in = nn.Linear(hidden_dim*2, hidden_dim)
 
         
 
     def forward(self, trg_word, prev_s, ctx):        
-        print ctx.size()
         gates = self.input_weights(trg_word) + self.hidden_weights(prev_s) + self.ctx_weights(ctx)
         reset_gate, update_gate = gates.chunk(2, 1)
 
@@ -348,17 +347,6 @@ class RGLIndividualSaperateSC(nn.Module):
         output02,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output02, batch_first = True)
         
         feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
-        print output01.size()
-        print output02.size()
-
-
-        print src_h_t02.size()
-
-
-        print mask.size()
-
-        print uppacked_lenth
-        print feature02.size()
         return feature01, feature02, output01
     
     
