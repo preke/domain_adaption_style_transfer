@@ -64,9 +64,6 @@ class Decoder(nn.Module):
         prev_s = torch.cat((content, sentiment), 1)
         prev_s = self.combine_hidden(prev_s)
 
-        print hiddens.size()
-        print prev_s.size()
-
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
@@ -118,7 +115,7 @@ class DecoderCell(nn.Module):
         
 
     def forward(self, trg_word, prev_s, ctx):        
-        
+        print ctx.size()
         gates = self.input_weights(trg_word) + self.hidden_weights(prev_s) + self.ctx_weights(ctx)
         reset_gate, update_gate = gates.chunk(2, 1)
 
