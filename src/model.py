@@ -281,58 +281,38 @@ class RGLIndividualSaperateSC(nn.Module):
         self.decoder = Decoder(self.embedding_num, self.embedding_size, self.hidden_size, args.max_length, self.w2i, pre_embedding)
 
     def get_state(self, input_line):
+        '''
+        Init h and c
+        '''
         batch_size = input_line.size(0)
         h0_encoder_bi01 = Variable(torch.zeros(
             2,
             batch_size,
-            self.hidden_size // 2
+            self.hidden_size
         ))
         c0_encoder_bi01 = Variable(torch.zeros(
             2,
             batch_size,
-            self.hidden_size // 2
+            self.hidden_size
         ))
         
         h0_encoder_bi02 = Variable(torch.zeros(
             2,
             batch_size,
-            self.hidden_size // 2
+            self.hidden_size
         ))
         c0_encoder_bi02 = Variable(torch.zeros(
             2,
             batch_size,
-            self.hidden_size // 2
-        ))
-
-        h0_encoder01 = Variable(torch.zeros(
-            self.layers - 1,
-            batch_size,
             self.hidden_size
         ))
 
-        c0_encoder01 = Variable(torch.zeros(
-            self.layers - 1,
-            batch_size,
-            self.hidden_size
-        ))
-        h0_encoder02 = Variable(torch.zeros(
-            self.layers - 1,
-            batch_size,
-            self.hidden_size
-        ))
-
-        c0_encoder02 = Variable(torch.zeros(
-            self.layers - 1,
-            batch_size,
-            self.hidden_size
-        ))
-        return (h0_encoder_bi01.cuda(), c0_encoder_bi01.cuda()), (h0_encoder_bi02.cuda(), c0_encoder_bi02.cuda()),\
-            (h0_encoder01.cuda(), c0_encoder01.cuda()),(h0_encoder02.cuda(), c0_encoder02.cuda())
+        return (h0_encoder_bi01.cuda(), c0_encoder_bi01.cuda()), (h0_encoder_bi02.cuda(), c0_encoder_bi02.cuda())
     
     def extractFeature(self, input_line, lenth, mask):
         embed = self.embedding(input_line)
 
-        hidden_bi01,hidden_bi02, hidden_01,hidden_02 = self.get_state(input_line)
+        hidden_bi01,hidden_bi02 = self.get_state(input_line)
         
         pack_embed = torch.nn.utils.rnn.pack_padded_sequence(embed,lenth,batch_first = True)
         packed_output01, (feature01, _) = self.bi_encoder01(pack_embed, hidden_bi01)
