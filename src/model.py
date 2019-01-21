@@ -239,7 +239,7 @@ class RGLIndividualSaperateSC(nn.Module):
         
         self.bi_encoder01 = nn.LSTM(
             self.embedding_size,
-            self.hidden_size // 2,
+            self.hidden_size,
             1,
             bidirectional=True,
             batch_first=True,
@@ -247,7 +247,7 @@ class RGLIndividualSaperateSC(nn.Module):
         )
         self.bi_encoder02 = nn.LSTM(
             self.embedding_size,
-            self.hidden_size // 2,
+            self.hidden_size,
             1,
             bidirectional=True,
             batch_first=True,
