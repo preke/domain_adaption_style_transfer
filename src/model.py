@@ -61,9 +61,9 @@ class Decoder(nn.Module):
     def forward(self, content, sentiment, hiddens, target, length, is_train=True):
         # logger.info('Is train: ' + str(is_train))
         
-        prev_s = content
-        # prev_s = torch.cat((content, sentiment), 1)
-        # prev_s = self.combine_hidden(prev_s)
+        # prev_s = content
+        prev_s = torch.cat((content, sentiment), 1)
+        prev_s = self.combine_hidden(prev_s)
         # print prev_s.size()
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
@@ -94,8 +94,8 @@ class Decoder(nn.Module):
                 prev_s = self.decodercell(target, prev_s, ctx)
                 output = self.dec2word(prev_s) # b * v
                 outputs[:,i,:] = output
-                target = output.topk(1)[1]
-                # target = output.topk(2)[1][:,1] # the index of the most probable word
+                # target = output.topk(1)[1]
+                target = output.topk(2)[1][:,1] # the index of the most probable word
                 # print target
 
         return outputs
