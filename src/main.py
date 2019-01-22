@@ -64,7 +64,7 @@ args.batch_size = 32
 args.lr         = 0.001
 args.num_epoch  = 30
 args.num_class  = 2
-args.max_length = 100
+args.max_length = 50
 args.lamda      = 1.0
 args.device     = torch.device('cuda')
 
