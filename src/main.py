@@ -59,9 +59,9 @@ args = parser.parse_args()
 
 # Parameters setting
 args.embed_dim  = 300
-args.hidden_dim = 128
+args.hidden_dim = 200
 args.batch_size = 32
-args.lr         = 0.0001
+args.lr         = 0.001
 args.num_epoch  = 30
 args.num_class  = 2
 args.max_length = 20
