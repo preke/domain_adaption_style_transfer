@@ -25,7 +25,7 @@ for line in list_of_sent[:10000]:
     writer.write(line)
 writer.close()
 writer = open('../data/amazon_test.tsv', 'w')
-for line in list_of_sent[:-1000]:
+for line in list_of_sent[-1000:]:
     writer.write(line)
 writer.close()
 
