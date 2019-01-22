@@ -42,12 +42,12 @@ small_neg_path   = '../data/small.neg'
 small_pos   = '../data/small_pos.tsv'
 small_neg   = '../data/small_neg.tsv'
 
-small_glove_path = '../data/small_glove.txt'
+small_glove_path = '../data/wordvec.txt'
 small_path       = '../data/small.txt'
 small_pre_path   = '../data/small_preprocess.tsv'
 
 
-amazon_small_train = '../data/amazon_small_train.tsv'
+amazon_train = '../data/amazon_train.tsv'
 amazon_test = '../data/amazon_test.tsv'
 
 parser = argparse.ArgumentParser(description='')
@@ -58,10 +58,11 @@ args = parser.parse_args()
 
 
 # Parameters setting
+args.grad_clip  = 2
 args.embed_dim  = 300
 args.hidden_dim = 200
 args.batch_size = 32
-args.lr         = 0.005
+args.lr         = 0.01
 args.num_epoch  = 500
 args.num_class  = 2
 args.max_length = 20
@@ -78,8 +79,8 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_test, amazon_test, args)
-text_field.build_vocab(train_data, dev_data, min_freq=5)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_train, amazon_test, args)
+text_field.build_vocab(train_data, dev_data, min_freq=20)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
 

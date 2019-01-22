@@ -117,9 +117,9 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
-            # err = err_domain + err_label + lamda * out + reconstruct_loss
-            err = reconstruct_loss
+            err = err_domain + err_label + lamda * out + 5*reconstruct_loss
             err.backward()
+            torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
             if cnt_batch % 500 == 0:
                 show_reconstruct_results(dev_iter, model, args, cnt_batch)
