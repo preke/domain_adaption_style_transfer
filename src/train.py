@@ -121,7 +121,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err = reconstruct_loss
             err.backward()
             optimizer.step()
-            if cnt_batch % 200 == 0:
+            if cnt_batch % 500 == 0:
                 show_reconstruct_results(dev_iter, model, args, cnt_batch)
                 acc, flag = eval(dev_iter, model, alpha)
                 save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
