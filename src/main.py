@@ -47,6 +47,9 @@ small_path       = '../data/small.txt'
 small_pre_path   = '../data/small_preprocess.tsv'
 
 
+amazon_small_train = '../data/amazon_small_train.tsv'
+amazon_test = '../data/amazon_test.tsv'
+
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('-test', action='store_true', default=False, help='train or test')
 parser.add_argument('-train', action='store_true', default=True, help='train or test')
@@ -75,7 +78,7 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(TEST_PRE_PATH, small_pre_path, args)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_small_train, amazon_test, args)
 text_field.build_vocab(train_data, dev_data, min_freq=20)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
@@ -87,7 +90,7 @@ args.index_2_word = text_field.vocab.itos # only list of words
 
 # Initial word embedding
 logger.info('Getting pre-trained word embedding ...')
-args.pretrained_weight = get_pretrained_word_embed(GLOVE_PATH, args, text_field)  
+args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_field)  
 
 
 # Build model and train
