@@ -121,7 +121,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                 if flag:
                     torch.save(model.state_dict(), save_path)
                     logger.info('Save model to ' + save_path)
-                    logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
+                logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
                       % (epoch, cnt_batch, len_iter, err_label.cpu().data.numpy(),
                          err_domain.cpu().data.numpy(), out, reconstruct_loss))
             cnt_batch += 1
