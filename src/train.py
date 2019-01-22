@@ -117,12 +117,12 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             if cnt_batch % 100 == 0:
                 show_reconstruct_results(dev_iter, model, args, cnt_batch)
                 acc, flag = eval(dev_iter, model, alpha)
-                save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(i) + "_acc_" + str(acc) +"_bestmodel.pt"
+                save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
                 if flag:
                     torch.save(model.state_dict(), save_path)
                     logger.info('Save model to ' + save_path)
                     logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
-                      % (epoch, i, len_iter, err_label.cpu().data.numpy(),
+                      % (epoch, cnt_batch, len_iter, err_label.cpu().data.numpy(),
                          err_domain.cpu().data.numpy(), out, reconstruct_loss))
             cnt_batch += 1
         cnt_epoch += 1
