@@ -104,8 +104,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             
             
             feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
-            # print reconstruct_out.size()
-            # print feature_iow.size()
+            print reconstruct_out.size()
+            print feature_iow.size()
 
 
             # print reconstruct_out
@@ -152,7 +152,7 @@ def show_reconstruct_results(dev_iter, model, args, cnt):
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
             # writer.write('\n')
             writer.write('\n=============\n')
-            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
+            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
             writer.write('\n************\n')
             k = k + 1
         cnt_batch += 1
