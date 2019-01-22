@@ -61,9 +61,9 @@ class Decoder(nn.Module):
     def forward(self, content, sentiment, hiddens, target, length, is_train=True):
         # logger.info('Is train: ' + str(is_train))
         
-        prev_s = content
-        # prev_s = torch.cat((content, sentiment), 1)
-        # prev_s = self.combine_hidden(prev_s)
+        # prev_s = content
+        prev_s = torch.cat((content, sentiment), 1)
+        prev_s = self.combine_hidden(prev_s)
         # print prev_s.size()
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
