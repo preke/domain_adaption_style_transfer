@@ -20,7 +20,7 @@ class Attention(nn.Module):
     def __init__(self, hidden_dim):
         super(Attention, self).__init__()
 
-        self.enc_h_in = nn.Linear(hidden_dim, hidden_dim)
+        self.enc_h_in = nn.Linear(hidden_dim*2, hidden_dim)
         self.prev_s_in = nn.Linear(hidden_dim, hidden_dim)
         self.linear = nn.Linear(hidden_dim, 1)
         
@@ -63,7 +63,7 @@ class Decoder(nn.Module):
         
         prev_s = torch.cat((content, sentiment), 1)
         prev_s = self.combine_hidden(prev_s)
-
+        print prev_s.size()
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
@@ -106,11 +106,11 @@ class DecoderCell(nn.Module):
 
         self.input_weights = nn.Linear(embed_dim, hidden_dim*2)
         self.hidden_weights = nn.Linear(hidden_dim, hidden_dim*2)
-        self.ctx_weights = nn.Linear(hidden_dim, hidden_dim*2)
+        self.ctx_weights = nn.Linear(hidden_dim*2, hidden_dim*2)
         
         self.input_in = nn.Linear(embed_dim, hidden_dim)
         self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
-        self.ctx_in = nn.Linear(hidden_dim, hidden_dim)
+        self.ctx_in = nn.Linear(hidden_dim*2, hidden_dim)
 
         
 
@@ -297,10 +297,6 @@ class RGLIndividualSaperateSC(nn.Module):
         feature02 = feature02[-1]
         feature01 = F.tanh(self.linear_feature(feature01))
         feature02 = F.tanh(self.linear_feature(feature02))
-
-        print feature01.size()
-        print feature02.size()
-        print unpacked_output01.size()
         
         return feature01, feature02, unpacked_output01
     
