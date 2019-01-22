@@ -295,8 +295,8 @@ class RGLIndividualSaperateSC(nn.Module):
 
         feature01 = feature01[-1]
         feature02 = feature02[-1]
-        feature01 = F.tanh(self.linear(feature01))
-        feature02 = F.tanh(self.linear(feature02))
+        feature01 = F.tanh(self.linear_feature(feature01))
+        feature02 = F.tanh(self.linear_feature(feature02))
 
         print feature01.size()
         print feature02.size()
