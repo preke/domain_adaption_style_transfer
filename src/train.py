@@ -110,7 +110,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err = err_domain + err_label + lamda * out + reconstruct_loss
             err.backward()
             optimizer.step()
-            if cnt_batch % 500 == 0:
+            if cnt_batch % 200 == 0:
                 show_reconstruct_results(dev_iter, model, args, cnt_batch)
                 acc, flag = eval(dev_iter, model, alpha)
                 save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
@@ -136,7 +136,7 @@ def show_reconstruct_results(dev_iter, model, args, cnt):
         feature = Variable(sample)
         feature01, feature02, output = model.extractFeature(feature, length, mask)
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, length, is_train=False)
-        out_in_batch = reconstruct_out.view(len(length), args.max_length, args.vocab_size)
+        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
