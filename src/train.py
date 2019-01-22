@@ -101,7 +101,17 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             
             
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
-            feature_iow      = Variable(feature.view(-1)).cuda()
+            
+            
+            feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
+            print reconstruct_out.size()
+            print feature_iow.size()
+
+
+            # print reconstruct_out
+            # print '*'*10
+            # print feature_iow
+
             optimizer.zero_grad()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             err_label   = loss_class(class_out, target)
