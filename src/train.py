@@ -117,7 +117,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
-            err = err_domain + err_label + lamda * out + reconstruct_loss
+            # err = err_domain + err_label + lamda * out + reconstruct_loss
+            err = reconstruct_loss
             err.backward()
             optimizer.step()
             if cnt_batch % 200 == 0:
@@ -145,7 +146,7 @@ def show_reconstruct_results(dev_iter, model, args, cnt):
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         feature01, feature02, output = model.extractFeature(feature, length, mask)
-        reconstruct_out = model.reconstruct(feature01, feature02, output, feature, length, is_train=True)
+        reconstruct_out = model.reconstruct(feature01, feature02, output, feature, length, is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
