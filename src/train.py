@@ -121,8 +121,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err.backward()
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
-            if cnt_batch % 500 == 0:
-                show_reconstruct_results(dev_iter, model, args, cnt_batch)
+            if cnt_batch % 1000 == 0:
+                show_reconstruct_results(dev_iter, model, args, cnt_batch, reconstruct_loss)
                 acc, flag = eval(dev_iter, model, alpha)
                 save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
                 if flag:
@@ -135,8 +135,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             cnt_batch += 1
         cnt_epoch += 1
 
-def show_reconstruct_results(dev_iter, model, args, cnt):
-    writer = open('logs_'+str(cnt)+'_.txt', 'w')
+def show_reconstruct_results(dev_iter, model, args, cnt, reconstruct_loss):
+    writer = open('logs_'+str(cnt)+'_' + str(reconstruct_loss) + '_.txt', 'w')
     cnt_batch = 0
     for batch in dev_iter:
         # logger.info('In ' + str(cnt_batch) + '  batch...')
