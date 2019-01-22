@@ -230,96 +230,51 @@ class RGLIndividualSaperateSC(nn.Module):
         self.embedding_size = embedding_size
         self.embedding      = nn.Embedding(embedding_num,embedding_size)
         self.hidden_size    = hidden_size
-        self.linear         = nn.Linear(embedding_size,num_class)
+        self.linear         = nn.Linear(embedding_size, num_class)
         self.linear.weight.data.normal_(0,0.01)
         self.linear.bias.data.fill_(0)
         self.layers         = 4
         self.embedding.weight.data.copy_(torch.from_numpy(pre_embedding))
         self.w2i = w2i
         
-        self.bi_encoder01 = nn.LSTM(
-            self.embedding_size,
-            self.hidden_size,
-            1,
-            bidirectional=True,
-            batch_first=True,
-            dropout=0.2
-        )
-        self.bi_encoder02 = nn.LSTM(
-            self.embedding_size,
-            self.hidden_size,
-            1,
-            bidirectional=True,
-            batch_first=True,
-            dropout=0.2
-        )
-        self.encoder01 = nn.LSTM(
-            self.hidden_size,
-            self.hidden_size,
-            self.layers - 1,
-            bidirectional=False,
-            batch_first=True,
-            dropout=0.2
-        )
-        self.encoder02 = nn.LSTM(
-            self.hidden_size,
-            self.hidden_size,
-            self.layers - 1,
-            bidirectional=False,
-            batch_first=True,
-            dropout=0.2
-        )
+        self.bi_encoder01 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
+        self.bi_encoder02 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
+        # self.encoder01 = nn.GRU(self.hidden_size, self.hidden_size, self.layers - 1, bidirectional=False, batch_first=True, dropout=0.2)
+        # self.encoder02 = nn.GRU(self.hidden_size, self.hidden_size, self.layers - 1, bidirectional=False, batch_first=True, dropout=0.2)
         
 
 
-        self.class_classifier = nn.Linear(hidden_size,num_class)
+        self.class_classifier = nn.Linear(hidden_size, num_class)
         self.class_classifier.weight.data.normal_(0, 0.01)
         self.class_classifier.bias.data.fill_(0)
-        self.domain_classifier = nn.Linear(hidden_size,num_class)
+        self.domain_classifier = nn.Linear(hidden_size, num_class)
         self.domain_classifier.weight.data.normal_(0, 0.01)
         self.domain_classifier.bias.data.fill_(0)
         self.decoder = Decoder(self.embedding_num, self.embedding_size, self.hidden_size, args.max_length, self.w2i, pre_embedding)
-
+        self.linear_feature = nn.Linear(hidden_size, hidden_size)
     def get_state(self, input_line):
         '''
         Init h and c
         '''
         batch_size = input_line.size(0)
-        h0_encoder_bi01 = Variable(torch.zeros(
-            2,
-            batch_size,
-            self.hidden_size
-        ))
-        c0_encoder_bi01 = Variable(torch.zeros(
-            2,
-            batch_size,
-            self.hidden_size
-        ))
-        
-        h0_encoder_bi02 = Variable(torch.zeros(
-            2,
-            batch_size,
-            self.hidden_size
-        ))
-        c0_encoder_bi02 = Variable(torch.zeros(
-            2,
-            batch_size,
-            self.hidden_size
-        ))
+        h0_encoder_bi01 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
+        # c0_encoder_bi01 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
+        h0_encoder_bi02 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
+        # c0_encoder_bi02 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
 
-        return (h0_encoder_bi01.cuda(), c0_encoder_bi01.cuda()), (h0_encoder_bi02.cuda(), c0_encoder_bi02.cuda())
+        # return (h0_encoder_bi01.cuda(), c0_encoder_bi01.cuda()), (h0_encoder_bi02.cuda(), c0_encoder_bi02.cuda())
+        return h0_encoder_bi01.cuda(), h0_encoder_bi02.cuda()
+    
     
     def extractFeature(self, input_line, lenth, mask):
-        embed = self.embedding(input_line)
-
-        hidden_bi01,hidden_bi02 = self.get_state(input_line)
-        
-        pack_embed = torch.nn.utils.rnn.pack_padded_sequence(embed,lenth,batch_first = True)
-        packed_output01, (feature01, _) = self.bi_encoder01(pack_embed, hidden_bi01)
+        embed                           = self.embedding(input_line)
+        hidden_bi01,hidden_bi02         = self.get_state(input_line)
+        pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
+        packed_output01, feature01      = self.bi_encoder01(pack_embed, hidden_bi01)
         unpacked_output01, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01, batch_first = True)
         
-        pack_embed = torch.nn.utils.rnn.pack_padded_sequence(embed,lenth,batch_first = True)
-        packed_output02, (feature02, _) = self.bi_encoder02(pack_embed, hidden_bi02)
+        pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
+        packed_output02, feature02      = self.bi_encoder02(pack_embed, hidden_bi02)
         unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
         
         
@@ -336,9 +291,17 @@ class RGLIndividualSaperateSC(nn.Module):
         
         # feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
         
+        
+
+        feature01 = feature01[-1]
+        feature02 = feature02[-1]
+        feature01 = F.tanh(self.linear(feature01))
+        feature02 = F.tanh(self.linear(feature02))
+
         print feature01.size()
         print feature02.size()
         print unpacked_output01.size()
+        
         return feature01, feature02, unpacked_output01
     
     
