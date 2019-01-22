@@ -104,8 +104,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             
             
             feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
-            print reconstruct_out.size()
-            print feature_iow.size()
+            # print reconstruct_out.size()
+            # print feature_iow.size()
 
 
             # print reconstruct_out
