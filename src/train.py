@@ -101,7 +101,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             
             
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
-            feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
+            feature_iow      = Variable(feature.view(-1)).cuda()
             optimizer.zero_grad()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             err_label   = loss_class(class_out, target)
@@ -136,7 +136,7 @@ def show_reconstruct_results(dev_iter, model, args, cnt):
         feature = Variable(sample)
         feature01, feature02, output = model.extractFeature(feature, length, mask)
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, length, is_train=False)
-        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
+        out_in_batch = reconstruct_out.view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
