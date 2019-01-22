@@ -99,19 +99,15 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             mask    = generate_mask(torch.max(length), length)
             mask    = Variable(torch.FloatTensor(mask).cuda())
             
-            model.zero_grad()
+            
             class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
             feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
+            optimizer.zero_grad()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
-            
-            ## begin print reconstruct result
-            ## end
-
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
             err = err_domain + err_label + lamda * out + reconstruct_loss
-            # err = reconstruct_loss
             err.backward()
             optimizer.step()
             if cnt_batch % 500 == 0:
