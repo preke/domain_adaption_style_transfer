@@ -314,7 +314,6 @@ class RGLIndividualSaperateSC(nn.Module):
         reconstruction_out = self.reconstruct(feature01, feature02, output01, input_line, lenth, is_train)
         
         class_out = self.class_classifier(feature02)
-        
         reverse_feature = ReverseLayerF.apply(feature01, alpha)
         class_out   = self.class_classifier(feature02)
         domain_out  = self.domain_classifier(reverse_feature)

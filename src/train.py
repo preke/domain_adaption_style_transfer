@@ -110,7 +110,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
-            err = err_domain + err_label + lamda * out + reconstruct_loss
+            # err = err_domain + err_label + lamda * out + reconstruct_loss
+            err = reconstruct_loss
             err.backward()
             optimizer.step()
             if cnt_batch % 100 == 0:
