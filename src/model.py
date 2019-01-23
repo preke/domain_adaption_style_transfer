@@ -204,12 +204,7 @@ class Seq2Seq(nn.Module):
     
     def forward(self, source, src_length=None, target=None):
         batch_size = source.size(0)
-        print '11111111111'
-        if target is not None:
-            print 'In train'
-        print source.size()
-        print src_length
-        print '222222222'
+
         enc_h, enc_h_t = self.encoder(source, src_length) # B x S x 2*H / 2 x B x H 
         
         dec_h0 = enc_h_t[-1] # B x H 
