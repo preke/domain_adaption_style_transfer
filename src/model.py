@@ -205,7 +205,7 @@ class Seq2Seq(nn.Module):
     def forward(self, source, src_length=None, target=None):
         batch_size = source.size(0)
         print '11111111111'
-        if target:
+        if target is not None:
             print 'In train'
         print source.size()
         print src_length
