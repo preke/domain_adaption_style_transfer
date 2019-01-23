@@ -173,7 +173,8 @@ class Decoder(nn.Module):
             batch_size = enc_h.size(0)
             target = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
             outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
-
+            outputs[:,0,:] = self.embed(target).squeeze(1) 
+            
             if torch.cuda.is_available():
                 target = target.cuda()
                 outputs = outputs.cuda()
