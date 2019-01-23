@@ -305,9 +305,6 @@ def eval_S2S(dev_iter, model):
         
         reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()])
         feature_iow      = Variable(feature.contiguous().view(-1)).cuda() # the whole sentence
-        print '**********************'
-        print reconstruct_out.size()
-        print feature_iow.size()
 
         loss_reconstruct = nn.NLLLoss()
         reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
