@@ -277,7 +277,7 @@ def trainS2S(train_iter, dev_iter, train_data, model, args):
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(sample)
 
-            reconstruct_out = model(feature[:, :-1], length, feature[:, :-1])
+            reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], feature[:, :-1])
             feature_iow     = Variable(feature[:,1:].contiguous().view(-1)).cuda()
 
             print reconstruct_out.size()
@@ -332,7 +332,7 @@ def show_reconstruct_results_S2S(dev_iter, model, args, cnt):
         length  = batch.text[1]
         feature = Variable(sample)
         
-        reconstruct_out = model(feature[:, :-1], length)
+        reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()])
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
