@@ -277,7 +277,7 @@ def trainS2S(train_iter, dev_iter, train_data, model, args):
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(sample)
 
-            reconstruct_out = model(feature[:, :-1], length, feature[:,1:])
+            reconstruct_out = model(feature[:, :-1], length, feature[:, :-1])
             feature_iow     = Variable(feature[:,1:].contiguous().view(-1)).cuda()
 
             print reconstruct_out.size()
@@ -307,7 +307,7 @@ def eval_S2S(dev_iter, model, reconstruct_loss):
         feature = Variable(sample)
         
         reconstruct_out = model(feature[:, :-1], length)
-        feature_iow      = Variable(feature[:, 1:].contiguous().view(-1)).cuda()
+        feature_iow      = Variable(feature.contiguous().view(-1)).cuda() # the whole sentence
         print '**********************'
         print reconstruct_out.size()
         print feature_iow.size()
@@ -332,7 +332,7 @@ def show_reconstruct_results_S2S(dev_iter, model, args, cnt, reconstruct_loss):
         feature = Variable(sample)
         
         reconstruct_out = model(feature[:, :-1], length)
-        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length-1, args.vocab_size)
+        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
