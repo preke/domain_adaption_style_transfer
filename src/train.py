@@ -286,8 +286,9 @@ def trainS2S(train_iter, dev_iter, train_data, model, args):
             err.backward()
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
-            if cnt_batch % 500 == 0:
+            if cnt_batch % 100 == 0:
                 avg_loss = eval_S2S(dev_iter, model, reconstruct_loss)
+            if cnt_batch % 1000 == 0:                
                 show_reconstruct_results_S2S(dev_iter, model, args, cnt_batch, avg_loss)
             cnt_batch += 1
         cnt_epoch += 1
