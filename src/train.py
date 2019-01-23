@@ -300,7 +300,6 @@ def eval_S2S(dev_iter, model):
         sample  = batch.text[0]
         length  = batch.text[1]
         feature = Variable(sample)
-        target  = Variable(label)
         
         reconstruct_out = model(feature, length)
         feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
