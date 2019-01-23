@@ -46,30 +46,52 @@ def eval(dev_iter, model, alpha):
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         target  = Variable(label)
-        logit,_,_,reconstruct_out = model(feature, length, alpha, mask, is_train=False)
-        loss                      = F.cross_entropy(logit, target, size_average=False)
+        
+        # logit,_,_,reconstruct_out = model(feature, length, alpha, mask, is_train=False)
+        # loss                      = F.cross_entropy(logit, target, size_average=False)
 
+        # feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
+        # loss_reconstruct = nn.NLLLoss()
+        # reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
+
+
+        # avg_loss += loss.data
+        # corrects += (torch.max(logit, 1)
+        #              [1].view(target.size()).data == target.data).sum()
+        # size += len(sample)
+
+        reconstruct_out = model(feature, length, alpha, mask, is_train=False)
         feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
         loss_reconstruct = nn.NLLLoss()
         reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
 
 
-        avg_loss += loss.data
-        corrects += (torch.max(logit, 1)
-                     [1].view(target.size()).data == target.data).sum()
+        avg_loss += reconstruct_loss.data
+        # corrects += (torch.max(logit, 1)
+        #              [1].view(target.size()).data == target.data).sum()
         size += len(sample)
+
+    # avg_loss /= size
+    # accuracy = 100.0 * float(corrects)/float(size)
+    # global best_results
+    # logger.info('Evaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) err_ae: {:.6f}\n'.format(avg_loss, 
+    #                                                                        accuracy, 
+    #                                                                        corrects, 
+    #                                                                        size,
+    #                                                                        reconstruct_loss))
+    # if accuracy > best_results:
+    #     flag = 1
+    #     best_results = accuracy
+        
+    # return accuracy, flag, eval_aeloss
+
     avg_loss /= size
-    accuracy = 100.0 * float(corrects)/float(size)
-    global best_results
-    if accuracy > best_results:
-        flag = 1
-        best_results = accuracy
-        logger.info('Evaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) err_ae: {:.6f}\n'.format(avg_loss, 
-                                                                           accuracy, 
-                                                                           corrects, 
-                                                                           size,
-                                                                           reconstruct_loss))
-    return accuracy, flag
+    logger.info('Evaluation - loss: {:.6f}\n'.format(avg_loss))
+    # if accuracy > best_results:
+    #     flag = 1
+    #     best_results = accuracy
+    accuracy = 0, flag = 0, eval_aeloss = avg_loss   
+    return accuracy, flag, eval_aeloss
 
 
 
@@ -107,22 +129,16 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             mask    = Variable(torch.FloatTensor(mask).cuda())
             
             
-            class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
-            
-            
-            feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
-            # print reconstruct_out.size()
-            # print feature_iow.size()
+            # class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
+            reconstruct_out = model(feature, length, alpha, mask)
+            feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
 
-
-            # print reconstruct_out
-            # print '*'*10
-            # print feature_iow
 
             optimizer.zero_grad()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
-            err_label   = loss_class(class_out, target)
-            err_domain  = loss_domain(class_out, target)
+            
+            # err_label   = loss_class(class_out, target)
+            # err_domain  = loss_domain(class_out, target)
             
             # err = err_domain + err_label + lamda * out + 5*reconstruct_loss
             err = reconstruct_loss
@@ -130,13 +146,14 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
             if cnt_batch % 2000 == 0:
-                show_reconstruct_results(dev_iter, model, args, cnt_batch, reconstruct_loss)
-                acc, flag = eval(dev_iter, model, alpha)
-                save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
-                if flag:
+                
+                acc, flag, eval_aeloss = eval(dev_iter, model, alpha)
+                show_reconstruct_results(dev_iter, model, args, cnt_batch, eval_aeloss)
+                # save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
+                # if flag:
                     
-                    torch.save(model.state_dict(), save_path)
-                    logger.info('Save model to ' + save_path)
+                #     torch.save(model.state_dict(), save_path)
+                #     logger.info('Save model to ' + save_path)
                     # logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
                     #   % (epoch, cnt_batch, len_iter, err_label.cpu().data.numpy(),
                     #      err_domain.cpu().data.numpy(), out, reconstruct_loss))
@@ -153,7 +170,12 @@ def show_reconstruct_results(dev_iter, model, args, cnt, reconstruct_loss):
         mask    = generate_mask(torch.max(length), length)
         mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
-        feature01, feature02, output = model.extractFeature(feature, length, mask)
+        
+
+
+        # feature01, feature02, output = model.extractFeature(feature, length, mask)
+        feature01, output = model.extractFeature(feature, length, mask)
+        feature02 = ''
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, length, is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
