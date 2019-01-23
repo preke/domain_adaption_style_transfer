@@ -287,12 +287,12 @@ def trainS2S(train_iter, dev_iter, train_data, model, args):
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
             if cnt_batch % 500 == 0:
-                avg_loss = eval_S2S(dev_iter, model)
+                avg_loss = eval_S2S(dev_iter, model, reconstruct_loss)
                 show_reconstruct_results_S2S(dev_iter, model, args, cnt_batch, avg_loss)
             cnt_batch += 1
         cnt_epoch += 1
 
-def eval_S2S(dev_iter, model):
+def eval_S2S(dev_iter, model, reconstruct_loss):
     model.eval()
     corrects, avg_loss = 0, 0
     size = 0
@@ -311,7 +311,7 @@ def eval_S2S(dev_iter, model):
         size += len(sample)
 
     avg_loss /= size
-    logger.info('Evaluation - loss: {:.6f}\n'.format(avg_loss))
+    logger.info('Evaluation - Train_loss:{:.6f}, eva_loss: {:.6f}\n'.format(reconstruct_loss, avg_loss))
     return avg_loss
 
 def show_reconstruct_results_S2S(dev_iter, model, args, cnt, reconstruct_loss):
