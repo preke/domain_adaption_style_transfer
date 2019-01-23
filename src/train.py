@@ -90,7 +90,9 @@ def eval(dev_iter, model, alpha):
     # if accuracy > best_results:
     #     flag = 1
     #     best_results = accuracy
-    accuracy = 0, flag = 0, eval_aeloss = avg_loss   
+    accuracy = 0
+    flag = 0
+    eval_aeloss = avg_loss   
     return accuracy, flag, eval_aeloss
 
 
