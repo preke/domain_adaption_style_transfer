@@ -179,7 +179,7 @@ class Decoder(nn.Module):
                 target = target.cuda()
                 outputs = outputs.cuda()
             
-            outputs[:,0,:] = self.embed(target).squeeze(1) 
+            outputs[:,0,:] = target.squeeze(1) 
             for i in range(1, self.max_len):
                 target = self.embed(target).squeeze(1)              
                 ctx = self.attention(enc_h, prev_s)                 
