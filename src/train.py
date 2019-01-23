@@ -48,6 +48,11 @@ def eval(dev_iter, model, alpha):
         target  = Variable(label)
         logit,_,_,reconstruct_out = model(feature, length, alpha, mask, is_train=False)
         loss                      = F.cross_entropy(logit, target, size_average=False)
+
+        feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
+        reconstruct_loss = nn.NLLLoss(reconstruct_out, feature_iow)
+
+
         avg_loss += loss.data
         corrects += (torch.max(logit, 1)
                      [1].view(target.size()).data == target.data).sum()
@@ -62,7 +67,7 @@ def eval(dev_iter, model, alpha):
                                                                            accuracy, 
                                                                            corrects, 
                                                                            size,
-                                                                           reconstruct_out))
+                                                                           reconstruct_loss))
     return accuracy, flag
 
 
