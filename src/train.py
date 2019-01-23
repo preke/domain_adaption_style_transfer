@@ -58,10 +58,11 @@ def eval(dev_iter, model, alpha):
     if accuracy > best_results:
         flag = 1
         best_results = accuracy
-        logger.info('Evaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) \n'.format(avg_loss, 
+        logger.info('Evaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) err_ae: %f\n'.format(avg_loss, 
                                                                            accuracy, 
                                                                            corrects, 
-                                                                           size))
+                                                                           size,
+                                                                           reconstruct_out))
     return accuracy, flag
 
 
@@ -117,7 +118,8 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err_label   = loss_class(class_out, target)
             err_domain  = loss_domain(class_out, target)
             
-            err = err_domain + err_label + lamda * out + 5*reconstruct_loss
+            # err = err_domain + err_label + lamda * out + 5*reconstruct_loss
+            err = reconstruct_loss
             err.backward()
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
@@ -129,14 +131,14 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                     
                     torch.save(model.state_dict(), save_path)
                     logger.info('Save model to ' + save_path)
-                logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
-                      % (epoch, cnt_batch, len_iter, err_label.cpu().data.numpy(),
-                         err_domain.cpu().data.numpy(), out, reconstruct_loss))
+                    # logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
+                    #   % (epoch, cnt_batch, len_iter, err_label.cpu().data.numpy(),
+                    #      err_domain.cpu().data.numpy(), out, reconstruct_loss))
             cnt_batch += 1
         cnt_epoch += 1
 
 def show_reconstruct_results(dev_iter, model, args, cnt, reconstruct_loss):
-    writer = open('logs_'+str(cnt)+'_' + str(reconstruct_loss) + '_.txt', 'w')
+    writer = open('logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
     cnt_batch = 0
     for batch in dev_iter:
         # logger.info('In ' + str(cnt_batch) + '  batch...')
