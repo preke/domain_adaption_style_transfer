@@ -324,7 +324,7 @@ def show_reconstruct_results_S2S(dev_iter, model, args, cnt, reconstruct_loss):
         feature = Variable(sample)
         
         reconstruct_out = model(feature[:,:-1], length)
-        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length-1 args.vocab_size)
+        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
