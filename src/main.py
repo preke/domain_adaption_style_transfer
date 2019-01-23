@@ -127,7 +127,7 @@ s2s_model = Seq2Seq(src_nword=args.vocab_size,
                     max_len=args.max_length, 
                     trg_soi=args.word_2_index['<SOS>'], 
                     args=args)
-
+s2s_model.cuda()
 if args.snapshot is not None:
     logger.info('Load model from' + args.snapshot)
     s2s_model.load_state_dict(torch.load(args.snapshot))

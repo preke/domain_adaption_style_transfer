@@ -42,63 +42,63 @@ class Attention(nn.Module):
 
         return ctx 
 
-class Decoder(nn.Module):
-    def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi, pre_embedding):
-        super(Decoder, self).__init__()
-        self.hidden_dim = hidden_dim
-        self.max_len    = max_len
-        self.vocab_size = vocab_size
-        self.trg_soi    = trg_soi
+# class Decoder(nn.Module):
+#     def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi, pre_embedding):
+#         super(Decoder, self).__init__()
+#         self.hidden_dim = hidden_dim
+#         self.max_len    = max_len
+#         self.vocab_size = vocab_size
+#         self.trg_soi    = trg_soi
         
-        self.embed = nn.Embedding(vocab_size, embed_dim)
-        self.embed.weight.data.copy_(pre_embedding)
+#         self.embed = nn.Embedding(vocab_size, embed_dim)
+#         self.embed.weight.data.copy_(pre_embedding)
         
-        self.attention   = Attention(hidden_dim) 
-        self.decodercell = DecoderCell(embed_dim, hidden_dim)
-        self.dec2word    = nn.Linear(hidden_dim, vocab_size)
-        self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
+#         self.attention   = Attention(hidden_dim) 
+#         self.decodercell = DecoderCell(embed_dim, hidden_dim)
+#         self.dec2word    = nn.Linear(hidden_dim, vocab_size)
+#         self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
 
-    def forward(self, content, sentiment, hiddens, target, length, is_train=True):
-        # logger.info('Is train: ' + str(is_train))
+#     def forward(self, content, sentiment, hiddens, target, length, is_train=True):
+#         # logger.info('Is train: ' + str(is_train))
         
-        prev_s = content
-        # prev_s = torch.cat((content, sentiment), 1)
-        # prev_s = self.combine_hidden(prev_s)
-        # print prev_s.size()
-        if is_train:
-            batch_size, target_len = target.size(0), target.size(1)
-            dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
+#         prev_s = content
+#         # prev_s = torch.cat((content, sentiment), 1)
+#         # prev_s = self.combine_hidden(prev_s)
+#         # print prev_s.size()
+#         if is_train:
+#             batch_size, target_len = target.size(0), target.size(1)
+#             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
 
-            if torch.cuda.is_available():
-                dec_h = dec_h.cuda()
+#             if torch.cuda.is_available():
+#                 dec_h = dec_h.cuda()
 
-            target = self.embed(target)
+#             target = self.embed(target)
             
-            for i in range(target_len):
-                ctx = self.attention(hiddens, prev_s)   
-                prev_s       = self.decodercell(target[:, i], prev_s, ctx)
-                dec_h[:,i,:] = prev_s # .unsqueeze(1)
-            outputs = self.dec2word(dec_h)
-        else:
-            batch_size = len(length)
-            target = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
-            outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
+#             for i in range(target_len):
+#                 ctx = self.attention(hiddens, prev_s)   
+#                 prev_s       = self.decodercell(target[:, i], prev_s, ctx)
+#                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
+#             outputs = self.dec2word(dec_h)
+#         else:
+#             batch_size = len(length)
+#             target = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
+#             outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
 
-            if torch.cuda.is_available():
-                target = target.cuda()
-                outputs = outputs.cuda()
+#             if torch.cuda.is_available():
+#                 target = target.cuda()
+#                 outputs = outputs.cuda()
             
-            for i in range(self.max_len):
-                target = self.embed(target).squeeze(1)     
-                ctx = self.attention(hiddens, prev_s)                        
-                prev_s = self.decodercell(target, prev_s, ctx)
-                output = self.dec2word(prev_s) # b * v
-                outputs[:,i,:] = output
-                target = output.topk(1)[1]
-                # target = output.topk(2)[1][:,1] # the index of the most probable word
-                # print target
+#             for i in range(self.max_len):
+#                 target = self.embed(target).squeeze(1)     
+#                 ctx = self.attention(hiddens, prev_s)                        
+#                 prev_s = self.decodercell(target, prev_s, ctx)
+#                 output = self.dec2word(prev_s) # b * v
+#                 outputs[:,i,:] = output
+#                 target = output.topk(1)[1]
+#                 # target = output.topk(2)[1][:,1] # the index of the most probable word
+#                 # print target
 
-        return outputs
+#         return outputs
 
 
 class DecoderCell(nn.Module):
@@ -131,6 +131,63 @@ class DecoderCell(nn.Module):
         return prev_s
 
 
+class Decoder(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi, pre_embedding):
+        super(Decoder, self).__init__()
+        self.hidden_dim = hidden_dim
+        self.max_len = max_len
+        self.vocab_size = vocab_size
+        self.trg_soi = trg_soi
+        
+        self.embed = nn.Embedding(vocab_size, embed_dim) 
+        self.embed.weight.data.copy_(pre_embedding)       
+        self.attention = Attention(hidden_dim) 
+        self.decodercell = DecoderCell(embed_dim, hidden_dim)
+        self.dec2word = nn.Linear(hidden_dim, vocab_size)
+
+
+    def forward(self, enc_h, prev_s, target=None):
+        '''
+        enc_h  : B x S x 2*H 
+        prev_s : B x H
+        '''
+
+        if target is not None:
+            batch_size, target_len = target.size(0), target.size(1)
+            
+            dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
+
+            if torch.cuda.is_available():
+                dec_h = dec_h.cuda()
+
+            target = self.embed(target)  
+            for i in range(target_len):
+                ctx = self.attention(enc_h, prev_s)                     
+                prev_s = self.decodercell(target[:, i], prev_s, ctx)
+                dec_h[:,i,:] = prev_s
+
+            outputs = self.dec2word(dec_h)
+
+
+        else:
+            batch_size = enc_h.size(0)
+            target = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
+            outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
+
+            if torch.cuda.is_available():
+                target = target.cuda()
+                outputs = outputs.cuda()
+            
+            for i in range(self.max_len):
+                target = self.embed(target).squeeze(1)              
+                ctx = self.attention(enc_h, prev_s)                 
+                prev_s = self.decodercell(target, prev_s, ctx)
+                output = self.dec2word(prev_s)
+                outputs[:,i,:] = output
+                target = output.topk(1)[1]
+            
+        return outputs
+
 
 class Seq2Seq(nn.Module):
     def __init__(self, src_nword, trg_nword, num_layer, embed_dim, hidden_dim, max_len, trg_soi, args):
@@ -154,8 +211,6 @@ class Seq2Seq(nn.Module):
 
         out = self.decoder(enc_h, dec_h0, target) # B x S x H
         out = F.log_softmax(out.contiguous().view(-1, self.trg_nword))
-        # print('seq2seq out:')
-        # print(out)
         return out
 
 class Encoder(nn.Module):
