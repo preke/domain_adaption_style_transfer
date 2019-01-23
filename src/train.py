@@ -64,7 +64,7 @@ def eval(dev_iter, model, alpha):
     if accuracy > best_results:
         flag = 1
         best_results = accuracy
-        logger.info('Evaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) err_ae: %f\n'.format(avg_loss, 
+        logger.info('Evaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) err_ae: {:.6f}\n'.format(avg_loss, 
                                                                            accuracy, 
                                                                            corrects, 
                                                                            size,
