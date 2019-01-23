@@ -129,7 +129,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err.backward()
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
-            if cnt_batch % 1000 == 0:
+            if cnt_batch % 2000 == 0:
                 show_reconstruct_results(dev_iter, model, args, cnt_batch, reconstruct_loss)
                 acc, flag = eval(dev_iter, model, alpha)
                 save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
