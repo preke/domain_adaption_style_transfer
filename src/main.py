@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 # self define
 from utils import preprocess_write, get_pretrained_word_embed, preprocess_pos_neg
 from dataload import load_data, load_pos_neg_data
-from train import eval, trainRGL, show_reconstruct_results, style_transfer
-from model import RGLIndividualSaperateSC
+from train import eval, trainRGL, show_reconstruct_results, style_transfer, trainS2S
+from model import RGLIndividualSaperateSC, Seq2Seq
 
 # paths
 TRAIN_PATH     = '../data/train.ft.txt'
@@ -94,14 +94,44 @@ logger.info('Getting pre-trained word embedding ...')
 args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_field)  
 
 
+# # Build model and train
+# rgl_net = RGLIndividualSaperateSC(args.vocab_size, args.embed_dim, args.num_class, 
+#     args.hidden_dim, args.pretrained_weight.numpy(), args.word_2_index['<SOS>'], args).cuda()
+
+# if args.snapshot is not None:
+#     logger.info('Load model from' + args.snapshot)
+#     rgl_net.load_state_dict(torch.load(args.snapshot))
+#     show_reconstruct_results(dev_iter, rgl_net, args)
+#     # if not os.path.exists(small_pos):
+#     #     preprocess_pos_neg(small_pos_path, small_pos)
+#     #     preprocess_pos_neg(small_neg_path, small_neg)
+#     # pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
+#     # style_transfer(pos_iter, neg_iter, rgl_net, args)
+# else:
+#     logger.info('Train model begin...')
+
+#     try:
+#         trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args)
+#     except KeyboardInterrupt:
+#         print(traceback.print_exc())
+#         print('\n' + '-' * 89)
+#         print('Exiting from training early')
+
+
 # Build model and train
-rgl_net = RGLIndividualSaperateSC(args.vocab_size, args.embed_dim, args.num_class, 
-    args.hidden_dim, args.pretrained_weight.numpy(), args.word_2_index['<SOS>'], args).cuda()
+s2s_model = Seq2Seq(src_nword=args.vocab_size, 
+                    trg_nword=args.vocab_size, 
+                    num_layer=2, 
+                    embed_dim=args.embed_dim, 
+                    hidden_dim=args.hidden_dim, 
+                    max_len=args.max_len, 
+                    trg_soi=args.word_2_index['<SOS>'], 
+                    args)
 
 if args.snapshot is not None:
     logger.info('Load model from' + args.snapshot)
-    rgl_net.load_state_dict(torch.load(args.snapshot))
-    show_reconstruct_results(dev_iter, rgl_net, args)
+    s2s_model.load_state_dict(torch.load(args.snapshot))
+    show_reconstruct_results(dev_iter, s2s_model, args)
     # if not os.path.exists(small_pos):
     #     preprocess_pos_neg(small_pos_path, small_pos)
     #     preprocess_pos_neg(small_neg_path, small_neg)
@@ -111,11 +141,13 @@ else:
     logger.info('Train model begin...')
 
     try:
-        trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args)
+        trainS2S(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=s2s_model, args=args)
     except KeyboardInterrupt:
         print(traceback.print_exc())
         print('\n' + '-' * 89)
         print('Exiting from training early')
+
+
 
 
 

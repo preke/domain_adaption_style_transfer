@@ -47,55 +47,33 @@ def eval(dev_iter, model, alpha):
         feature = Variable(sample)
         target  = Variable(label)
         
-        # logit,_,_,reconstruct_out = model(feature, length, alpha, mask, is_train=False)
-        # loss                      = F.cross_entropy(logit, target, size_average=False)
+        logit,_,_,reconstruct_out = model(feature, length, alpha, mask, is_train=False)
+        loss                      = F.cross_entropy(logit, target, size_average=False)
 
-        # feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
-        # loss_reconstruct = nn.NLLLoss()
-        # reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
-
-
-        # avg_loss += loss.data
-        # corrects += (torch.max(logit, 1)
-        #              [1].view(target.size()).data == target.data).sum()
-        # size += len(sample)
-
-        reconstruct_out = model(feature, length, alpha, mask, is_train=False)
         feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
         loss_reconstruct = nn.NLLLoss()
         reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
 
 
-        avg_loss += reconstruct_loss.data
-        # corrects += (torch.max(logit, 1)
-        #              [1].view(target.size()).data == target.data).sum()
+        avg_loss += loss.data
+        corrects += (torch.max(logit, 1)
+                     [1].view(target.size()).data == target.data).sum()
         size += len(sample)
 
-    # avg_loss /= size
-    # accuracy = 100.0 * float(corrects)/float(size)
-    # global best_results
-    # logger.info('Evaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) err_ae: {:.6f}\n'.format(avg_loss, 
-    #                                                                        accuracy, 
-    #                                                                        corrects, 
-    #                                                                        size,
-    #                                                                        reconstruct_loss))
-    # if accuracy > best_results:
-    #     flag = 1
-    #     best_results = accuracy
-        
-    # return accuracy, flag, eval_aeloss
 
     avg_loss /= size
-    logger.info('Evaluation - loss: {:.6f}\n'.format(avg_loss))
-    # if accuracy > best_results:
-    #     flag = 1
-    #     best_results = accuracy
-    accuracy = 0
-    flag = 0
-    eval_aeloss = avg_loss   
+    accuracy = 100.0 * float(corrects)/float(size)
+    global best_results
+    logger.info('Evaluation - loss: {:.6f}  acc: {:.1f}%({}/{}) err_ae: {:.6f}\n'.format(avg_loss, 
+                                                                           accuracy, 
+                                                                           corrects, 
+                                                                           size,
+                                                                           reconstruct_loss))
+    if accuracy > best_results:
+        flag = 1
+        best_results = accuracy
+        
     return accuracy, flag, eval_aeloss
-
-
 
 def generate_mask(max_length, length):
     mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
@@ -277,5 +255,83 @@ def demo_style_transfer(sent1, sent2, model, args):
     pass
 
 
+def trainS2S(train_iter, dev_iter, train_data, model, args):
+    save_dir = "RGLModel/Newdata/"
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
 
+    optimizer        = optim.Adam(model.parameters(), lr=args.lr)
+    loss_reconstruct = nn.NLLLoss()
+    n_epoch          = args.num_epoch
+    lamda            = args.lamda
+    len_iter         = int(len(train_data)/args.batch_size) + 1
+    cnt_epoch = 0
+    cnt_batch = 0
+    for epoch in range(n_epoch): 
+        logger.info('In ' + str(cnt_epoch) + ' epoch... ')
+        for batch in train_iter:
+            model.train()
+            sample  = batch.text[0]
+            length  = batch.text[1]
+            p       = float(cnt_batch + epoch * len_iter) / n_epoch / len_iter
+            alpha   = 2. / (1. + np.exp(-10 * p)) - 1
+            feature = Variable(sample)
+
+            reconstruct_out = model(feature, length, feature)
+            feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
+
+            optimizer.zero_grad()
+            reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
+            err = reconstruct_loss
+            err.backward()
+            torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
+            optimizer.step()
+            if cnt_batch % 500 == 0:
+                avg_loss = eval_S2S(dev_iter, model)
+                show_reconstruct_results_S2S(dev_iter, model, args, cnt_batch, avg_loss)
+            cnt_batch += 1
+        cnt_epoch += 1
+
+def eval_S2S(dev_iter, model):
+    model.eval()
+    corrects, avg_loss = 0, 0
+    size = 0
+    for batch in dev_iter:
+        sample  = batch.text[0]
+        length  = batch.text[1]
+        feature = Variable(sample)
+        target  = Variable(label)
+        
+        reconstruct_out = model(feature, length)
+        feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
+        loss_reconstruct = nn.NLLLoss()
+        reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
+
+
+        avg_loss += reconstruct_loss.data
+        size += len(sample)
+
+    avg_loss /= size
+    logger.info('Evaluation - loss: {:.6f}\n'.format(avg_loss))
+    return avg_loss
+
+def show_reconstruct_results_S2S(dev_iter, model, args, cnt, reconstruct_loss):
+    writer = open('s2s_logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
+    cnt_batch = 0
+    for batch in dev_iter:
+        sample  = batch.text[0]
+        length  = batch.text[1]
+        feature = Variable(sample)
+        
+        reconstruct_out = model(feature, length)
+        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
+        k = 0 
+        for i in out_in_batch:
+            writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+            writer.write('\n=============\n')
+            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+            writer.write('\n************\n')
+            k = k + 1
+        cnt_batch += 1
+    writer.close()
 

@@ -130,6 +130,67 @@ class DecoderCell(nn.Module):
         prev_s = torch.mul((1-reset_gate), prev_s) + torch.mul(reset_gate, prev_s_tilde)
         return prev_s
 
+
+
+class Seq2Seq(nn.Module):
+    def __init__(self, src_nword, trg_nword, num_layer, embed_dim, hidden_dim, max_len, trg_soi, args):
+        super(Seq2Seq, self).__init__()
+
+        self.hidden_dim = hidden_dim
+        self.trg_nword = trg_nword
+
+        self.encoder = Encoder(src_nword, embed_dim, hidden_dim, args)
+        self.linear = nn.Linear(hidden_dim, hidden_dim)
+        self.decoder = Decoder(trg_nword, embed_dim, hidden_dim, max_len, trg_soi)
+
+    
+    def forward(self, source, src_length=None, target=None):
+        batch_size = source.size(0)
+        
+        enc_h, enc_h_t = self.encoder(source, src_length) # B x S x 2*H / 2 x B x H 
+        
+        dec_h0 = enc_h_t[-1] # B x H 
+        dec_h0 = F.tanh(self.linear(dec_h0)) # B x 1 x 2*H
+
+        out = self.decoder(enc_h, dec_h0, target) # B x S x H
+        out = F.log_softmax(out.contiguous().view(-1, self.trg_nword))
+        # print('seq2seq out:')
+        # print(out)
+        return out
+
+class Encoder(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, args):
+        super(Encoder, self).__init__()
+        self.num_layers = 2
+        self.hidden_dim = hidden_dim
+        print(args.embed_dim)
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
+        self.embedding.weight.data.copy_(args.pretrained_weight)
+        self.gru = nn.GRU(embed_dim, self.hidden_dim, self.num_layers, batch_first=True, bidirectional=True)
+        
+    def forward(self, source, src_length=None, hidden=None):
+        '''
+        source: B x T 
+        '''
+        batch_size = source.size(0)
+        src_embed = self.embedding(source)
+        
+        if hidden is None:
+            h_size = (self.num_layers *2, batch_size, self.hidden_dim)
+            enc_h_0 = Variable(src_embed.data.new(*h_size).zero_(), requires_grad=False)
+
+        if src_length is not None:
+            src_embed = nn.utils.rnn.pack_padded_sequence(src_embed, src_length, batch_first=True)
+
+        enc_h, enc_h_t = self.gru(src_embed, enc_h_0) 
+
+        if src_length is not None:
+            enc_h, _ = nn.utils.rnn.pad_packed_sequence(enc_h, batch_first=True)
+
+        return enc_h, enc_h_t
+
+
+
         
         
 class ReverseLayerF(Function):
