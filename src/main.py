@@ -79,7 +79,7 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_train, amazon_test, args)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_test, amazon_test, args)
 text_field.build_vocab(train_data, dev_data, min_freq=20)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
@@ -124,7 +124,7 @@ s2s_model = Seq2Seq(src_nword=args.vocab_size,
                     num_layer=2, 
                     embed_dim=args.embed_dim, 
                     hidden_dim=args.hidden_dim, 
-                    max_len=args.max_len, 
+                    max_len=args.max_length, 
                     trg_soi=args.word_2_index['<SOS>'], 
                     args=args)
 
