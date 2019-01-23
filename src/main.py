@@ -126,7 +126,7 @@ s2s_model = Seq2Seq(src_nword=args.vocab_size,
                     hidden_dim=args.hidden_dim, 
                     max_len=args.max_len, 
                     trg_soi=args.word_2_index['<SOS>'], 
-                    args)
+                    args=args)
 
 if args.snapshot is not None:
     logger.info('Load model from' + args.snapshot)
