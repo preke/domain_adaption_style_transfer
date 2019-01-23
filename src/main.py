@@ -124,7 +124,7 @@ s2s_model = Seq2Seq(src_nword=args.vocab_size,
                     num_layer=2, 
                     embed_dim=args.embed_dim, 
                     hidden_dim=args.hidden_dim, 
-                    max_len=args.max_length-1, 
+                    max_len=args.max_length, 
                     trg_soi=args.word_2_index['<SOS>'], 
                     args=args)
 s2s_model.cuda()
