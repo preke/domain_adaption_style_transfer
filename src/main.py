@@ -60,7 +60,7 @@ args = parser.parse_args()
 # Parameters setting
 args.grad_clip  = 2
 args.embed_dim  = 300
-args.hidden_dim = 100
+args.hidden_dim = 128
 args.batch_size = 32
 args.lr         = 0.0001
 args.num_epoch  = 200
