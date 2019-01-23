@@ -280,10 +280,6 @@ def trainS2S(train_iter, dev_iter, train_data, model, args):
             reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], feature[:, :-1])
             feature_iow     = Variable(feature[:,1:].contiguous().view(-1)).cuda()
 
-            print reconstruct_out.size()
-            print feature_iow.size()
-
-
             optimizer.zero_grad()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             err = reconstruct_loss
