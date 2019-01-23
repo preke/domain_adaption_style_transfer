@@ -223,12 +223,13 @@ class Encoder(nn.Module):
         self.embedding.weight.data.copy_(args.pretrained_weight)
         self.gru = nn.GRU(embed_dim, self.hidden_dim, self.num_layers, batch_first=True, bidirectional=True)
 
-        # use orthogonal init for GRU layer0 weights
-        weight_init.orthogonal(self.gru.weight_ih_l0)
-        weight_init.orthogonal(self.gru.weight_hh_l0)
-        # use zero init for GRU layer0 bias
-        self.gru.bias_ih_l0.zero_()
-        self.gru.bias_hh_l0.zero_()
+        for name, param in self.gru.named_parameters():
+            if 'weight_ih' in name:
+                torch.nn.init.xavier_uniform_(param.data)
+            elif 'weight_hh' in name:
+                torch.nn.init.orthogonal_(param.data)
+            elif 'bias' in name:
+                param.data.fill_(0)
         
     def forward(self, source, src_length=None, hidden=None):
         '''
