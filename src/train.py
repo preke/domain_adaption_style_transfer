@@ -73,7 +73,7 @@ def eval(dev_iter, model, alpha):
         flag = 1
         best_results = accuracy
         
-    return accuracy, flag, eval_aeloss
+    return accuracy, flag, reconstruct_loss
 
 # def generate_mask(max_length, length):
 #     mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
