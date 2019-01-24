@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 # self define
 from utils import preprocess_write, get_pretrained_word_embed, preprocess_pos_neg
 from dataload import load_data, load_pos_neg_data
-from train import eval, trainRGL, show_reconstruct_results, style_transfer, trainS2S
-from model import RGLIndividualSaperateSC, Seq2Seq
+from train import eval, trainRGL, show_reconstruct_results, style_transfer
+from model import RGLIndividualSaperateSC
 
 # paths
 TRAIN_PATH     = '../data/train.ft.txt'
