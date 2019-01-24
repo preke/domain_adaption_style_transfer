@@ -79,7 +79,7 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_test, amazon_test, args)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_train, amazon_test, args)
 text_field.build_vocab(train_data, dev_data, min_freq=10)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
@@ -117,6 +117,7 @@ else:
         print('\n' + '-' * 89)
         print('Exiting from training early')
 
+### python main.py -snapshot RGLModel/IndSep/epoch_18_batch_1900_acc_99.9005634736_bestmodel.pt
 
 # Build s2s model and train
 # s2s_model = Seq2Seq(src_nword=args.vocab_size, 
@@ -152,20 +153,7 @@ else:
 
 
 
-### python main.py -snapshot RGLModel/IndSep/epoch_18_batch_1900_acc_99.9005634736_bestmodel.pt
 
-# Train RGL()
-if args.train:
-    logger.info('Training begin...')
-    trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
-            dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
-            test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
-            vocab, w2i, embedding)
-else:
-    logger.info('Test begin...')
-    model = RGLIndividualSaperateSC(len(vocab), 300, 2, 200, embedding, w2i).cuda()
-    model = load_state_dict(torch.load(args.snapshot))
-    demo_model(sent1, sent2, model, w2i)
 
 
 
