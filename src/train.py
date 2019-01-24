@@ -111,7 +111,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             
             # class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
             class_out, domain_out, out, reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha)
-            feature_iow     = Variable(featurefeature[:,1:].contiguous().view(-1)).cuda()
+            feature_iow     = Variable(feature[:,1:].contiguous().view(-1)).cuda()
 
 
             optimizer.zero_grad()
