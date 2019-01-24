@@ -94,28 +94,28 @@ logger.info('Getting pre-trained word embedding ...')
 args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_field)  
 
 
-# # Build model and train
-# rgl_net = RGLIndividualSaperateSC(args.vocab_size, args.embed_dim, args.num_class, 
-#     args.hidden_dim, args.pretrained_weight.numpy(), args.word_2_index['<SOS>'], args).cuda()
+# Build model and train
+rgl_net = RGLIndividualSaperateSC(args.vocab_size, args.embed_dim, args.num_class, 
+    args.hidden_dim, args.pretrained_weight.numpy(), args.word_2_index['<SOS>'], args).cuda()
 
-# if args.snapshot is not None:
-#     logger.info('Load model from' + args.snapshot)
-#     rgl_net.load_state_dict(torch.load(args.snapshot))
-#     show_reconstruct_results(dev_iter, rgl_net, args)
-#     # if not os.path.exists(small_pos):
-#     #     preprocess_pos_neg(small_pos_path, small_pos)
-#     #     preprocess_pos_neg(small_neg_path, small_neg)
-#     # pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
-#     # style_transfer(pos_iter, neg_iter, rgl_net, args)
-# else:
-#     logger.info('Train model begin...')
+if args.snapshot is not None:
+    logger.info('Load model from' + args.snapshot)
+    rgl_net.load_state_dict(torch.load(args.snapshot))
+    show_reconstruct_results(dev_iter, rgl_net, args)
+    # if not os.path.exists(small_pos):
+    #     preprocess_pos_neg(small_pos_path, small_pos)
+    #     preprocess_pos_neg(small_neg_path, small_neg)
+    # pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
+    # style_transfer(pos_iter, neg_iter, rgl_net, args)
+else:
+    logger.info('Train model begin...')
 
-#     try:
-#         trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args)
-#     except KeyboardInterrupt:
-#         print(traceback.print_exc())
-#         print('\n' + '-' * 89)
-#         print('Exiting from training early')
+    try:
+        trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args)
+    except KeyboardInterrupt:
+        print(traceback.print_exc())
+        print('\n' + '-' * 89)
+        print('Exiting from training early')
 
 
 # Build s2s model and train
