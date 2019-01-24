@@ -51,7 +51,7 @@ class Decoder(nn.Module):
         self.trg_soi    = trg_soi
         
         self.embed = nn.Embedding(vocab_size, embed_dim)
-        self.embedding.weight.data.copy_(torch.from_numpy(pre_embedding))
+        self.embed.weight.data.copy_(torch.from_numpy(pre_embedding))
         
         self.attention   = Attention(hidden_dim) 
         self.decodercell = DecoderCell(embed_dim, hidden_dim)
