@@ -79,8 +79,8 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_train, amazon_test, args)
-text_field.build_vocab(train_data, dev_data, min_freq=20)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_test, amazon_test, args)
+text_field.build_vocab(train_data, dev_data, min_freq=10)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
 
@@ -118,34 +118,34 @@ args.pretrained_weight = get_pretrained_word_embed(small_glove_path, args, text_
 #         print('Exiting from training early')
 
 
-# Build model and train
-s2s_model = Seq2Seq(src_nword=args.vocab_size, 
-                    trg_nword=args.vocab_size, 
-                    num_layer=2, 
-                    embed_dim=args.embed_dim, 
-                    hidden_dim=args.hidden_dim, 
-                    max_len=args.max_length, 
-                    trg_soi=args.word_2_index['<SOS>'], 
-                    args=args)
-s2s_model.cuda()
-if args.snapshot is not None:
-    logger.info('Load model from' + args.snapshot)
-    s2s_model.load_state_dict(torch.load(args.snapshot))
-    show_reconstruct_results(dev_iter, s2s_model, args)
-    # if not os.path.exists(small_pos):
-    #     preprocess_pos_neg(small_pos_path, small_pos)
-    #     preprocess_pos_neg(small_neg_path, small_neg)
-    # pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
-    # style_transfer(pos_iter, neg_iter, rgl_net, args)
-else:
-    logger.info('Train model begin...')
+# Build s2s model and train
+# s2s_model = Seq2Seq(src_nword=args.vocab_size, 
+#                     trg_nword=args.vocab_size, 
+#                     num_layer=2, 
+#                     embed_dim=args.embed_dim, 
+#                     hidden_dim=args.hidden_dim, 
+#                     max_len=args.max_length, 
+#                     trg_soi=args.word_2_index['<SOS>'], 
+#                     args=args)
+# s2s_model.cuda()
+# if args.snapshot is not None:
+#     logger.info('Load model from' + args.snapshot)
+#     s2s_model.load_state_dict(torch.load(args.snapshot))
+#     show_reconstruct_results(dev_iter, s2s_model, args)
+#     # if not os.path.exists(small_pos):
+#     #     preprocess_pos_neg(small_pos_path, small_pos)
+#     #     preprocess_pos_neg(small_neg_path, small_neg)
+#     # pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
+#     # style_transfer(pos_iter, neg_iter, rgl_net, args)
+# else:
+#     logger.info('Train model begin...')
 
-    try:
-        trainS2S(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=s2s_model, args=args)
-    except KeyboardInterrupt:
-        print(traceback.print_exc())
-        print('\n' + '-' * 89)
-        print('Exiting from training early')
+#     try:
+#         trainS2S(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=s2s_model, args=args)
+#     except KeyboardInterrupt:
+#         print(traceback.print_exc())
+#         print('\n' + '-' * 89)
+#         print('Exiting from training early')
 
 
 
@@ -154,18 +154,18 @@ else:
 
 ### python main.py -snapshot RGLModel/IndSep/epoch_18_batch_1900_acc_99.9005634736_bestmodel.pt
 
-# # Train RGL()
-# if args.train:
-#     logger.info('Training begin...')
-#     trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
-#             dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
-#             test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
-#             vocab, w2i, embedding)
-# else:
-#     logger.info('Test begin...')
-#     model = RGLIndividualSaperateSC(len(vocab), 300, 2, 200, embedding, w2i).cuda()
-#     model = load_state_dict(torch.load(args.snapshot))
-#     demo_model(sent1, sent2, model, w2i)
+# Train RGL()
+if args.train:
+    logger.info('Training begin...')
+    trainRGL(train_samples_batch,train_lenth_batch,train_labels_batch,train_mask_batch, \
+            dev_samples_batch,dev_lenth_batch,dev_labels_batch,dev_mask_batch, \
+            test_samples_batch,test_lenth_batch,test_labels_batch,test_mask_batch, \
+            vocab, w2i, embedding)
+else:
+    logger.info('Test begin...')
+    model = RGLIndividualSaperateSC(len(vocab), 300, 2, 200, embedding, w2i).cuda()
+    model = load_state_dict(torch.load(args.snapshot))
+    demo_model(sent1, sent2, model, w2i)
 
 
 

@@ -42,15 +42,15 @@ def eval(dev_iter, model, alpha):
         sample  = batch.text[0]
         length  = batch.text[1]
         label   = batch.label         
-        mask    = generate_mask(torch.max(length), length)
-        mask    = Variable(torch.FloatTensor(mask).cuda())
+        # mask    = generate_mask(torch.max(length), length)
+        # mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         target  = Variable(label)
         
-        logit,_,_,reconstruct_out = model(feature, length, alpha, mask, is_train=False)
+        logit,_,_,reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha, is_train=False)
         loss                      = F.cross_entropy(logit, target, size_average=False)
 
-        feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
+        feature_iow      = Variable(featurefeature[:,1:].contiguous().view(-1)).cuda()
         loss_reconstruct = nn.NLLLoss()
         reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
 
@@ -75,9 +75,9 @@ def eval(dev_iter, model, alpha):
         
     return accuracy, flag, eval_aeloss
 
-def generate_mask(max_length, length):
-    mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
-    return mask_batch
+# def generate_mask(max_length, length):
+#     mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
+#     return mask_batch
 
 def trainRGL(train_iter, dev_iter, train_data, model, args):    
     save_dir = "RGLModel/Newdata/"
@@ -105,23 +105,26 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(sample)
             target  = Variable(label)
-            mask    = generate_mask(torch.max(length), length)
-            mask    = Variable(torch.FloatTensor(mask).cuda())
+            # mask    = generate_mask(torch.max(length), length)
+            # mask    = Variable(torch.FloatTensor(mask).cuda())
             
             
             # class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
-            reconstruct_out = model(feature, length, alpha, mask)
-            feature_iow     = Variable(feature.contiguous().view(-1)).cuda()
+            class_out, domain_out, out, reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha)
+            feature_iow     = Variable(featurefeature[:,1:].contiguous().view(-1)).cuda()
 
 
             optimizer.zero_grad()
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             
-            # err_label   = loss_class(class_out, target)
-            # err_domain  = loss_domain(class_out, target)
+            err_label   = loss_class(class_out, target)
+            err_domain  = loss_domain(class_out, target)
             
-            # err = err_domain + err_label + lamda * out + 5*reconstruct_loss
-            err = reconstruct_loss
+
+            '''
+            How to give weights to each loss
+            '''
+            err = err_domain + err_label + lamda * out + 5*reconstruct_loss
             err.backward()
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
@@ -147,16 +150,14 @@ def show_reconstruct_results(dev_iter, model, args, cnt, reconstruct_loss):
         # logger.info('In ' + str(cnt_batch) + '  batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
-        mask    = generate_mask(torch.max(length), length)
-        mask    = Variable(torch.FloatTensor(mask).cuda())
+        # mask    = generate_mask(torch.max(length), length)
+        # mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         
 
 
-        # feature01, feature02, output = model.extractFeature(feature, length, mask)
-        feature01, output = model.extractFeature(feature, length, mask)
-        feature02 = ''
-        reconstruct_out = model.reconstruct(feature01, feature02, output, feature, length, is_train=False)
+        feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
+        reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
@@ -164,7 +165,7 @@ def show_reconstruct_results(dev_iter, model, args, cnt, reconstruct_loss):
             # writer.write('\n')
             writer.write('\n=============\n')
             writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
-            writer.write('\n************\n')
+            writer.write('\n\n')
             k = k + 1
         cnt_batch += 1
     writer.close()

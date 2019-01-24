@@ -42,63 +42,60 @@ class Attention(nn.Module):
 
         return ctx 
 
-# class Decoder(nn.Module):
-#     def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi, pre_embedding):
-#         super(Decoder, self).__init__()
-#         self.hidden_dim = hidden_dim
-#         self.max_len    = max_len
-#         self.vocab_size = vocab_size
-#         self.trg_soi    = trg_soi
+class Decoder(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi, pre_embedding):
+        super(Decoder, self).__init__()
+        self.hidden_dim = hidden_dim
+        self.max_len    = max_len
+        self.vocab_size = vocab_size
+        self.trg_soi    = trg_soi
         
-#         self.embed = nn.Embedding(vocab_size, embed_dim)
-#         self.embed.weight.data.copy_(pre_embedding)
+        self.embed = nn.Embedding(vocab_size, embed_dim)
+        self.embed.weight.data.copy_(pre_embedding)
         
-#         self.attention   = Attention(hidden_dim) 
-#         self.decodercell = DecoderCell(embed_dim, hidden_dim)
-#         self.dec2word    = nn.Linear(hidden_dim, vocab_size)
-#         self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
+        self.attention   = Attention(hidden_dim) 
+        self.decodercell = DecoderCell(embed_dim, hidden_dim)
+        self.dec2word    = nn.Linear(hidden_dim, vocab_size)
+        self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
 
-#     def forward(self, content, sentiment, hiddens, target, length, is_train=True):
-#         # logger.info('Is train: ' + str(is_train))
+    def forward(self, content, sentiment, hiddens, target, length, is_train=True):
+        # logger.info('Is train: ' + str(is_train))
         
-#         prev_s = content
-#         # prev_s = torch.cat((content, sentiment), 1)
-#         # prev_s = self.combine_hidden(prev_s)
-#         # print prev_s.size()
-#         if is_train:
-#             batch_size, target_len = target.size(0), target.size(1)
-#             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
+        prev_s = content
+        # prev_s = torch.cat((content, sentiment), 1)
+        # prev_s = self.combine_hidden(prev_s)
+        # print prev_s.size()
+        if is_train:
+            batch_size, target_len = target.size(0), target.size(1)
+            dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
 
-#             if torch.cuda.is_available():
-#                 dec_h = dec_h.cuda()
+            if torch.cuda.is_available():
+                dec_h = dec_h.cuda()
 
-#             target = self.embed(target)
+            target = self.embed(target)
             
-#             for i in range(target_len):
-#                 ctx = self.attention(hiddens, prev_s)   
-#                 prev_s       = self.decodercell(target[:, i], prev_s, ctx)
-#                 dec_h[:,i,:] = prev_s # .unsqueeze(1)
-#             outputs = self.dec2word(dec_h)
-#         else:
-#             batch_size = len(length)
-#             target = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
-#             outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
+            for i in range(target_len):
+                ctx = self.attention(hiddens, prev_s)   
+                prev_s       = self.decodercell(target[:, i], prev_s, ctx)
+                dec_h[:,i,:] = prev_s # .unsqueeze(1)
+            outputs = self.dec2word(dec_h)
+        else:
+            batch_size = len(length)
+            target = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
+            outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
 
-#             if torch.cuda.is_available():
-#                 target = target.cuda()
-#                 outputs = outputs.cuda()
+            if torch.cuda.is_available():
+                target = target.cuda()
+                outputs = outputs.cuda()
             
-#             for i in range(self.max_len):
-#                 target = self.embed(target).squeeze(1)     
-#                 ctx = self.attention(hiddens, prev_s)                        
-#                 prev_s = self.decodercell(target, prev_s, ctx)
-#                 output = self.dec2word(prev_s) # b * v
-#                 outputs[:,i,:] = output
-#                 target = output.topk(1)[1]
-#                 # target = output.topk(2)[1][:,1] # the index of the most probable word
-#                 # print target
-
-#         return outputs
+            for i in range(self.max_len):
+                target = self.embed(target).squeeze(1)     
+                ctx = self.attention(hiddens, prev_s)                        
+                prev_s = self.decodercell(target, prev_s, ctx)
+                output = self.dec2word(prev_s) # b * v
+                outputs[:,i,:] = output
+                target = output.topk(1)[1]
+        return outputs
 
 
 class DecoderCell(nn.Module):
@@ -131,127 +128,7 @@ class DecoderCell(nn.Module):
         return prev_s
 
 
-class Decoder(nn.Module):
-    def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi, pre_embedding):
-        super(Decoder, self).__init__()
-        self.hidden_dim = hidden_dim
-        self.max_len = max_len
-        self.vocab_size = vocab_size
-        self.trg_soi = trg_soi
-        
-        self.embed = nn.Embedding(vocab_size, embed_dim) 
-        self.embed.weight.data.copy_(pre_embedding)       
-        self.attention = Attention(hidden_dim) 
-        self.decodercell = DecoderCell(embed_dim, hidden_dim)
-        self.dec2word = nn.Linear(hidden_dim, vocab_size)
 
-
-    def forward(self, enc_h, prev_s, target=None):
-        '''
-        enc_h  : B x S x 2*H 
-        prev_s : B x H
-        '''
-
-        if target is not None:
-            batch_size, target_len = target.size(0), target.size(1)
-            
-            dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
-
-            if torch.cuda.is_available():
-                dec_h = dec_h.cuda()
-
-            target = self.embed(target)  
-            for i in range(target_len):
-                ctx = self.attention(enc_h, prev_s)                     
-                prev_s = self.decodercell(target[:, i], prev_s, ctx)
-                dec_h[:,i,:] = prev_s
-
-            outputs = self.dec2word(dec_h)
-
-
-        else:
-            batch_size = enc_h.size(0)
-            target = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
-            outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
-            
-            
-            if torch.cuda.is_available():
-                target = target.cuda()
-                outputs = outputs.cuda()
-            
-            for i in range(1, self.max_len):
-                target = self.embed(target).squeeze(1)              
-                ctx = self.attention(enc_h, prev_s)                 
-                prev_s = self.decodercell(target, prev_s, ctx)
-                output = self.dec2word(prev_s)
-                outputs[:,i,:] = output
-                target = output.topk(1)[1]
-            
-        return outputs
-
-
-class Seq2Seq(nn.Module):
-    def __init__(self, src_nword, trg_nword, num_layer, embed_dim, hidden_dim, max_len, trg_soi, args):
-        super(Seq2Seq, self).__init__()
-
-        self.hidden_dim = hidden_dim
-        self.trg_nword = trg_nword
-
-        self.encoder = Encoder(src_nword, embed_dim, hidden_dim, args)
-        self.linear = nn.Linear(hidden_dim, hidden_dim)
-        self.decoder = Decoder(trg_nword, embed_dim, hidden_dim, max_len, trg_soi, args.pretrained_weight)
-
-    
-    def forward(self, source, src_length=None, target=None):
-        batch_size = source.size(0)
-
-        enc_h, enc_h_t = self.encoder(source, src_length) # B x S x 2*H / 2 x B x H 
-        
-        dec_h0 = enc_h_t[-1] # B x H 
-        dec_h0 = F.tanh(self.linear(dec_h0)) # B x 1 x 2*H
-
-        out = self.decoder(enc_h, dec_h0, target) # B x S x H
-        out = F.log_softmax(out.contiguous().view(-1, self.trg_nword))
-        return out
-
-class Encoder(nn.Module):
-    def __init__(self, vocab_size, embed_dim, hidden_dim, args):
-        super(Encoder, self).__init__()
-        self.num_layers = 2
-        self.hidden_dim = hidden_dim
-        print(args.embed_dim)
-        self.embedding = nn.Embedding(vocab_size, embed_dim)
-        self.embedding.weight.data.copy_(args.pretrained_weight)
-        self.gru = nn.GRU(embed_dim, self.hidden_dim, self.num_layers, batch_first=True, bidirectional=True)
-
-        for name, param in self.gru.named_parameters():
-            if 'weight_ih' in name:
-                torch.nn.init.xavier_uniform_(param.data)
-            elif 'weight_hh' in name:
-                torch.nn.init.orthogonal_(param.data)
-            elif 'bias' in name:
-                param.data.fill_(0)
-        
-    def forward(self, source, src_length=None, hidden=None):
-        '''
-        source: B x T 
-        '''
-        batch_size = source.size(0)
-        src_embed = self.embedding(source)
-        
-        if hidden is None:
-            h_size = (self.num_layers *2, batch_size, self.hidden_dim)
-            enc_h_0 = Variable(src_embed.data.new(*h_size).zero_(), requires_grad=False)
-
-        if src_length is not None:
-            src_embed = nn.utils.rnn.pack_padded_sequence(src_embed, src_length, batch_first=True)
-
-        enc_h, enc_h_t = self.gru(src_embed, enc_h_0) 
-
-        if src_length is not None:
-            enc_h, _ = nn.utils.rnn.pad_packed_sequence(enc_h, batch_first=True)
-
-        return enc_h, enc_h_t
 
 
 
@@ -364,7 +241,7 @@ class RGLIndividualSaperateSC(nn.Module):
         self.w2i = w2i
         
         self.bi_encoder01 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
-        # self.bi_encoder02 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
+        self.bi_encoder02 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
         
 
         # self.encoder01 = nn.GRU(self.hidden_size, self.hidden_size, self.layers - 1, bidirectional=False, batch_first=True, dropout=0.2)
@@ -372,12 +249,12 @@ class RGLIndividualSaperateSC(nn.Module):
         
 
 
-        # self.class_classifier = nn.Linear(hidden_size, num_class)
-        # self.class_classifier.weight.data.normal_(0, 0.01)
-        # self.class_classifier.bias.data.fill_(0)
-        # self.domain_classifier = nn.Linear(hidden_size, num_class)
-        # self.domain_classifier.weight.data.normal_(0, 0.01)
-        # self.domain_classifier.bias.data.fill_(0)
+        self.class_classifier = nn.Linear(hidden_size, num_class)
+        self.class_classifier.weight.data.normal_(0, 0.01)
+        self.class_classifier.bias.data.fill_(0)
+        self.domain_classifier = nn.Linear(hidden_size, num_class)
+        self.domain_classifier.weight.data.normal_(0, 0.01)
+        self.domain_classifier.bias.data.fill_(0)
         
 
         self.decoder = Decoder(self.embedding_num, self.embedding_size, self.hidden_size, args.max_length, self.w2i, pre_embedding)
@@ -392,26 +269,29 @@ class RGLIndividualSaperateSC(nn.Module):
         # c0_encoder_bi01 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
         
 
-        # h0_encoder_bi02 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
+        h0_encoder_bi02 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
         # c0_encoder_bi02 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
 
         # return (h0_encoder_bi01.cuda(), c0_encoder_bi01.cuda()), (h0_encoder_bi02.cuda(), c0_encoder_bi02.cuda())
-        return h0_encoder_bi01.cuda() #, h0_encoder_bi02.cuda()
+        return h0_encoder_bi01.cuda(), h0_encoder_bi02.cuda()
     
     
-    def extractFeature(self, input_line, lenth, mask):
+    def extractFeature(self, input_line, lenth):
+        '''
+        Current not using mask
+        '''
+
         embed                           = self.embedding(input_line)
         
-        # hidden_bi01,hidden_bi02         = self.get_state(input_line)
-        hidden_bi01         = self.get_state(input_line)
+        hidden_bi01,hidden_bi02         = self.get_state(input_line)
         
         pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
         packed_output01, feature01      = self.bi_encoder01(pack_embed, hidden_bi01)
         unpacked_output01, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01, batch_first = True)
         
-        # pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
-        # packed_output02, feature02      = self.bi_encoder02(pack_embed, hidden_bi02)
-        # unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
+        pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
+        packed_output02, feature02      = self.bi_encoder02(pack_embed, hidden_bi02)
+        unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
         
         
 
@@ -430,12 +310,11 @@ class RGLIndividualSaperateSC(nn.Module):
         
 
         feature01 = feature01[-1]
-        # feature02 = feature02[-1]
+        feature02 = feature02[-1]
         feature01 = F.tanh(self.linear_feature(feature01))
-        # feature02 = F.tanh(self.linear_feature(feature02))
+        feature02 = F.tanh(self.linear_feature(feature02))
         
-        # return feature01, feature02, unpacked_output01
-        return feature01, unpacked_output01
+        return feature01, feature02, unpacked_output01
     
     
     def reconstruct(self, content, style, input_hiddens, input_line, length, is_train=True):
@@ -444,24 +323,142 @@ class RGLIndividualSaperateSC(nn.Module):
         return out
 
 
-    def forward(self, input_line, lenth, alpha, mask, is_train=True):
-        # feature01, feature02, output01 = self.extractFeature(input_line, lenth, mask)
-        feature01, output01 = self.extractFeature(input_line, lenth, mask)
-
-        feature02 = ''
+    def forward(self, input_line, lenth, alpha, is_train=True):
+        feature01, feature02, output01 = self.extractFeature(input_line, lenth)
+        
         reconstruction_out = self.reconstruct(feature01, feature02, output01, input_line, lenth, is_train)
         
 
-        # class_out = self.class_classifier(feature02)
-        # reverse_feature = ReverseLayerF.apply(feature01, alpha)
-        # class_out   = self.class_classifier(feature02)
-        # domain_out  = self.domain_classifier(reverse_feature)
-        # feature_out = feature01.mm(feature02.t())
-        # feature_out = feature_out ** 2
-        # feature_out = torch.mean(feature_out)
-        # return class_out, domain_out, feature_out, reconstruction_out
-        return reconstruction_out
+        class_out = self.class_classifier(feature02)
+        reverse_feature = ReverseLayerF.apply(feature01, alpha)
+        class_out   = self.class_classifier(feature02)
+        domain_out  = self.domain_classifier(reverse_feature)
+        feature_out = feature01.mm(feature02.t())
+        feature_out = feature_out ** 2
+        feature_out = torch.mean(feature_out)
+        return class_out, domain_out, feature_out, reconstruction_out
 
+
+# class Decoder(nn.Module):
+#     def __init__(self, vocab_size, embed_dim, hidden_dim, max_len, trg_soi, pre_embedding):
+#         super(Decoder, self).__init__()
+#         self.hidden_dim = hidden_dim
+#         self.max_len = max_len
+#         self.vocab_size = vocab_size
+#         self.trg_soi = trg_soi
+        
+#         self.embed = nn.Embedding(vocab_size, embed_dim) 
+#         self.embed.weight.data.copy_(pre_embedding)       
+#         self.attention = Attention(hidden_dim) 
+#         self.decodercell = DecoderCell(embed_dim, hidden_dim)
+#         self.dec2word = nn.Linear(hidden_dim, vocab_size)
+
+
+#     def forward(self, enc_h, prev_s, target=None):
+#         '''
+#         enc_h  : B x S x 2*H 
+#         prev_s : B x H
+#         '''
+
+#         if target is not None:
+#             batch_size, target_len = target.size(0), target.size(1)
+            
+#             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
+
+#             if torch.cuda.is_available():
+#                 dec_h = dec_h.cuda()
+
+#             target = self.embed(target)  
+#             for i in range(target_len):
+#                 ctx = self.attention(enc_h, prev_s)                     
+#                 prev_s = self.decodercell(target[:, i], prev_s, ctx)
+#                 dec_h[:,i,:] = prev_s
+
+#             outputs = self.dec2word(dec_h)
+
+
+#         else:
+#             batch_size = enc_h.size(0)
+#             target = Variable(torch.LongTensor([self.trg_soi] * batch_size), volatile=True).view(batch_size, 1)
+#             outputs = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))
+            
+            
+#             if torch.cuda.is_available():
+#                 target = target.cuda()
+#                 outputs = outputs.cuda()
+            
+#             for i in range(1, self.max_len):
+#                 target = self.embed(target).squeeze(1)              
+#                 ctx = self.attention(enc_h, prev_s)                 
+#                 prev_s = self.decodercell(target, prev_s, ctx)
+#                 output = self.dec2word(prev_s)
+#                 outputs[:,i,:] = output
+#                 target = output.topk(1)[1]
+            
+#         return outputs
+
+# class Seq2Seq(nn.Module):
+#     def __init__(self, src_nword, trg_nword, num_layer, embed_dim, hidden_dim, max_len, trg_soi, args):
+#         super(Seq2Seq, self).__init__()
+
+#         self.hidden_dim = hidden_dim
+#         self.trg_nword = trg_nword
+
+#         self.encoder = Encoder(src_nword, embed_dim, hidden_dim, args)
+#         self.linear = nn.Linear(hidden_dim, hidden_dim)
+#         self.decoder = Decoder(trg_nword, embed_dim, hidden_dim, max_len, trg_soi, args.pretrained_weight)
+
+    
+#     def forward(self, source, src_length=None, target=None):
+#         batch_size = source.size(0)
+
+#         enc_h, enc_h_t = self.encoder(source, src_length) # B x S x 2*H / 2 x B x H 
+        
+#         dec_h0 = enc_h_t[-1] # B x H 
+#         dec_h0 = F.tanh(self.linear(dec_h0)) # B x 1 x 2*H
+
+#         out = self.decoder(enc_h, dec_h0, target) # B x S x H
+#         out = F.log_softmax(out.contiguous().view(-1, self.trg_nword))
+#         return out
+
+# class Encoder(nn.Module):
+#     def __init__(self, vocab_size, embed_dim, hidden_dim, args):
+#         super(Encoder, self).__init__()
+#         self.num_layers = 2
+#         self.hidden_dim = hidden_dim
+#         print(args.embed_dim)
+#         self.embedding = nn.Embedding(vocab_size, embed_dim)
+#         self.embedding.weight.data.copy_(args.pretrained_weight)
+#         self.gru = nn.GRU(embed_dim, self.hidden_dim, self.num_layers, batch_first=True, bidirectional=True)
+
+#         for name, param in self.gru.named_parameters():
+#             if 'weight_ih' in name:
+#                 torch.nn.init.xavier_uniform_(param.data)
+#             elif 'weight_hh' in name:
+#                 torch.nn.init.orthogonal_(param.data)
+#             elif 'bias' in name:
+#                 param.data.fill_(0)
+        
+#     def forward(self, source, src_length=None, hidden=None):
+#         '''
+#         source: B x T 
+#         '''
+#         batch_size = source.size(0)
+#         src_embed = self.embedding(source)
+        
+#         if hidden is None:
+#             h_size = (self.num_layers *2, batch_size, self.hidden_dim)
+#             enc_h_0 = Variable(src_embed.data.new(*h_size).zero_(), requires_grad=False)
+
+#         if src_length is not None:
+#             src_embed = nn.utils.rnn.pack_padded_sequence(src_embed, src_length, batch_first=True)
+
+#         enc_h, enc_h_t = self.gru(src_embed, enc_h_0) 
+
+#         if src_length is not None:
+#             enc_h, _ = nn.utils.rnn.pad_packed_sequence(enc_h, batch_first=True)
+
+#         return enc_h, enc_h_t
 
 
 
