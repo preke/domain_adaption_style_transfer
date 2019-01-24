@@ -18,7 +18,7 @@ with open('../data/neg.txt', 'r') as reader:
 
 
 random.shuffle(list_of_sent)
-
+print (len(list_of_sent))
 
 writer = open('../data/amazon_train.tsv', 'w')
 for line in list_of_sent[:-1000]:
