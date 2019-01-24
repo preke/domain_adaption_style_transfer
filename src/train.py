@@ -50,7 +50,7 @@ def eval(dev_iter, model, alpha):
         logit,_,_,reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha, is_train=False)
         loss                      = F.cross_entropy(logit, target, size_average=False)
 
-        feature_iow      = Variable(feature[:,1:].contiguous().view(-1)).cuda()
+        feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
         loss_reconstruct = nn.NLLLoss()
         reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
 
