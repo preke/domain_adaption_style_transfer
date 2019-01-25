@@ -39,8 +39,8 @@ GLOVE_PATH     = '../data/glove.42B.300d.txt'
 
 small_pos_path   = '../data/amazon_small.pos'
 small_neg_path   = '../data/amazon_small.neg'
-small_pos   = '../data/amazon_small_pos.tsv'
-small_neg   = '../data/amazon_small_neg.tsv'
+small_pos   = '../data/amazon_small.pos'
+small_neg   = '../data/amazon_small.neg'
 
 small_glove_path = '../data/wordvec.txt'
 small_path       = '../data/small.txt'
@@ -116,6 +116,11 @@ else:
         print(traceback.print_exc())
         print('\n' + '-' * 89)
         print('Exiting from training early')
+
+
+# python main.py -snapshot RGLModel/epoch_10_batch_254000_acc_85.2_bestmodel.pt
+
+
 
 ### python main.py -snapshot RGLModel/IndSep/epoch_18_batch_1900_acc_99.9005634736_bestmodel.pt
 
