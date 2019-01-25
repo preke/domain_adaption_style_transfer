@@ -188,12 +188,12 @@ def style_transfer(pos_iter, neg_iter, model, args):
         logger.info('In ' + str(cnt_batch) + '  pos batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
-        mask    = generate_mask(torch.max(length), length)
-        mask    = Variable(torch.FloatTensor(mask).cuda())
+        # mask    = generate_mask(torch.max(length), length)
+        # mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
-        feature01, feature02 = model.extractFeature(feature, length, mask)
+        feature01, feature02 = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
         for i in range(len(length)):
-            pos_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
+            pos_df.append([total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
             total_cnt += 1
         cnt_batch += 1
     
@@ -202,9 +202,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
         sample  = batch.text[0]
         length  = batch.text[1]
         feature = Variable(sample)
-        mask    = generate_mask(torch.max(length), length)
-        mask    = Variable(torch.FloatTensor(mask).cuda())
-        feature01, feature02 = model.extractFeature(feature, length, mask)
+        # mask    = generate_mask(torch.max(length), length)
+        # mask    = Variable(torch.FloatTensor(mask).cuda())
+        feature01, feature02 = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
         for i in range(len(length)):
             neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
             total_cnt += 1
