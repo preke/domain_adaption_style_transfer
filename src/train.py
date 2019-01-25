@@ -191,7 +191,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
         # mask    = generate_mask(torch.max(length), length)
         # mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
-        feature01, feature02 = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
+        feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
         for i in range(len(length)):
             pos_df.append([total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
             total_cnt += 1
