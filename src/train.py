@@ -193,7 +193,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
         feature = Variable(sample)
         feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
         for i in range(len(length)):
-            pos_df.append([total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
+            pos_df.append([total_cnt, length[i], feature[i], feature01[i], feature02[i], output[i] ])
             total_cnt += 1
         cnt_batch += 1
     
@@ -206,26 +206,28 @@ def style_transfer(pos_iter, neg_iter, model, args):
         # mask    = Variable(torch.FloatTensor(mask).cuda())
         feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
         for i in range(len(length)):
-            neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i] ])
+            neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i], output[i] ])
             total_cnt += 1
         cnt_batch += 1
 
-    pos_df = pd.DataFrame(pos_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
-    neg_df = pd.DataFrame(neg_df, columns=['id', 'length', 'feature', 'feature1', 'feature2'])
+    pos_df = pd.DataFrame(pos_df, columns=['id', 'length', 'feature', 'feature1', 'feature2', 'hiddens'])
+    neg_df = pd.DataFrame(neg_df, columns=['id', 'length', 'feature', 'feature1', 'feature2', 'hiddens'])
 
-    print pos_df.shape
-    print neg_df.shape
+    # print pos_df.shape
+    # print neg_df.shape
     writer = open('pos_neg_log.txt', 'w')
     for index, row in pos_df.iterrows():
         pos = row['feature1']
+        pos_attention = row['hiddens']
         sim = []
         for neg in neg_df['feature1']:
-            print neg
+            # print neg
             sim.append(F.cosine_similarity(pos.unsqueeze(0), neg.unsqueeze(0)))
         max_index = int(np.argmax(np.array(sim)))
         reconstruct_out = model.reconstruct(
                             pos.unsqueeze(0), 
                             neg_df['feature2'][max_index].unsqueeze(0), 
+                            pos_attention.unsqueeze(0),
                             row['feature'].unsqueeze(0), 
                             row['length'].unsqueeze(0),
                             is_train=False)
