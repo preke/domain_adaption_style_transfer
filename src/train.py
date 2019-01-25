@@ -217,9 +217,10 @@ def style_transfer(pos_iter, neg_iter, model, args):
     # print neg_df.shape
     writer = open('pos_neg_log.txt', 'w')
     for index, row in pos_df.iterrows():
-        pos = row['feature1']
+        pos           = row['feature1']
         pos_attention = row['hiddens']
-        sim = []
+        length        = row['length'].unsqueeze(0)
+        sim           = []
         for neg in neg_df['feature1']:
             # print neg
             sim.append(F.cosine_similarity(pos.unsqueeze(0), neg.unsqueeze(0)))
@@ -229,7 +230,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
                             neg_df['feature2'][max_index].unsqueeze(0), 
                             pos_attention.unsqueeze(0),
                             row['feature'].unsqueeze(0), 
-                            row['length'].unsqueeze(0),
+                            [i-1 for i in length.tolist()],
                             is_train=False)
         out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
         k = 0 
