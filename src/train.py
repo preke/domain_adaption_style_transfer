@@ -233,6 +233,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
                             is_train=False)
         out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
         k = 0 
+        print out_in_batch.size()
         '''
          Still have problems
         '''
