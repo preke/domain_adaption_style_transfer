@@ -102,13 +102,13 @@ class DecoderCell(nn.Module):
     def __init__(self, embed_dim, hidden_dim):
         super(DecoderCell, self).__init__()
 
-        self.input_weights = nn.Linear(embed_dim, hidden_dim*2)
+        self.input_weights  = nn.Linear(embed_dim, hidden_dim*2)
         self.hidden_weights = nn.Linear(hidden_dim, hidden_dim*2)
-        self.ctx_weights = nn.Linear(hidden_dim*2, hidden_dim*2)
+        self.ctx_weights    = nn.Linear(hidden_dim*2, hidden_dim*2)
         
-        self.input_in = nn.Linear(embed_dim, hidden_dim)
+        self.input_in  = nn.Linear(embed_dim, hidden_dim)
         self.hidden_in = nn.Linear(hidden_dim, hidden_dim)
-        self.ctx_in = nn.Linear(hidden_dim*2, hidden_dim)
+        self.ctx_in    = nn.Linear(hidden_dim*2, hidden_dim)
 
         
 
