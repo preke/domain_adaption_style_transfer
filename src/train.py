@@ -143,7 +143,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
         cnt_epoch += 1
 
 def show_reconstruct_results(dev_iter, model, args, cnt=0, reconstruct_loss=0.0):
-    writer = open('logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
+    writer = open('f12_logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
     cnt_batch = 0
     for batch in dev_iter:
         # logger.info('In ' + str(cnt_batch) + '  batch...')
@@ -157,6 +157,61 @@ def show_reconstruct_results(dev_iter, model, args, cnt=0, reconstruct_loss=0.0)
 
         feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
+        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
+        k = 0 
+        for i in out_in_batch:
+            writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+            # writer.write('\n')
+            writer.write('\n=============\n')
+            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+            writer.write('\n\n')
+            k = k + 1
+        cnt_batch += 1
+    writer.close()
+
+
+def show_reconstruct_results_f11(dev_iter, model, args, cnt=0, reconstruct_loss=0.0):
+    writer = open('f11_logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
+    cnt_batch = 0
+    for batch in dev_iter:
+        # logger.info('In ' + str(cnt_batch) + '  batch...')
+        sample  = batch.text[0]
+        length  = batch.text[1]
+        # mask    = generate_mask(torch.max(length), length)
+        # mask    = Variable(torch.FloatTensor(mask).cuda())
+        feature = Variable(sample)
+        
+
+
+        feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
+        reconstruct_out = model.reconstruct(feature01, feature01, output, feature, [i-1 for i in length.tolist()], is_train=False)
+        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
+        k = 0 
+        for i in out_in_batch:
+            writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+            # writer.write('\n')
+            writer.write('\n=============\n')
+            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+            writer.write('\n\n')
+            k = k + 1
+        cnt_batch += 1
+    writer.close()
+
+def show_reconstruct_results_f22(dev_iter, model, args, cnt=0, reconstruct_loss=0.0):
+    writer = open('f22_logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
+    cnt_batch = 0
+    for batch in dev_iter:
+        # logger.info('In ' + str(cnt_batch) + '  batch...')
+        sample  = batch.text[0]
+        length  = batch.text[1]
+        # mask    = generate_mask(torch.max(length), length)
+        # mask    = Variable(torch.FloatTensor(mask).cuda())
+        feature = Variable(sample)
+        
+
+
+        feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
+        reconstruct_out = model.reconstruct(feature01, feature01, output, feature, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
