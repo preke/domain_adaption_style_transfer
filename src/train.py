@@ -211,7 +211,7 @@ def show_reconstruct_results_f22(dev_iter, model, args, cnt=0, reconstruct_loss=
 
 
         feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
-        reconstruct_out = model.reconstruct(feature01, feature01, output, feature, [i-1 for i in length.tolist()], is_train=False)
+        reconstruct_out = model.reconstruct(feature02, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
