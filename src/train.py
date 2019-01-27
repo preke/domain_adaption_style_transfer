@@ -20,6 +20,9 @@ import traceback
 
 import dataload
 from model import *
+from utils import preprocess_write, get_pretrained_word_embed, preprocess_pos_neg
+from dataload import load_data, load_pos_neg_data
+
 
 
 # logging
