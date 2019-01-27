@@ -82,7 +82,7 @@ def eval(dev_iter, model, alpha):
 #     mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
 #     return mask_batch
 
-def trainRGL(train_iter, dev_iter, train_data, model, args):    
+def trainRGL(train_iter, dev_iter, train_data, model, args, text_field):    
     save_dir = "RGLModel/Newdata/"
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
