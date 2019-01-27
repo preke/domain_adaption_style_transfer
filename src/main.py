@@ -39,8 +39,8 @@ GLOVE_PATH     = '../data/glove.42B.300d.txt'
 
 small_pos_path   = '../data/amazon_small.pos'
 small_neg_path   = '../data/amazon_small.neg'
-small_pos   = '../data/amazon_small.pos'
-small_neg   = '../data/amazon_small.neg'
+small_pos        = '../data/amazon_small.pos'
+small_neg        = '../data/amazon_small.neg'
 
 small_glove_path = '../data/wordvec.txt'
 small_path       = '../data/small.txt'

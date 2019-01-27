@@ -55,19 +55,19 @@ class Decoder(nn.Module):
         
         self.attention   = Attention(hidden_dim) 
         self.decodercell = DecoderCell(embed_dim, hidden_dim)
-        self.dec2word    = nn.Linear(hidden_dim, vocab_size)
+        self.dec2word    = nn.Linear(hidden_dim*2, vocab_size)
         self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
 
     def forward(self, content, sentiment, hiddens, target, length, is_train=True):
         # logger.info('Is train: ' + str(is_train))
         
-        # prev_s = content
-        prev_s = torch.cat((content, sentiment), 1)
-        prev_s = self.combine_hidden(prev_s)
+        prev_s = content
+        # prev_s = torch.cat((content, sentiment), 1)
+        # prev_s = self.combine_hidden(prev_s)
         # print prev_s.size()
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
-            dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
+            dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim*2))
 
             if torch.cuda.is_available():
                 dec_h = dec_h.cuda()
@@ -76,8 +76,10 @@ class Decoder(nn.Module):
             
             for i in range(target_len):
                 ctx = self.attention(hiddens, prev_s)   
+                
                 prev_s       = self.decodercell(target[:, i], prev_s, ctx)
-                dec_h[:,i,:] = prev_s # .unsqueeze(1)
+                
+                dec_h[:,i,:] = torch.cat((prev_s, sentiment), 1) # .unsqueeze(1)
             outputs = self.dec2word(dec_h)
         else:
             batch_size = len(length)
@@ -92,7 +94,7 @@ class Decoder(nn.Module):
                 target = self.embed(target).squeeze(1)     
                 ctx = self.attention(hiddens, prev_s)                        
                 prev_s = self.decodercell(target, prev_s, ctx)
-                output = self.dec2word(prev_s) # b * v
+                output = self.dec2word(torch.cat((prev_s, sentiment), 1)) # b * v
                 outputs[:,i,:] = output
                 target = output.topk(1)[1]
         return outputs
