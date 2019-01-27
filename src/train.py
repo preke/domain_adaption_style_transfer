@@ -139,6 +139,20 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                     logger.info('epoch: %d, [iter: %d / all %d], err_s_label: %f, err_s_domain: %f, err_t_domain: %f, err_ae: %f' \
                       % (epoch, cnt_batch, len_iter, err_label.cpu().data.numpy(),
                          err_domain.cpu().data.numpy(), out, reconstruct_loss))
+
+                
+                # Try to illustrate the Style Transfer
+                small_pos_path   = '../data/amazon_small.pos'
+                small_neg_path   = '../data/amazon_small.neg'
+                small_pos        = '../data/amazon_small.pos'
+                small_neg        = '../data/amazon_small.neg'
+                
+                if not os.path.exists(small_pos):
+                    preprocess_pos_neg(small_pos_path, small_pos)
+                    preprocess_pos_neg(small_neg_path, small_neg)
+                pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
+                style_transfer(pos_iter, neg_iter, model, args, cnt_batch, eval_aeloss)
+
             cnt_batch += 1
         cnt_epoch += 1
 
@@ -225,7 +239,7 @@ def show_reconstruct_results_f22(dev_iter, model, args, cnt=0, reconstruct_loss=
     writer.close()
 
 
-def style_transfer(pos_iter, neg_iter, model, args):
+def style_transfer(pos_iter, neg_iter, model, args, cnt_batch, eval_aeloss):
     
     total_cnt = 0
     model.eval()
@@ -270,7 +284,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
 
     # print pos_df.shape
     # print neg_df.shape
-    writer = open('pos_neg_log.txt', 'w')
+    writer = open(str(cnt_batch + '_pos_neg_log_' + str(eval_aeloss) + '_.txt', 'w')
     for index, row in pos_df.iterrows():
         pos           = row['feature1']
         pos_attention = row['hiddens']
@@ -289,7 +303,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
                             is_train=False)
         out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
         k = 0 
-        print out_in_batch.size()
+        # print out_in_batch.size()
         '''
          Still have problems
         '''
