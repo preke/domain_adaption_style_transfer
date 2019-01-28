@@ -135,7 +135,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args, text_field):
                 
                 acc, flag, eval_aeloss = eval(dev_iter, model, alpha)
                 show_reconstruct_results(dev_iter, model, args, cnt_batch, eval_aeloss)
-                save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
+                save_path = save_dir + "epoch_ " + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
                 if flag:
                     torch.save(model.state_dict(), save_path)
                     logger.info('Save model to ' + save_path)
