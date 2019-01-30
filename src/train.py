@@ -318,8 +318,8 @@ def style_transfer(pos_iter, neg_iter, model, args, cnt_batch, eval_aeloss):
 
             writer.write(' '.join([args.index_2_word[int(l)] for l in neg_sample]))
             writer.write('\n\n')
-            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
-            writer.write('\n************\n')
+            # writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
+            # writer.write('\n************\n')
             k = k + 1
 
     
