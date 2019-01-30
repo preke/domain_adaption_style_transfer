@@ -158,7 +158,7 @@ class CNN_Text(nn.Module):
         q1 = [i.size(2) * F.avg_pool1d(i, i.size(2)).squeeze(2) for i in q1]  # [(N, Co), ...]*len(Ks)
         q1 = [F.tanh(i) for i in q1]
         q1 = torch.cat(q1, 1) # 32 * 300
-        
+        q1 = self.fc1(q1)
         return q1
 
         
