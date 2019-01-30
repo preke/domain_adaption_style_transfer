@@ -143,9 +143,9 @@ class CNN_Text(nn.Module):
         Ks = args.kernel_sizes
         self.embed = nn.Embedding(V, D)
         # use pre-trained
-        if args.word_Embedding:
+        # if args.word_Embedding:
             # pass
-            self.embed.weight.data.copy_(args.pretrained_weight)
+        self.embed.weight.data.copy_(args.pretrained_weight)
         self.convs1 = nn.ModuleList([nn.Conv2d(Ci, Co, (K, D)) for K in Ks])
         self.dropout = nn.Dropout(args.dropout)
         self.fc1 = nn.Linear(300, 300)
