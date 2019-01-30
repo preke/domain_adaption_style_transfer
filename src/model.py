@@ -270,8 +270,10 @@ class RGLIndividualSaperateSC(nn.Module):
         self.w2i = w2i
         
         self.bi_encoder01 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
-        self.bi_encoder02 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
-        
+        # self.bi_encoder02 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
+        self.cnn_text = CNN_Text(args)
+
+
         self.class_classifier = nn.Linear(hidden_size, num_class)
         self.class_classifier.weight.data.normal_(0, 0.01)
         self.class_classifier.bias.data.fill_(0)
@@ -282,6 +284,8 @@ class RGLIndividualSaperateSC(nn.Module):
 
         self.decoder = Decoder(self.embedding_num, self.embedding_size, self.hidden_size, args.max_length, self.w2i, pre_embedding)
         self.linear_feature = nn.Linear(hidden_size, hidden_size)
+
+
     
     def get_state(self, input_line):
         '''
@@ -314,6 +318,8 @@ class RGLIndividualSaperateSC(nn.Module):
         
         
         print input_line.size()
+        feature02 = self.cnn_text(input_line)
+        print feature02
         # pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
         # packed_output02, feature02      = self.bi_encoder02(pack_embed, hidden_bi02)
         # unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
