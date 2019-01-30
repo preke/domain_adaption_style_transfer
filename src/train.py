@@ -131,7 +131,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err.backward()
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
-            if cnt_batch % 2000 == 0:
+            if cnt_batch % 1000 == 0:
                 
                 acc, flag, eval_aeloss = eval(dev_iter, model, alpha)
                 show_reconstruct_results(dev_iter, model, args, cnt_batch, eval_aeloss)
