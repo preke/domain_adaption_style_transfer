@@ -71,6 +71,7 @@ args.device       = torch.device('cuda')
 args.kernel_num   = 100
 args.kernel_sizes = '3,4,5'
 args.kernel_sizes = [int(k) for k in args.kernel_sizes.split(',')]
+args.dropout      = 0.1
 
 # Preprocess
 if not os.path.exists(TEST_PRE_PATH):
