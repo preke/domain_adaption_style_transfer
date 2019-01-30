@@ -82,7 +82,7 @@ def eval(dev_iter, model, alpha):
 #     mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
 #     return mask_batch
 
-def trainRGL(train_iter, dev_iter, train_data, model, args, text_field):    
+def trainRGL(train_iter, dev_iter, train_data, model, args):    
     save_dir = "RGLModel/Newdata/"
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
@@ -145,16 +145,16 @@ def trainRGL(train_iter, dev_iter, train_data, model, args, text_field):
 
                 
                 # Try to illustrate the Style Transfer
-                small_pos_path   = '../data/amazon_small.pos'
-                small_neg_path   = '../data/amazon_small.neg'
-                small_pos        = '../data/amazon_small.pos'
-                small_neg        = '../data/amazon_small.neg'
+                # small_pos_path   = '../data/amazon_small.pos'
+                # small_neg_path   = '../data/amazon_small.neg'
+                # small_pos        = '../data/amazon_small.pos'
+                # small_neg        = '../data/amazon_small.neg'
                 
-                if not os.path.exists(small_pos):
-                    preprocess_pos_neg(small_pos_path, small_pos)
-                    preprocess_pos_neg(small_neg_path, small_neg)
-                pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
-                style_transfer(pos_iter, neg_iter, model, args, cnt_batch, eval_aeloss)
+                # if not os.path.exists(small_pos):
+                #     preprocess_pos_neg(small_pos_path, small_pos)
+                #     preprocess_pos_neg(small_neg_path, small_neg)
+                # pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
+                # style_transfer(pos_iter, neg_iter, model, args, cnt_batch, eval_aeloss)
 
             cnt_batch += 1
         cnt_epoch += 1
