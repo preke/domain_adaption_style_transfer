@@ -135,7 +135,7 @@ class CNN_Text(nn.Module):
         super(CNN_Text, self).__init__()
         self.args = args
         
-        V = args.embed_num
+        V = args.vocab_size
         D = args.embed_dim
         
         Ci = 1
