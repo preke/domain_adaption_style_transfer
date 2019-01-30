@@ -242,7 +242,7 @@ def show_reconstruct_results_f22(dev_iter, model, args, cnt=0, reconstruct_loss=
     writer.close()
 
 
-def style_transfer(pos_iter, neg_iter, model, args, cnt_batch, eval_aeloss):
+def style_transfer(pos_iter, neg_iter, model, args):
     
     total_cnt = 0
     model.eval()
