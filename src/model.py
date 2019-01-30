@@ -62,9 +62,6 @@ class Decoder(nn.Module):
         # logger.info('Is train: ' + str(is_train))
         
         prev_s = content
-        # prev_s = torch.cat((content, sentiment), 1)
-        # prev_s = self.combine_hidden(prev_s)
-        # print prev_s.size()
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
             dec_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim*2))
@@ -133,6 +130,36 @@ class DecoderCell(nn.Module):
 
 
 
+class CNN_Text(nn.Module):
+    def __init__(self, args):
+        super(CNN_Text, self).__init__()
+        self.args = args
+        
+        V = args.embed_num
+        D = args.embed_dim
+        
+        Ci = 1
+        Co = args.kernel_num
+        Ks = args.kernel_sizes
+        self.embed = nn.Embedding(V, D)
+        # use pre-trained
+        if args.word_Embedding:
+            # pass
+            self.embed.weight.data.copy_(args.pretrained_weight)
+        self.convs1 = nn.ModuleList([nn.Conv2d(Ci, Co, (K, D)) for K in Ks])
+        self.dropout = nn.Dropout(args.dropout)
+        self.fc1 = nn.Linear(300, 300)
+
+    
+    def forward(self, q1):
+        q1 = self.embed(q1)
+        q1 = q1.unsqueeze(1)  # (N, Ci, W, D)
+        q1 = [F.tanh(conv(q1)).squeeze(3) for conv in self.convs1]  # [(N, Co, W), ...]*len(Ks)
+        q1 = [i.size(2) * F.avg_pool1d(i, i.size(2)).squeeze(2) for i in q1]  # [(N, Co), ...]*len(Ks)
+        q1 = [F.tanh(i) for i in q1]
+        q1 = torch.cat(q1, 1) # 32 * 300
+        
+        return q1
 
         
         
@@ -245,12 +272,6 @@ class RGLIndividualSaperateSC(nn.Module):
         self.bi_encoder01 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
         self.bi_encoder02 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
         
-
-        # self.encoder01 = nn.GRU(self.hidden_size, self.hidden_size, self.layers - 1, bidirectional=False, batch_first=True, dropout=0.2)
-        # self.encoder02 = nn.GRU(self.hidden_size, self.hidden_size, self.layers - 1, bidirectional=False, batch_first=True, dropout=0.2)
-        
-
-
         self.class_classifier = nn.Linear(hidden_size, num_class)
         self.class_classifier.weight.data.normal_(0, 0.01)
         self.class_classifier.bias.data.fill_(0)
@@ -285,15 +306,17 @@ class RGLIndividualSaperateSC(nn.Module):
 
         embed                           = self.embedding(input_line)
         
-        hidden_bi01,hidden_bi02         = self.get_state(input_line)
+        hidden_bi01, hidden_bi02         = self.get_state(input_line)
         
         pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
         packed_output01, feature01      = self.bi_encoder01(pack_embed, hidden_bi01)
         unpacked_output01, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01, batch_first = True)
         
-        pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
-        packed_output02, feature02      = self.bi_encoder02(pack_embed, hidden_bi02)
-        unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
+        
+        print input_line.size()
+        # pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
+        # packed_output02, feature02      = self.bi_encoder02(pack_embed, hidden_bi02)
+        # unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
         
         
 

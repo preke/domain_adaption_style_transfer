@@ -58,17 +58,19 @@ args = parser.parse_args()
 
 
 # Parameters setting
-args.grad_clip  = 2
-args.embed_dim  = 300
-args.hidden_dim = 100
-args.batch_size = 32
-args.lr         = 0.0001
-args.num_epoch  = 100
-args.num_class  = 2
-args.max_length = 20
-args.lamda      = 1.0
-args.device     = torch.device('cuda')
-
+args.grad_clip    = 2
+args.embed_dim    = 300
+args.hidden_dim   = 100
+args.batch_size   = 32
+args.lr           = 0.0001
+args.num_epoch    = 100
+args.num_class    = 2
+args.max_length   = 20
+args.lamda        = 1.0
+args.device       = torch.device('cuda')
+args.kernel_num   = 100
+args.kernel_sizes = '3,4,5'
+args.kernel_sizes = [int(k) for k in args.kernel_sizes.split(',')]
 
 # Preprocess
 if not os.path.exists(TEST_PRE_PATH):
@@ -79,7 +81,7 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_train, amazon_test, args)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_test, amazon_test, args)
 text_field.build_vocab(train_data, dev_data, min_freq=10)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
