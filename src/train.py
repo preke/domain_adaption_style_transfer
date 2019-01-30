@@ -50,7 +50,7 @@ def eval(dev_iter, model, alpha):
         feature = Variable(sample)
         target  = Variable(label)
         
-        logit,_,_,reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha, is_train=False)
+        logit, _, _, reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha, is_train=False)
         loss                      = F.cross_entropy(logit, target, size_average=False)
 
         feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
@@ -135,7 +135,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args, text_field):
                 
                 acc, flag, eval_aeloss = eval(dev_iter, model, alpha)
                 show_reconstruct_results(dev_iter, model, args, cnt_batch, eval_aeloss)
-                save_path = save_dir + "epoch_ " + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
+                save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
                 if flag:
                     torch.save(model.state_dict(), save_path)
                     logger.info('Save model to ' + save_path)
@@ -311,8 +311,12 @@ def style_transfer(pos_iter, neg_iter, model, args, cnt_batch, eval_aeloss):
          Still have problems
         '''
         sample = row['feature']
+        neg_sample = neg_df['feature'][max_index]
         for i in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample]))
+            writer.write('\n\n')
+
+            writer.write(' '.join([args.index_2_word[int(l)] for l in neg_sample]))
             writer.write('\n\n')
             writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
             writer.write('\n************\n')
