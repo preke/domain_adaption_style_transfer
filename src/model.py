@@ -148,7 +148,7 @@ class CNN_Text(nn.Module):
         self.embed.weight.data.copy_(args.pretrained_weight)
         self.convs1 = nn.ModuleList([nn.Conv2d(Ci, Co, (K, D)) for K in Ks])
         self.dropout = nn.Dropout(args.dropout)
-        self.fc1 = nn.Linear(300, 300)
+        self.fc1 = nn.Linear(300, 100)
 
     
     def forward(self, q1):
@@ -317,9 +317,8 @@ class RGLIndividualSaperateSC(nn.Module):
         unpacked_output01, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01, batch_first = True)
         
         
-        print input_line.size()
         feature02 = self.cnn_text(input_line)
-        print feature02
+        # print feature02.size()
         # pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
         # packed_output02, feature02      = self.bi_encoder02(pack_embed, hidden_bi02)
         # unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
@@ -341,9 +340,7 @@ class RGLIndividualSaperateSC(nn.Module):
         
 
         feature01 = feature01[-1]
-        feature02 = feature02[-1]
         feature01 = F.tanh(self.linear_feature(feature01))
-        feature02 = F.tanh(self.linear_feature(feature02))
         
         return feature01, feature02, unpacked_output01
     
