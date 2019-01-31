@@ -55,7 +55,7 @@ class Decoder(nn.Module):
         
         self.attention   = Attention(hidden_dim) 
         self.decodercell = DecoderCell(embed_dim, hidden_dim)
-        self.dec2word    = nn.Linear(hidden_dim, vocab_size)
+        self.dec2word    = nn.Linear(hidden_dim*2, vocab_size)
         # self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
 
     def forward(self, content, sentiment, hiddens, target, length, is_train=True):
@@ -76,10 +76,10 @@ class Decoder(nn.Module):
                 ctx            = self.attention(hiddens, prev_s)
                 prev_s         = self.decodercell(target[:, i], prev_s, ctx)
                 dec_h[:,i,:]   = prev_s
-                style_h[:,i,:] = sentiment
-                # dec_h[:,i,:] = torch.cat((prev_s, sentiment), 1) # .unsqueeze(1)
+                # style_h[:,i,:] = sentiment
+                dec_h[:,i,:] = torch.cat((prev_s, sentiment), 1) # .unsqueeze(1)
             outputs = self.dec2word(dec_h)
-            outputs = outputs.add(0.5*self.dec2word(style_h))
+            # outputs = outputs.add(0.5*self.dec2word(style_h))
         else:
             batch_size = len(length)
             target     = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
@@ -92,9 +92,10 @@ class Decoder(nn.Module):
                 target         = self.embed(target).squeeze(1)     
                 ctx            = self.attention(hiddens, prev_s)                        
                 prev_s         = self.decodercell(target, prev_s, ctx)
-                output         = self.dec2word(prev_s)
+                # output       = self.dec2word(prev_s)
+                output         = torch.cat((prev_s, sentiment), 1)
                 outputs[:,i,:] = output
-                output       = output.add(0.5*self.dec2word(sentiment))
+                # output       = output.add(0.5*self.dec2word(sentiment))
                 target         = output.topk(1)[1]
         return outputs
 
