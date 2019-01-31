@@ -297,6 +297,19 @@ def style_transfer(pos_iter, neg_iter, model, args):
             # print neg
             sim.append(F.cosine_similarity(pos.unsqueeze(0), neg.unsqueeze(0)))
         max_index = int(np.argmax(np.array(sim)))
+
+
+        print pos.unsqueeze(0).size()
+        print type(pos.unsqueeze(0))
+        
+        print neg_df['feature2'][max_index].unsqueeze(0).size()
+        print type(neg_df['feature2'][max_index].unsqueeze(0))
+
+        print pos_attention.unsqueeze(0).size()
+        print type(pos_attention.unsqueeze(0))
+
+        print [i-1 for i in length.tolist()]
+        break
         reconstruct_out = model.reconstruct(
                             pos.unsqueeze(0), 
                             neg_df['feature2'][max_index].unsqueeze(0), 
