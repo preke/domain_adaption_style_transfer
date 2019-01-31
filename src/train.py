@@ -312,9 +312,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
     pos_attention = pos_df['hiddens'][0]
     length        = pos_df['length'][0]
     for i in range(5):
-        pos = torch.cat(pos, pos, dim=0)
-        pos_attention = torch.cat(pos_attention, pos_attention, dim=0)
-        length = torch.cat(length, length, dim=0)
+        pos = torch.cat((pos, pos), dim=0)
+        pos_attention = torch.cat((pos_attention, pos_attention), dim=0)
+        length = torch.cat((length, length), dim=0)
     print pos.size()
     print pos_attention.size()
     print length.size()
