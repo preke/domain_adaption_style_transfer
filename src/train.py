@@ -288,82 +288,46 @@ def style_transfer(pos_iter, neg_iter, model, args):
     # print pos_df.shape
     # print neg_df.shape
     writer = open('pos_neg_log_'+'_.txt', 'w')
-    # for index, row in pos_df.iterrows():
-        # pos           = row['feature1']
-        # pos_attention = row['hiddens']
-        # length        = row['length'].unsqueeze(0)
-        # sim           = []
-        # for neg in neg_df['feature1']:
-        #     # print neg
-        #     sim.append(F.cosine_similarity(pos.unsqueeze(0), neg.unsqueeze(0)))
-        # max_index = int(np.argmax(np.array(sim)))
+    for index, row in pos_df.iterrows():
+        pos           = row['feature1'].unsqueeze(0)
+        pos_attention = row['hiddens'].unsqueeze(0)
+        feature       = row['feature'].unsqueeze(0)
+        length        = row['length'].unsqueeze(0)
+        sim           = []
+        for neg in neg_df['feature1']:
+            sim.append(F.cosine_similarity(pos, neg.unsqueeze(0)))
+        max_index = int(np.argmax(np.array(sim)))
+        neg = neg_df['feature1'][max_index].unsqueeze(0)
 
-        # reconstruct_out = model.reconstruct(
-        #                     pos.unsqueeze(0).cuda(), 
-        #                     neg_df['feature1'][max_index].unsqueeze(0).cuda(), 
-        #                     pos_attention.unsqueeze(0).cuda(),
-        #                     row['feature'].unsqueeze(0).cuda(), 
-        #                     [i-1 for i in length.tolist()],
-        #                     is_train = False)
+        for i in range(5): # batch size 32 (2^5)
+            pos           = torch.cat((pos, pos))
+            neg           = torch.cat((neg, neg))
+            feature       = torch.cat((feature, feature))
+            pos_attention = torch.cat((pos_attention, pos_attention))
+            length        = torch.cat((length, length))
 
-    # xaigao
-    sim           = []
-    pos           = pos_df['feature1'][0].unsqueeze(0)
-    pos_attention = pos_df['hiddens'][0].unsqueeze(0)
-    length        = pos_df['length'][0].unsqueeze(0)
-
-
-    for neg in neg_df['feature1']:
-        # print neg
-        sim.append(F.cosine_similarity(pos, neg.unsqueeze(0)))
-    max_index = int(np.argmax(np.array(sim)))
-    neg = neg_df['feature1'][max_index].unsqueeze(0)
-
-    for i in range(5):
-        pos = torch.cat((pos, pos))
-        neg = torch.cat((neg, neg))
-        pos_attention = torch.cat((pos_attention, pos_attention))
-        length = torch.cat((length, length))
-    print pos.size()
-    print pos_attention.size()
-    print length.size()
-    
-    
-
-    reconstruct_out = model.reconstruct(
+        reconstruct_out = model.reconstruct(
                         Variable(pos).cuda(), 
                         Variable(neg).cuda(), 
                         Variable(pos_attention).cuda(),
-                        Variable(pos_attention).cuda(), 
+                        Variable(feature).cuda(), 
                         [i-1 for i in length.tolist()],
                         is_train = False)
-    # xaigao end
 
-    out_in_batch = reconstruct_out.view(32, args.max_length, args.vocab_size)
-    print out_in_batch.size()
-    for i in out_in_batch:
-        print torch.argmax(i, dim=1)
-        print ' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)])
-    # break
-    # k = 0 
-    # # print out_in_batch.size()
-    # '''
-    #  Still have problems
-    # '''
-    # sample = row['feature']
-    # neg_sample = neg_df['feature'][max_index]
-    # for i in out_in_batch:
-    #     writer.write(' '.join([args.index_2_word[int(l)] for l in sample]))
-    #     writer.write('\n\n')
+        out_in_batch = reconstruct_out.view(args.batch_size, args.max_length, args.vocab_size)
+        k = 0 
+        sample = row['feature']
+        neg_sample = neg_df['feature'][max_index]
+        for i in out_in_batch[:1]:
+            writer.write(' '.join([args.index_2_word[int(l)] for l in sample]))
+            writer.write('\n\n')
 
-    #     writer.write(' '.join([args.index_2_word[int(l)] for l in neg_sample]))
-    #     writer.write('\n\n')
-        
-    #     writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
-    #     writer.write('\n************\n')
-    #     k = k + 1
-
-
+            writer.write(' '.join([args.index_2_word[int(l)] for l in neg_sample]))
+            writer.write('\n\n')
+            
+            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
+            writer.write('\n************\n')
+            k = k + 1
 
     writer.close()
 
