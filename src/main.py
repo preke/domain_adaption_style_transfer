@@ -107,7 +107,7 @@ if args.snapshot is not None:
     # show_reconstruct_results(dev_iter, rgl_net, args)
     # show_reconstruct_results_f11(dev_iter, rgl_net, args)
     # show_reconstruct_results_f22(dev_iter, rgl_net, args)
-    trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args, text_field=text_field)
+    trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args)
     # if not os.path.exists(small_pos):
     #     preprocess_pos_neg(small_pos_path, small_pos)
     #     preprocess_pos_neg(small_neg_path, small_neg)
@@ -117,7 +117,7 @@ else:
     logger.info('Train model begin...')
 
     try:
-        trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args, text_field=text_field)
+        trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args)
     except KeyboardInterrupt:
         print(traceback.print_exc())
         print('\n' + '-' * 89)

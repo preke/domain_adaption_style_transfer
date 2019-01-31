@@ -82,7 +82,7 @@ def eval(dev_iter, model, alpha):
 #     mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
 #     return mask_batch
 
-def trainRGL(train_iter, dev_iter, train_data, model, args, text_field):    
+def trainRGL(train_iter, dev_iter, train_data, model, args):    
     save_dir = "RGLModel/Newdata/"
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
@@ -145,16 +145,16 @@ def trainRGL(train_iter, dev_iter, train_data, model, args, text_field):
 
                 
                 # Try to illustrate the Style Transfer
-                small_pos_path   = '../data/amazon_small.pos'
-                small_neg_path   = '../data/amazon_small.neg'
-                small_pos        = '../data/amazon_small.pos'
-                small_neg        = '../data/amazon_small.neg'
+                # small_pos_path   = '../data/amazon_small.pos'
+                # small_neg_path   = '../data/amazon_small.neg'
+                # small_pos        = '../data/amazon_small.pos'
+                # small_neg        = '../data/amazon_small.neg'
                 
-                if not os.path.exists(small_pos):
-                    preprocess_pos_neg(small_pos_path, small_pos)
-                    preprocess_pos_neg(small_neg_path, small_neg)
-                pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
-                style_transfer(pos_iter, neg_iter, model, args, cnt_batch)
+                # if not os.path.exists(small_pos):
+                #     preprocess_pos_neg(small_pos_path, small_pos)
+                #     preprocess_pos_neg(small_neg_path, small_neg)
+                # pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
+                # style_transfer(pos_iter, neg_iter, model, args, cnt_batch)
 
             cnt_batch += 1
         cnt_epoch += 1
@@ -242,7 +242,7 @@ def show_reconstruct_results_f22(dev_iter, model, args, cnt=0, reconstruct_loss=
     writer.close()
 
 
-def style_transfer(pos_iter, neg_iter, model, args, cnt_batch):
+def style_transfer(pos_iter, neg_iter, model, args):
     
     total_cnt = 0
     model.eval()
@@ -287,7 +287,7 @@ def style_transfer(pos_iter, neg_iter, model, args, cnt_batch):
 
     # print pos_df.shape
     # print neg_df.shape
-    writer = open('pos_neg_log_' + str(cnt_batch)+'_.txt', 'w')
+    writer = open('pos_neg_log_'+'_.txt', 'w')
     for index, row in pos_df.iterrows():
         pos           = row['feature1']
         pos_attention = row['hiddens']
