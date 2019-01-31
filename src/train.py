@@ -309,15 +309,17 @@ def style_transfer(pos_iter, neg_iter, model, args):
         print type(pos_attention.unsqueeze(0))
 
         print [i-1 for i in length.tolist()]
-        break
+
         reconstruct_out = model.reconstruct(
-                            pos.unsqueeze(0), 
-                            neg_df['feature2'][max_index].unsqueeze(0), 
-                            pos_attention.unsqueeze(0),
-                            row['feature'].unsqueeze(0), 
+                            pos.unsqueeze(0).cuda(), 
+                            neg_df['feature2'][max_index].unsqueeze(0).cuda(), 
+                            pos_attention.unsqueeze(0).cuda(),
+                            row['feature'].unsqueeze(0).cuda(), 
                             [i-1 for i in length.tolist()],
                             is_train = False)
         out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
+        print out_in_batch
+        break
         k = 0 
         # print out_in_batch.size()
         '''
