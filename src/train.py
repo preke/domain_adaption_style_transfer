@@ -318,7 +318,10 @@ def style_transfer(pos_iter, neg_iter, model, args):
                             [i-1 for i in length.tolist()],
                             is_train = False)
         out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
-        print out_in_batch
+        print out_in_batch.size()
+        for i in out_in_batch:
+            print torch.argmax(i, dim=1)
+            print ' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)])
         break
         k = 0 
         # print out_in_batch.size()
