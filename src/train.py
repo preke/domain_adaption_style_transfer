@@ -312,7 +312,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
 
         reconstruct_out = model.reconstruct(
                             pos.unsqueeze(0).cuda(), 
-                            neg_df['feature2'][max_index].unsqueeze(0).cuda(), 
+                            neg_df['feature1'][max_index].unsqueeze(0).cuda(), 
                             pos_attention.unsqueeze(0).cuda(),
                             row['feature'].unsqueeze(0).cuda(), 
                             [i-1 for i in length.tolist()],
