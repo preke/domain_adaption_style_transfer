@@ -72,10 +72,8 @@ class Decoder(nn.Module):
             target = self.embed(target)
             
             for i in range(target_len):
-                ctx = self.attention(hiddens, prev_s)   
-                
+                ctx = self.attention(hiddens, prev_s)
                 prev_s       = self.decodercell(target[:, i], prev_s, ctx)
-                
                 dec_h[:,i,:] = torch.cat((prev_s, sentiment), 1) # .unsqueeze(1)
             outputs = self.dec2word(dec_h)
         else:

@@ -131,7 +131,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             err.backward()
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
-            if cnt_batch % 1000 == 0:
+            if cnt_batch % 2000 == 0:
                 
                 acc, flag, eval_aeloss = eval(dev_iter, model, alpha)
                 show_reconstruct_results(dev_iter, model, args, cnt_batch, eval_aeloss)
@@ -145,16 +145,16 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
 
                 
                 # Try to illustrate the Style Transfer
-                # small_pos_path   = '../data/amazon_small.pos'
-                # small_neg_path   = '../data/amazon_small.neg'
-                # small_pos        = '../data/amazon_small.pos'
-                # small_neg        = '../data/amazon_small.neg'
+                small_pos_path   = '../data/amazon_small.pos'
+                small_neg_path   = '../data/amazon_small.neg'
+                small_pos        = '../data/amazon_small.pos'
+                small_neg        = '../data/amazon_small.neg'
                 
-                # if not os.path.exists(small_pos):
-                #     preprocess_pos_neg(small_pos_path, small_pos)
-                #     preprocess_pos_neg(small_neg_path, small_neg)
-                # pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
-                # style_transfer(pos_iter, neg_iter, model, args, cnt_batch, eval_aeloss)
+                if not os.path.exists(small_pos):
+                    preprocess_pos_neg(small_pos_path, small_pos)
+                    preprocess_pos_neg(small_neg_path, small_neg)
+                pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
+                style_transfer(pos_iter, neg_iter, model, args, cnt_batch)
 
             cnt_batch += 1
         cnt_epoch += 1
@@ -242,7 +242,7 @@ def show_reconstruct_results_f22(dev_iter, model, args, cnt=0, reconstruct_loss=
     writer.close()
 
 
-def style_transfer(pos_iter, neg_iter, model, args):
+def style_transfer(pos_iter, neg_iter, model, args, cnt_batch):
     
     total_cnt = 0
     model.eval()
@@ -257,7 +257,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
     '''
     cnt_batch = 0
     for batch in pos_iter:
-        logger.info('In ' + str(cnt_batch) + '  pos batch...')
+        # logger.info('In ' + str(cnt_batch) + '  pos batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
         # mask    = generate_mask(torch.max(length), length)
@@ -270,7 +270,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
         cnt_batch += 1
     
     for batch in neg_iter:
-        logger.info('In ' + str(cnt_batch) + '  batch...')
+        # logger.info('In ' + str(cnt_batch) + '  batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
         feature = Variable(sample)
@@ -287,7 +287,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
 
     # print pos_df.shape
     # print neg_df.shape
-    writer = open('pos_neg_log_' + '_.txt', 'w')
+    writer = open('pos_neg_log_' + str(cnt_batch)+'_.txt', 'w')
     for index, row in pos_df.iterrows():
         pos           = row['feature1']
         pos_attention = row['hiddens']
