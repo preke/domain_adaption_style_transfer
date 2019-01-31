@@ -73,7 +73,7 @@ class Decoder(nn.Module):
             target = self.embed(target)
             
             for i in range(target_len):
-                ctx = self.attention(hiddens, prev_s)
+                ctx            = self.attention(hiddens, prev_s)
                 prev_s         = self.decodercell(target[:, i], prev_s, ctx)
                 dec_h[:,i,:]   = prev_s
                 style_h[:,i,:] = sentiment
@@ -89,13 +89,13 @@ class Decoder(nn.Module):
                 outputs = outputs.cuda()
             
             for i in range(self.max_len):
-                target = self.embed(target).squeeze(1)     
-                ctx = self.attention(hiddens, prev_s)                        
-                prev_s = self.decodercell(target, prev_s, ctx)
-                output = self.dec2word(prev_s)
+                target         = self.embed(target).squeeze(1)     
+                ctx            = self.attention(hiddens, prev_s)                        
+                prev_s         = self.decodercell(target, prev_s, ctx)
+                output         = self.dec2word(prev_s)
                 outputs[:,i,:] = output
-                # output = output.add(0.1*self.dec2word(sentiment))
-                target = output.topk(1)[1]
+                # output       = output.add(0.1*self.dec2word(sentiment))
+                target         = output.topk(1)[1]
         return outputs
 
 
@@ -312,7 +312,7 @@ class RGLIndividualSaperateSC(nn.Module):
 
         embed                           = self.embedding(input_line)
         
-        hidden_bi01, hidden_bi02         = self.get_state(input_line)
+        hidden_bi01, hidden_bi02        = self.get_state(input_line)
         
         pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
         packed_output01, feature01      = self.bi_encoder01(pack_embed, hidden_bi01)

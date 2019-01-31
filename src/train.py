@@ -303,7 +303,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
                             pos_attention.unsqueeze(0),
                             row['feature'].unsqueeze(0), 
                             [i-1 for i in length.tolist()],
-                            is_train=False)
+                            is_train = False)
         out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
         k = 0 
         # print out_in_batch.size()
