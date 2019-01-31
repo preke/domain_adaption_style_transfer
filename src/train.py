@@ -326,7 +326,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
                         Variable(pos).cuda(), 
                         Variable(pos_attention).cuda(),
                         Variable(pos_attention).cuda(), 
-                        [i-1 for i in Variable(length.tolist())],
+                        [i-1 for i in length.tolist()],
                         is_train = False)
     # xaigao end
 
