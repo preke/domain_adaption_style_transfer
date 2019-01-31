@@ -313,14 +313,15 @@ def style_transfer(pos_iter, neg_iter, model, args):
     length        = pos_df['length'][0].unsqueeze(0)
 
 
-    # for neg in neg_df['feature1']:
-    #         # print neg
-    #         sim.append(F.cosine_similarity(pos.unsqueeze(0), neg.unsqueeze(0)))
-    #     max_index = int(np.argmax(np.array(sim)))
+    for neg in neg_df['feature1']:
+        # print neg
+        sim.append(F.cosine_similarity(pos, neg.unsqueeze(0)))
+    max_index = int(np.argmax(np.array(sim)))
+    neg = neg_df['feature1'][max_index].unsqueeze(0)
 
-    
     for i in range(5):
         pos = torch.cat((pos, pos))
+        neg = torch.cat((neg, neg))
         pos_attention = torch.cat((pos_attention, pos_attention))
         length = torch.cat((length, length))
     print pos.size()
@@ -331,7 +332,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
 
     reconstruct_out = model.reconstruct(
                         Variable(pos).cuda(), 
-                        Variable(pos).cuda(), 
+                        Variable(neg).cuda(), 
                         Variable(pos_attention).cuda(),
                         Variable(pos_attention).cuda(), 
                         [i-1 for i in length.tolist()],
