@@ -307,7 +307,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
         #                     is_train = False)
 
     # xaigao
-    
+    sim           = []
     pos           = pos_df['feature1'][0].unsqueeze(0)
     pos_attention = pos_df['hiddens'][0].unsqueeze(0)
     length        = pos_df['length'][0].unsqueeze(0)
@@ -327,7 +327,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
     print pos.size()
     print pos_attention.size()
     print length.size()
-    # sim           = []
+    
     
 
     reconstruct_out = model.reconstruct(
