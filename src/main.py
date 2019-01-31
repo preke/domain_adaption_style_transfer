@@ -63,7 +63,7 @@ args.embed_dim    = 300
 args.hidden_dim   = 100
 args.batch_size   = 32
 args.lr           = 0.0001
-args.num_epoch    = 100
+args.num_epoch    = 200
 args.num_class    = 2
 args.max_length   = 20
 args.lamda        = 1.0
@@ -82,8 +82,8 @@ else:
 
 # Load data
 logger.info('Loading data begin...')
-text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_train, amazon_test, args)
-text_field.build_vocab(train_data, dev_data, min_freq=10)
+text_field, label_field, train_data, train_iter, dev_data, dev_iter = load_data(amazon_test, amazon_test, args)
+text_field.build_vocab(train_data, dev_data)
 label_field.build_vocab(train_data)
 logger.info('Length of vocab is: ' + str(len(text_field.vocab)))
 
