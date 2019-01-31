@@ -307,10 +307,18 @@ def style_transfer(pos_iter, neg_iter, model, args):
         #                     is_train = False)
 
     # xaigao
-    pos           = torch.tensor(list(pos_df['feature1'][:32]))
-    pos_attention = torch.tensor(list(pos_df['hiddens'][:32]))
-    length        = torch.tensor(list(pos_df['length'][:32]))
-    sim           = []
+    
+    pos           = pos_df['feature1'][0]
+    pos_attention = pos_df['hiddens'][0]
+    length        = pos_df['length'][0]
+    for i in range(5):
+        pos = torch.cat(pos, pos, dim=0)
+        pos_attention = torch.cat(pos_attention, pos_attention, dim=0)
+        length = torch.cat(length, length, dim=0)
+    print pos.size()
+    print pos_attention.size()
+    print length.size()
+    # sim           = []
     
 
     reconstruct_out = model.reconstruct(
