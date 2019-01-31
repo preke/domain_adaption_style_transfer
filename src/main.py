@@ -117,7 +117,7 @@ else:
     logger.info('Train model begin...')
 
     try:
-        trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args)
+        trainRGL(train_iter=train_iter, dev_iter=dev_iter, train_data=train_data, model=rgl_net, args=args, text_field=text_field)
     except KeyboardInterrupt:
         print(traceback.print_exc())
         print('\n' + '-' * 89)
