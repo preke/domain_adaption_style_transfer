@@ -79,7 +79,7 @@ class Decoder(nn.Module):
                 style_h[:,i,:] = sentiment
                 # dec_h[:,i,:] = torch.cat((prev_s, sentiment), 1) # .unsqueeze(1)
             outputs = self.dec2word(dec_h)
-            # outputs = outputs.add(0.1*self.dec2word(style_h))
+            outputs = outputs.add(0.1*self.dec2word(style_h))
         else:
             batch_size = len(length)
             target     = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
@@ -94,7 +94,7 @@ class Decoder(nn.Module):
                 prev_s         = self.decodercell(target, prev_s, ctx)
                 output         = self.dec2word(prev_s)
                 outputs[:,i,:] = output
-                # output       = output.add(0.1*self.dec2word(sentiment))
+                output       = output.add(0.1*self.dec2word(sentiment))
                 target         = output.topk(1)[1]
         return outputs
 

@@ -311,6 +311,14 @@ def style_transfer(pos_iter, neg_iter, model, args):
     pos           = pos_df['feature1'][0].unsqueeze(0)
     pos_attention = pos_df['hiddens'][0].unsqueeze(0)
     length        = pos_df['length'][0].unsqueeze(0)
+
+
+    for neg in neg_df['feature1']:
+            # print neg
+            sim.append(F.cosine_similarity(pos.unsqueeze(0), neg.unsqueeze(0)))
+        max_index = int(np.argmax(np.array(sim)))
+
+    
     for i in range(5):
         pos = torch.cat((pos, pos))
         pos_attention = torch.cat((pos_attention, pos_attention))
