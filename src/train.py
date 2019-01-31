@@ -83,7 +83,7 @@ def eval(dev_iter, model, alpha):
 #     return mask_batch
 
 def trainRGL(train_iter, dev_iter, train_data, model, args):    
-    save_dir = "RGLModel/Newdata/"
+    save_dir = "RGLModel/concat/"
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
 
@@ -134,7 +134,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             if cnt_batch % 2000 == 0:
                 
                 acc, flag, eval_aeloss = eval(dev_iter, model, alpha)
-                show_reconstruct_results(dev_iter, model, args, cnt_batch, eval_aeloss)
+                # show_reconstruct_results(dev_iter, model, args, cnt_batch, eval_aeloss)
                 save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
                 if flag:
                     torch.save(model.state_dict(), save_path)
