@@ -64,7 +64,7 @@ class Decoder(nn.Module):
         prev_s = content
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
-            dec_h   = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
+            dec_h   = Variable(torch.zeros(batch_size, target_len, self.hidden_dim*2))
             style_h = Variable(torch.zeros(batch_size, target_len, self.hidden_dim))
             if torch.cuda.is_available():
                 dec_h = dec_h.cuda()
@@ -75,7 +75,7 @@ class Decoder(nn.Module):
             for i in range(target_len):
                 ctx            = self.attention(hiddens, prev_s)
                 prev_s         = self.decodercell(target[:, i], prev_s, ctx)
-                dec_h[:,i,:]   = prev_s
+                # dec_h[:,i,:]   = prev_s
                 # style_h[:,i,:] = sentiment
                 dec_h[:,i,:] = torch.cat((prev_s, sentiment), 1) # .unsqueeze(1)
             outputs = self.dec2word(dec_h)
@@ -93,7 +93,7 @@ class Decoder(nn.Module):
                 ctx            = self.attention(hiddens, prev_s)                        
                 prev_s         = self.decodercell(target, prev_s, ctx)
                 # output       = self.dec2word(prev_s)
-                output         = torch.cat((prev_s, sentiment), 1)
+                output         = self.dec2word(torch.cat((prev_s, sentiment), 1))
                 outputs[:,i,:] = output
                 # output       = output.add(0.5*self.dec2word(sentiment))
                 target         = output.topk(1)[1]
