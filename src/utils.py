@@ -29,7 +29,7 @@ def preprocess(in_path, pos_output_paths, neg_output_paths):
             if line[9] == '2': # positive
                 text = line[11:]
                 # pos_writer.write(text.split(': ')[0].lower()) # title
-                # pos_writer.write('\t')
+                # pos_writer.write('\t') 
                 pos_writer.write(text.split(': ')[1].lower())
     pos_writer.close()
     neg_writer.close()
