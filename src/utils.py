@@ -39,6 +39,7 @@ def preprocess_pos_neg(in_path, out_path):
     with open(in_path, 'r') as reader:
         for line in reader:
             writer.write(line.split('\t')[1].lower())
+    
     writer.close()
 
 
