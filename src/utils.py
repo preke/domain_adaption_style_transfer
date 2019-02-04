@@ -32,7 +32,7 @@ def preprocess(in_path, pos_output_paths, neg_output_paths):
                 # pos_writer.write('\t') 
                 pos_writer.write(text.split(': ')[1].lower())
     pos_writer.close()
-    neg_writer.close()
+    neg_writer.close() 
 
 def preprocess_pos_neg(in_path, out_path):
     writer = open(out_path, 'w')
