@@ -287,7 +287,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
 
     # print pos_df.shape
     # print neg_df.shape
-    writer = open('pos_neg_log_'+'_.txt', 'w')
+    writer = open('pos_pos_log_'+'_.txt', 'w')
     for index, row in pos_df[:100].iterrows():
         pos           = row['feature1'].unsqueeze(0)
         pos_attention = row['hiddens'].unsqueeze(0)
@@ -298,7 +298,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
         for neg in neg_df['feature1']:
             sim.append(F.cosine_similarity(pos, neg.unsqueeze(0)))
         max_index = int(np.argmax(np.array(sim)))
-        neg = neg_df['feature2'][max_index].unsqueeze(0)
+        # neg = neg_df['feature2'][max_index].unsqueeze(0)
+        neg = row['feature2'][max_index].unsqueeze(0)
 
         for i in range(5): # batch size 32 (2^5)
             pos           = torch.cat((pos, pos))
