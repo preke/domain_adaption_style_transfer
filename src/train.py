@@ -299,7 +299,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
             sim.append(F.cosine_similarity(pos, neg.unsqueeze(0)))
         max_index = int(np.argmax(np.array(sim)))
         # neg = neg_df['feature2'][max_index].unsqueeze(0)
-        neg = row['feature2'][max_index].unsqueeze(0)
+        neg = row['feature2'].unsqueeze(0)
 
         for i in range(5): # batch size 32 (2^5)
             pos           = torch.cat((pos, pos))
