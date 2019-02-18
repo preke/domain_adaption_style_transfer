@@ -191,7 +191,7 @@ class LSTMSC(nn.Module):
         self.embedding = nn.Embedding(embedding_num,embedding_size)
         self.hidden_size = hidden_size
         self.linear = nn.Linear(embedding_size,num_class)
-        self.linear.weight.data.normal_(0,0.01)
+        self.linear.weight.data.normal_(0, 0.01)
         self.linear.bias.data.fill_(0)
         self.layers = 3
         self.embedding.weight.data.copy_(torch.from_numpy(pre_embedding))

@@ -248,20 +248,11 @@ def style_transfer(pos_iter, neg_iter, model, args):
     model.eval()
     pos_df = [] # id, length, feature, feature1, feature2
     neg_df = [] # id, length, feature, feature1, feature2
-    '''
-    <type 'int'>
-    <class 'torch.Tensor'>;  tensor(65, device='cuda:0')
-    <class 'torch.Tensor'>;  torch.Size([100])
-    <class 'torch.Tensor'>;  torch.Size([200])
-    <class 'torch.Tensor'>;  torch.Size([200])
-    '''
+    
     cnt_batch = 0
     for batch in pos_iter:
-        # logger.info('In ' + str(cnt_batch) + '  pos batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
-        # mask    = generate_mask(torch.max(length), length)
-        # mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
         for i in range(len(length)):
@@ -270,12 +261,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
         cnt_batch += 1
     
     for batch in neg_iter:
-        # logger.info('In ' + str(cnt_batch) + '  batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
         feature = Variable(sample)
-        # mask    = generate_mask(torch.max(length), length)
-        # mask    = Variable(torch.FloatTensor(mask).cuda())
         feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
         for i in range(len(length)):
             neg_df.append([ total_cnt, length[i], feature[i], feature01[i], feature02[i], output[i] ])
@@ -301,12 +289,12 @@ def style_transfer(pos_iter, neg_iter, model, args):
         # neg = neg_df['feature2'][max_index].unsqueeze(0)
         neg = row['feature2'].unsqueeze(0)
 
-        for i in range(5): # batch size 32 (2^5)
-            pos           = torch.cat((pos, pos))
-            neg           = torch.cat((neg, neg))
-            feature       = torch.cat((feature, feature))
-            pos_attention = torch.cat((pos_attention, pos_attention))
-            length        = torch.cat((length, length))
+        # for i in range(5): # batch size 32 (2^5)
+        #     pos           = torch.cat((pos, pos))
+        #     neg           = torch.cat((neg, neg))
+        #     feature       = torch.cat((feature, feature))
+        #     pos_attention = torch.cat((pos_attention, pos_attention))
+        #     length        = torch.cat((length, length))
 
         reconstruct_out = model.reconstruct(
                         Variable(pos).cuda(), 
