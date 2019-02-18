@@ -304,7 +304,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
                         [i-1 for i in length.tolist()],
                         is_train = False)
 
-        out_in_batch = reconstruct_out.view(args.batch_size, args.max_length, args.vocab_size)
+        out_in_batch = reconstruct_out.view(1, args.max_length, args.vocab_size)
         k = 0 
         sample = row['feature']
         neg_sample = neg_df['feature'][max_index]
