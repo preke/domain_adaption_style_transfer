@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 # self define
 from utils import preprocess_write, get_pretrained_word_embed, preprocess_pos_neg
 from dataload import load_data, load_pos_neg_data
-from train import eval, trainRGL, show_reconstruct_results, style_transfer, show_reconstruct_results_f11, show_reconstruct_results_f22
+from train import eval, trainRGL, show_reconstruct_results, style_transfer# , show_reconstruct_results_f11, show_reconstruct_results_f22
 from model import RGLIndividualSaperateSC
 
 # paths
