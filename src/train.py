@@ -203,18 +203,21 @@ def style_transfer(pos_iter, neg_iter, model, args):
             pos_df.append([total_cnt, length[i], feature[i], feature01[i], feature02[i], output[i] ])
             total_cnt += 1
         cnt_batch += 1
-        writer = open('pos_only'+'_.txt', 'w')
-        reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
-        out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
-        k = 0 
-        for i in out_in_batch:
-            writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
-            # writer.write('\n')
-            writer.write('\n=============\n')
-            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
-            writer.write('\n\n')
-            k = k + 1
-        writer.close()
+        
+
+
+        # writer = open('pos_only'+'_.txt', 'w')
+        # reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
+        # out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
+        # k = 0 
+        # for i in out_in_batch:
+        #     writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+        #     # writer.write('\n')
+        #     writer.write('\n=============\n')
+        #     writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+        #     writer.write('\n\n')
+        #     k = k + 1
+        # writer.close()
 
     for batch in neg_iter:
         sample  = batch.text[0]
@@ -253,10 +256,10 @@ def style_transfer(pos_iter, neg_iter, model, args):
             length        = torch.cat((length, length))
 
         reconstruct_out = model.reconstruct(
-                        Variable(pos).cuda(), 
-                        Variable(neg).cuda(), 
-                        Variable(pos_attention).cuda(),
-                        Variable(feature).cuda(), 
+                        pos, 
+                        neg, 
+                        pos_attention,
+                        feature, 
                         [i-1 for i in length.tolist()],
                         is_train = False)
 
