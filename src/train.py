@@ -233,12 +233,12 @@ def style_transfer(pos_iter, neg_iter, model, args):
         # neg = neg_df['feature2'][max_index].unsqueeze(0)
         neg = row['feature2'].unsqueeze(0)
 
-        # for i in range(5): # batch size 32 (2^5)
-        #     pos           = torch.cat((pos, pos))
-        #     neg           = torch.cat((neg, neg))
-        #     feature       = torch.cat((feature, feature))
-        #     pos_attention = torch.cat((pos_attention, pos_attention))
-        #     length        = torch.cat((length, length))
+        for i in range(5): # batch size 32 (2^5)
+            pos           = torch.cat((pos, pos))
+            neg           = torch.cat((neg, neg))
+            feature       = torch.cat((feature, feature))
+            pos_attention = torch.cat((pos_attention, pos_attention))
+            length        = torch.cat((length, length))
 
         reconstruct_out = model.reconstruct(
                         Variable(pos).cuda(), 
@@ -248,7 +248,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
                         [i-1 for i in length.tolist()],
                         is_train = False)
 
-        out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
+        out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
         k = 0 
         sample = row['feature']
         neg_sample = neg_df['feature'][max_index]
