@@ -205,7 +205,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
         cnt_batch += 1
         
 
-
+        print feature01.size()
+        print feature02.size()
+        print output.size()
         # writer = open('pos_only'+'_.txt', 'w')
         # reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
         # out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
@@ -255,6 +257,11 @@ def style_transfer(pos_iter, neg_iter, model, args):
             pos_attention = torch.cat((pos_attention, pos_attention))
             length        = torch.cat((length, length))
 
+        print '++++++++'
+        print pos.size()
+        print neg.size()
+        print pos_attention.size()
+
         reconstruct_out = model.reconstruct(
                         pos, 
                         neg, 
@@ -267,7 +274,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
         k = 0 
         sample = row['feature']
         neg_sample = neg_df['feature'][max_index]
-        for i in out_in_batch[:1]:
+        for i in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample]))
             writer.write('\n\n')
 
