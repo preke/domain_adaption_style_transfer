@@ -205,21 +205,20 @@ def style_transfer(pos_iter, neg_iter, model, args):
         cnt_batch += 1
         
 
-        print feature01.size()
-        print feature02.size()
-        print output.size()
-        # writer = open('pos_only'+'_.txt', 'w')
-        # reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
-        # out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
-        # k = 0 
-        # for i in out_in_batch:
-        #     writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
-        #     # writer.write('\n')
-        #     writer.write('\n=============\n')
-        #     writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
-        #     writer.write('\n\n')
-        #     k = k + 1
-        # writer.close()
+        writer = open('pos_only'+'_.txt', 'w')
+        for tmp in range(len(length)):
+            reconstruct_out = model.reconstruct(feature01[tmp], feature02[tmp], output[tmp], feature[tmp], length[tmp]-1, is_train=False)
+            out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
+            k = 0 
+            for i in out_in_batch:
+                writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+                # writer.write('\n')
+                writer.write('\n=============\n')
+                writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+                writer.write('\n\n')
+                k = k + 1
+        
+        writer.close()
 
     for batch in neg_iter:
         sample  = batch.text[0]
@@ -236,8 +235,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
 
     # print pos_df.shape
     # print neg_df.shape
+    '''
     writer = open('pos_pos_log_'+'_.txt', 'w')
-    for index, row in pos_df.iterrows():
+    for index, row in pos_df[:100].iterrows():
         pos           = row['feature1'].unsqueeze(0)
         pos_attention = row['hiddens'].unsqueeze(0)
         feature       = row['feature'].unsqueeze(0)
@@ -278,15 +278,16 @@ def style_transfer(pos_iter, neg_iter, model, args):
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample]))
             writer.write('\n\n')
 
-            writer.write(' '.join([args.index_2_word[int(l)] for l in neg_sample]))
-            writer.write('\n\n')
+            # writer.write(' '.join([args.index_2_word[int(l)] for l in neg_sample]))
+            # writer.write('\n\n')
             
             writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(generated, dim=1)]))
             writer.write('\n************\n')
             k = k + 1
 
     writer.close()
-
+    '''
+    
 def demo_style_transfer(sent1, sent2, model, args):
     '''
         Input sent1 and sent2,
