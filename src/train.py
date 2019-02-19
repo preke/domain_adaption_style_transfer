@@ -207,7 +207,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
 
         writer = open('pos_only'+'_.txt', 'w')
         for tmp in range(len(length)):
-            reconstruct_out = model.reconstruct(feature01[tmp], feature02[tmp], output[tmp], feature[tmp], length[tmp]-1, is_train=False)
+            reconstruct_out = model.reconstruct(feature01[tmp], feature02[tmp], output[tmp], feature[tmp], [length[tmp]-1], is_train=False)
             out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
             k = 0 
             for i in out_in_batch:
@@ -287,7 +287,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
 
     writer.close()
     '''
-    
+
 def demo_style_transfer(sent1, sent2, model, args):
     '''
         Input sent1 and sent2,
