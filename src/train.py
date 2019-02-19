@@ -257,10 +257,10 @@ def style_transfer(pos_iter, neg_iter, model, args):
             pos_attention = torch.cat((pos_attention, pos_attention))
             length        = torch.cat((length, length))
 
-        print '++++++++'
-        print pos.size()
-        print neg.size()
-        print pos_attention.size()
+        # print '++++++++'
+        # print pos.size()
+        # print neg.size()
+        # print pos_attention.size()
 
         reconstruct_out = model.reconstruct(
                         pos, 
