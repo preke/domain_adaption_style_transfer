@@ -237,7 +237,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
     # print pos_df.shape
     # print neg_df.shape
     writer = open('pos_pos_log_'+'_.txt', 'w')
-    for index, row in pos_df[:100].iterrows():
+    for index, row in pos_df.iterrows():
         pos           = row['feature1'].unsqueeze(0)
         pos_attention = row['hiddens'].unsqueeze(0)
         feature       = row['feature'].unsqueeze(0)
