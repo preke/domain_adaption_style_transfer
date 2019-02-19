@@ -274,14 +274,14 @@ def style_transfer(pos_iter, neg_iter, model, args):
         k = 0 
         sample = row['feature']
         neg_sample = neg_df['feature'][max_index]
-        for i in out_in_batch:
+        for generated in out_in_batch:
             writer.write(' '.join([args.index_2_word[int(l)] for l in sample]))
             writer.write('\n\n')
 
             writer.write(' '.join([args.index_2_word[int(l)] for l in neg_sample]))
             writer.write('\n\n')
             
-            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=1)]))
+            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(generated, dim=1)]))
             writer.write('\n************\n')
             k = k + 1
 
