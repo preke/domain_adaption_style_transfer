@@ -232,7 +232,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
 
             reconstruct_out = model.reconstruct(pos, neg, output.data, feature.data, [i-1 for i in length.tolist()], is_train=False)
             out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
-            if tmp_out_in_batch == out_in_batch:
+            if torch.equal(tmp_out_in_batch, out_in_batch):
                 print 'same' + str(tmp)
             tmp_out_in_batch = out_in_batch    
             for i in out_in_batch[:1]:
