@@ -226,7 +226,6 @@ def style_transfer(pos_iter, neg_iter, model, args):
                 pos_attention = torch.cat((pos_attention, pos_attention))
                 length        = torch.cat((length, length))
 
-            print type(feature)
             reconstruct_out = model.reconstruct(Variable(pos, requires_grad=True),
                                                 Variable(neg, requires_grad=True),
                                                 Variable(pos_attention, requires_grad=True),
