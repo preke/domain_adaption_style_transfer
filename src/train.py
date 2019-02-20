@@ -216,7 +216,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
             writer1.write('\n\n')
             k = k + 1
         
-        tmp_out_in_batch = output
+        tmp_out_in_batch = out_in_batch
         for tmp in range(len(length)):
             pos           = feature01.data[tmp].unsqueeze(0)
             neg           = feature02.data[tmp].unsqueeze(0)
