@@ -220,8 +220,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
         for tmp in range(len(length)):
             pos           = feature01.data[tmp].unsqueeze(0)
             neg           = feature02.data[tmp].unsqueeze(0)
-            feature       = output.data[tmp].unsqueeze(0)
-            pos_attention = feature.data[tmp].unsqueeze(0)
+            pos_attention = output.data[tmp].unsqueeze(0)
+            feature       = feature.data[tmp].unsqueeze(0)
             length        = (length[tmp]-1).unsqueeze(0)
             for i in range(5): # batch size 32 (2^5)
                 pos           = torch.cat((pos, pos))
