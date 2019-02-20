@@ -243,7 +243,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
                 k = k + 1
     
     writer1.close()    
-    # writer2.close()
+    writer2.close()
 
     # for batch in neg_iter:
     #     sample  = batch.text[0]
