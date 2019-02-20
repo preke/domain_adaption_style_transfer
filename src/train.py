@@ -196,6 +196,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
     cnt_batch = 0
     writer1 = open('pos_batch'+'_.txt', 'w')
     writer2 = open('pos_single'+'_.txt', 'w')
+    tmp_out_in_batch = 0
     for batch in pos_iter:
         sample  = batch.text[0]
         length  = batch.text[1]
@@ -216,19 +217,21 @@ def style_transfer(pos_iter, neg_iter, model, args):
         for tmp in range(len(length)):
             pos           = feature01.data[tmp].unsqueeze(0)
             neg           = feature02.data[tmp].unsqueeze(0)
-            pos_attention = output.data[tmp].unsqueeze(0)
+            # pos_attention = output.data[tmp].unsqueeze(0)
             # feature       = feature.data[tmp].unsqueeze(0)
             # length        = (length[tmp]-1).unsqueeze(0)
             for i in range(5): # batch size 32 (2^5)
                 pos           = torch.cat((pos, pos))
                 neg           = torch.cat((neg, neg))
                 # feature       = torch.cat((feature, feature))
-                pos_attention = torch.cat((pos_attention, pos_attention))
+                # pos_attention = torch.cat((pos_attention, pos_attention))
                 # length        = torch.cat((length, length))
 
-            reconstruct_out = model.reconstruct(pos, neg, pos_attention, feature.data, [i-1 for i in length.tolist()], is_train=False)
+            reconstruct_out = model.reconstruct(pos, neg, output.data, feature.data, [i-1 for i in length.tolist()], is_train=False)
             out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
-             
+            if tmp_out_in_batch == out_in_batch:
+                print 'same' + str(tmp)
+            tmp_out_in_batch = out_in_batch    
             for i in out_in_batch[:1]:
                 writer2.write(str())
                 writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[tmp]]))
