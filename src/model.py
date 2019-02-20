@@ -83,7 +83,6 @@ class Decoder(nn.Module):
             outputs = self.dec2word(dec_h)
             outputs = outputs.add(0.5*self.dec2word(style_h))
         else:
-            print 'NOT TRUE'
             batch_size = len(length)
             target     = Variable(torch.LongTensor([self.trg_soi] * batch_size)).view(batch_size, 1)
             outputs    = Variable(torch.zeros(batch_size, self.max_len, self.vocab_size))

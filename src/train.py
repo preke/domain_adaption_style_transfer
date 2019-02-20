@@ -235,9 +235,10 @@ def style_transfer(pos_iter, neg_iter, model, args):
             if torch.equal(tmp_out_in_batch, out_in_batch):
                 print 'same' + str(tmp)
             tmp_out_in_batch = out_in_batch    
-            for i in out_in_batch[:1]:
-                writer2.write(str())
-                writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[tmp]]))
+            
+            writer2.write(str(tmp))
+            writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[tmp]]))
+            for i in out_in_batch:
                 # writer.write('\n')
                 writer2.write('\n=============\n')
                 writer2.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
