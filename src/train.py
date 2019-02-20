@@ -201,7 +201,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
         length  = batch.text[1]
         feature = Variable(sample)
         feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
-
+        print feature01
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
@@ -219,7 +219,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
             pos_attention = output.data[tmp].unsqueeze(0)
             feature       = feature.data[tmp].unsqueeze(0)
             length        = (length[tmp]-1).unsqueeze(0)
-
+            print '    '
+            print pos
             reconstruct_out = model.reconstruct(pos, neg, pos_attention, feature, length, is_train=False)
             out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
             k = 0 
@@ -231,9 +232,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
                 writer2.write('\n\n')
                 k = k + 1
     
-        writer1.close()    
-        writer2.close()
-        break
+    writer1.close()    
+    writer2.close()
 
     # for batch in neg_iter:
     #     sample  = batch.text[0]
