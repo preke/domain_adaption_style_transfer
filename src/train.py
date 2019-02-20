@@ -204,7 +204,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
             total_cnt += 1
         cnt_batch += 1
         print type(feature01)
-        print type(feature01[tmp].unsqueeze(0))
+        print type(feature01[0].unsqueeze(0))
 
         writer = open('pos_only'+'_.txt', 'w')
         for tmp in range(len(length)):
