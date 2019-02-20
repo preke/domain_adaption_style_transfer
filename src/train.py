@@ -230,8 +230,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
             reconstruct_out = model.reconstruct(Variable(pos, requires_grad=True),
                                                 Variable(neg, requires_grad=True),
                                                 Variable(pos_attention, requires_grad=True),
-                                                Variable(feature, requires_grad=True),
-                                                Variable(length, requires_grad=True),
+                                                Variable(feature),
+                                                Variable(length),
                                                 is_train=False)
             out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
             k = 0 
