@@ -230,6 +230,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
             out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
             k = 0 
             for i in out_in_batch[:1]:
+                writer2.write(str(tmp))
                 writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
                 # writer.write('\n')
                 writer2.write('\n=============\n')
