@@ -203,7 +203,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
             pos_df.append([total_cnt, length[i], feature[i], feature01[i], feature02[i], output[i] ])
             total_cnt += 1
         cnt_batch += 1
-        
+        print type(feature01)
+        print type(feature01[tmp].unsqueeze(0))
 
         writer = open('pos_only'+'_.txt', 'w')
         for tmp in range(len(length)):
