@@ -219,12 +219,12 @@ def style_transfer(pos_iter, neg_iter, model, args):
             pos_attention = output.data[tmp].unsqueeze(0)
             feature       = feature.data[tmp].unsqueeze(0)
             length        = (length[tmp]-1).unsqueeze(0)
-        for i in range(5): # batch size 32 (2^5)
-            pos           = torch.cat((pos, pos))
-            neg           = torch.cat((neg, neg))
-            feature       = torch.cat((feature, feature))
-            pos_attention = torch.cat((pos_attention, pos_attention))
-            length        = torch.cat((length, length))
+            for i in range(5): # batch size 32 (2^5)
+                pos           = torch.cat((pos, pos))
+                neg           = torch.cat((neg, neg))
+                feature       = torch.cat((feature, feature))
+                pos_attention = torch.cat((pos_attention, pos_attention))
+                length        = torch.cat((length, length))
 
             reconstruct_out = model.reconstruct(Variable(pos, requires_grad=True),
                                                 Variable(neg, requires_grad=True),
@@ -232,9 +232,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
                                                 Variable(feature, requires_grad=True),
                                                 Variable(length, requires_grad=True),
                                                 is_train=False)
-            out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
+            out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
             k = 0 
-            for i in out_in_batch:
+            for i in out_in_batch[:1]:
                 writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
                 # writer.write('\n')
                 writer2.write('\n=============\n')
