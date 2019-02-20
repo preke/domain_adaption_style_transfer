@@ -216,22 +216,17 @@ def style_transfer(pos_iter, neg_iter, model, args):
         for tmp in range(len(length)):
             pos           = feature01.data[tmp].unsqueeze(0)
             neg           = feature02.data[tmp].unsqueeze(0)
-            pos_attention = output.data[tmp].unsqueeze(0)
-            feature       = feature.data[tmp].unsqueeze(0)
-            length        = (length[tmp]-1).unsqueeze(0)
+            # pos_attention = output.data[tmp].unsqueeze(0)
+            # feature       = feature.data[tmp].unsqueeze(0)
+            # length        = (length[tmp]-1).unsqueeze(0)
             for i in range(5): # batch size 32 (2^5)
                 pos           = torch.cat((pos, pos))
                 neg           = torch.cat((neg, neg))
-                feature       = torch.cat((feature, feature))
-                pos_attention = torch.cat((pos_attention, pos_attention))
-                length        = torch.cat((length, length))
+                # feature       = torch.cat((feature, feature))
+                # pos_attention = torch.cat((pos_attention, pos_attention))
+                # length        = torch.cat((length, length))
 
-            reconstruct_out = model.reconstruct(Variable(pos, requires_grad=True),
-                                                Variable(neg, requires_grad=True),
-                                                Variable(pos_attention, requires_grad=True),
-                                                Variable(feature),
-                                                Variable(length),
-                                                is_train=False)
+            reconstruct_out = model.reconstruct(pos, neg, output.data, feature.data, [i-1 for i in length.tolist()], is_train=False)
             out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
             k = 0 
             for i in out_in_batch[:1]:
@@ -242,9 +237,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
                 writer2.write('\n\n')
                 k = k + 1
     
-    writer1.close()    
-    writer2.close()
-
+        writer1.close()    
+        writer2.close()
+        break
     # for batch in neg_iter:
     #     sample  = batch.text[0]
     #     length  = batch.text[1]
