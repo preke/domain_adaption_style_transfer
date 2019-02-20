@@ -231,7 +231,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
                 length        = torch.cat((length, length))
 
             reconstruct_out = model.reconstruct(pos, neg, feature, pos_attention, length, is_train=False)
-            out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
+            out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
             k = 0 
             for i in out_in_batch:
                 writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
