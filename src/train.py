@@ -209,6 +209,12 @@ def style_transfer(pos_iter, neg_iter, model, args):
         writer1.write(str(feature01))
         writer1.write('\n\n\n\n\n')
         writer1.write(str(feature01.data[0].unsqueeze(0)))
+
+        writer1.write('\n\n\n\n\n')
+        writer1.write(str(feature01.data[1].unsqueeze(0)))
+
+        writer1.write('\n\n\n\n\n')
+        writer1.write(str(feature01.data[2].unsqueeze(0)))
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
