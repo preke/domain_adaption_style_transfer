@@ -201,7 +201,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
         length  = batch.text[1]
         feature = Variable(sample)
         feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
-        print feature01
+        # print feature01
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
@@ -213,27 +213,27 @@ def style_transfer(pos_iter, neg_iter, model, args):
             writer1.write('\n\n')
             k = k + 1
         
-        for tmp in range(len(length)):
-            pos           = feature01.data[tmp].unsqueeze(0)
-            neg           = feature02.data[tmp].unsqueeze(0)
-            pos_attention = output.data[tmp].unsqueeze(0)
-            feature       = feature.data[tmp].unsqueeze(0)
-            length        = (length[tmp]-1).unsqueeze(0)
-            print '    '
-            print pos
-            reconstruct_out = model.reconstruct(pos, neg, pos_attention, feature, length, is_train=False)
-            out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
-            k = 0 
-            for i in out_in_batch:
-                writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
-                # writer.write('\n')
-                writer2.write('\n=============\n')
-                writer2.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
-                writer2.write('\n\n')
-                k = k + 1
+        # for tmp in range(len(length)):
+        #     pos           = feature01.data[tmp].unsqueeze(0)
+        #     neg           = feature02.data[tmp].unsqueeze(0)
+        #     pos_attention = output.data[tmp].unsqueeze(0)
+        #     feature       = feature.data[tmp].unsqueeze(0)
+        #     length        = (length[tmp]-1).unsqueeze(0)
+        #     print '    '
+        #     print pos
+        #     reconstruct_out = model.reconstruct(pos, neg, pos_attention, feature, length, is_train=False)
+        #     out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
+        #     k = 0 
+        #     for i in out_in_batch:
+        #         writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+        #         # writer.write('\n')
+        #         writer2.write('\n=============\n')
+        #         writer2.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+        #         writer2.write('\n\n')
+        #         k = k + 1
     
     writer1.close()    
-    writer2.close()
+    # writer2.close()
 
     # for batch in neg_iter:
     #     sample  = batch.text[0]
