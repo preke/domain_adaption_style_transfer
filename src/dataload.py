@@ -66,7 +66,7 @@ def load_data(train_path, dev_path, args):
 def gen_pos_neg_iter(path, text_field, args):
     tmp_data = data.TabularDataset(path=path, format='tsv', fields=[('text', text_field)])
     tmp_iter = data.BucketIterator(tmp_data,
-                    batch_size        = args.batch_size,
+                    batch_size        = 1,
                     sort_key          = lambda x: len(x.text),
                     sort_within_batch = True,
                     device            = args.device,
