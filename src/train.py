@@ -196,7 +196,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
     cnt_batch = 0
     writer1 = open('pos_batch'+'_.txt', 'w')
     writer2 = open('pos_single'+'_.txt', 'w')
-    tmp_out_in_batch = 0
+    
     for batch in pos_iter:
         sample  = batch.text[0]
         length  = batch.text[1]
@@ -205,7 +205,9 @@ def style_transfer(pos_iter, neg_iter, model, args):
         
         reconstruct_out = model.reconstruct(feature01.data, feature02.data, output.data, feature.data, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
-        k = 0 
+        k = 0
+
+
         for i in out_in_batch:
             writer1.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
             # writer.write('\n')
@@ -214,6 +216,7 @@ def style_transfer(pos_iter, neg_iter, model, args):
             writer1.write('\n\n')
             k = k + 1
         
+        tmp_out_in_batch = output
         for tmp in range(len(length)):
             pos           = feature01.data[tmp].unsqueeze(0)
             neg           = feature02.data[tmp].unsqueeze(0)
