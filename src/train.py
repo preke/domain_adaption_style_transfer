@@ -194,6 +194,8 @@ def style_transfer(pos_iter, neg_iter, model, args):
     neg_df = [] # id, length, feature, feature1, feature2
     
     cnt_batch = 0
+    writer1 = open('pos_batch'+'_.txt', 'w')
+    writer2 = open('pos_single'+'_.txt', 'w')
     for batch in pos_iter:
         sample  = batch.text[0]
         length  = batch.text[1]
@@ -204,19 +206,18 @@ def style_transfer(pos_iter, neg_iter, model, args):
             total_cnt += 1
         cnt_batch += 1
         
-        writer = open('pos_batch'+'_.txt', 'w')
+        
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
         for i in out_in_batch:
-            writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+            writer1.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
             # writer.write('\n')
-            writer.write('\n=============\n')
-            writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
-            writer.write('\n\n')
+            writer1.write('\n=============\n')
+            writer1.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+            writer1.write('\n\n')
             k = k + 1
-        writer.close()
-        writer = open('pos_single'+'_.txt', 'w')
+        
         for tmp in range(len(length)):
             pos           = feature01.data[tmp].unsqueeze(0)
             neg           = feature02.data[tmp].unsqueeze(0)
@@ -234,15 +235,16 @@ def style_transfer(pos_iter, neg_iter, model, args):
             out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
             k = 0 
             for i in out_in_batch[:1]:
-                writer.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+                writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
                 # writer.write('\n')
-                writer.write('\n=============\n')
-                writer.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
-                writer.write('\n\n')
+                writer2.write('\n=============\n')
+                writer2.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+                writer2.write('\n\n')
                 k = k + 1
-        
-        writer.close()
-        break
+    
+    writer1.close()    
+    writer2.close()
+
     # for batch in neg_iter:
     #     sample  = batch.text[0]
     #     length  = batch.text[1]
