@@ -203,13 +203,13 @@ def style_transfer(pos_iter, neg_iter, model, args):
             pos_df.append([total_cnt, length[i], feature[i], feature01[i], feature02[i], output[i] ])
             total_cnt += 1
         cnt_batch += 1
-        print type(feature01)
+        print type(feature01.data)
         print type(feature01[0].unsqueeze(0))
 
         writer = open('pos_only'+'_.txt', 'w')
         for tmp in range(len(length)):
-            reconstruct_out = model.reconstruct(feature01[tmp].unsqueeze(0), 
-                feature02[tmp].unsqueeze(0), output[tmp].unsqueeze(0), feature[tmp].unsqueeze(0), [length[tmp]-1], is_train=False)
+            reconstruct_out = model.reconstruct(feature01.data[tmp].unsqueeze(0), 
+                feature02.data[tmp].unsqueeze(0), output.data[tmp].unsqueeze(0), feature.data[tmp].unsqueeze(0), [length[tmp]-1], is_train=False)
             out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
             k = 0 
             for i in out_in_batch:
