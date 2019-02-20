@@ -206,44 +206,47 @@ def style_transfer(pos_iter, neg_iter, model, args):
             total_cnt += 1
         cnt_batch += 1
         
-        
+        writer1.write(str(feature01))
+        writer1.write('\n\n\n\n\n')
+        writer1.write(feature01.data[tmp].unsqueeze(0))
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)
         k = 0 
-        for i in out_in_batch:
-            writer1.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
-            # writer.write('\n')
-            writer1.write('\n=============\n')
-            writer1.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
-            writer1.write('\n\n')
-            k = k + 1
+        # for i in out_in_batch:
+        #     writer1.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+        #     # writer.write('\n')
+        #     writer1.write('\n=============\n')
+        #     writer1.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+        #     writer1.write('\n\n')
+        #     k = k + 1
         
-        for tmp in range(len(length)):
-            pos           = feature01.data[tmp].unsqueeze(0)
-            neg           = feature02.data[tmp].unsqueeze(0)
-            pos_attention = output.data[tmp].unsqueeze(0)
-            feature       = feature.data[tmp].unsqueeze(0)
-            length        = (length[tmp]-1).unsqueeze(0)
-            for i in range(5): # batch size 32 (2^5)
-                pos           = torch.cat((pos, pos))
-                neg           = torch.cat((neg, neg))
-                feature       = torch.cat((feature, feature))
-                pos_attention = torch.cat((pos_attention, pos_attention))
-                length        = torch.cat((length, length))
+        # for tmp in range(len(length)):
+        #     pos           = feature01.data[tmp].unsqueeze(0)
+        #     neg           = feature02.data[tmp].unsqueeze(0)
+        #     pos_attention = output.data[tmp].unsqueeze(0)
+        #     feature       = feature.data[tmp].unsqueeze(0)
+        #     length        = (length[tmp]-1).unsqueeze(0)
+        #     # for i in range(5): # batch size 32 (2^5)
+        #     #     pos           = torch.cat((pos, pos))
+        #     #     neg           = torch.cat((neg, neg))
+        #     #     feature       = torch.cat((feature, feature))
+        #     #     pos_attention = torch.cat((pos_attention, pos_attention))
+        #     #     length        = torch.cat((length, length))
 
-            reconstruct_out = model.reconstruct(pos, neg, pos_attention, feature, length, is_train=False)
-            out_in_batch = reconstruct_out.contiguous().view(32, args.max_length, args.vocab_size)
-            k = 0 
-            for i in out_in_batch[:1]:
-                writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
-                # writer.write('\n')
-                writer2.write('\n=============\n')
-                writer2.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
-                writer2.write('\n\n')
-                k = k + 1
+        #     reconstruct_out = model.reconstruct(pos, neg, pos_attention, feature, length, is_train=False)
+        #     out_in_batch = reconstruct_out.contiguous().view(1, args.max_length, args.vocab_size)
+        #     k = 0 
+        #     for i in out_in_batch:
+        #         writer2.write(' '.join([args.index_2_word[int(l)] for l in sample[k]]))
+        #         # writer.write('\n')
+        #         writer2.write('\n=============\n')
+        #         writer2.write(' '.join([args.index_2_word[int(j)] for j in torch.argmax(i, dim=-1)]))
+        #         writer2.write('\n\n')
+        #         k = k + 1
     
-    writer1.close()    
-    writer2.close()
+        writer1.close()    
+        writer2.close()
+        break
 
     # for batch in neg_iter:
     #     sample  = batch.text[0]
