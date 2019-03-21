@@ -33,6 +33,12 @@ with open('../data/amazon_small.neg', 'r') as reader:
 
 logger.info('Train word2vec model...\n')
 # train w2v model
+list_pos = list_pos[:1000]
+list_neg = list_neg[:1000]
+pos_sentence_list = pos_sentence_list[:1000]
+neg_sentence_list = neg_sentence_list[:1000]
+
+
 list_all = list_pos + list_neg
 w2v_model = Word2Vec(list_all, min_count=3)
 
