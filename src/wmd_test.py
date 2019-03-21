@@ -42,13 +42,13 @@ for i in range(len(list_pos)):
     for j in range(len(list_neg)):
         sim_matrix[i].append(w2v_model.wmdistance(list_pos[i], list_neg[j]))
 
-logger.info('sim_matrix_shape: %d, %d\n', %(len(sim_matrix), len(sim_matrix[0])))
+logger.info('sim_matrix_shape: %d, %d\n' %(len(sim_matrix), len(sim_matrix[0])))
 
 with open('../data/wmd_result', 'w') as writer:
     for i in range(len(list_pos)):
-        writer.write('Pos: %s\n', %list_pos[i])    
-        neg_index = np.argmax(np.array(sim_matrix[i]))
-        writer.write('Neg: %s\n', %list_neg[neg_index])    
+        writer.write('Pos: %s\n' %list_pos[i])    
+        neg_index = int(np.argmax(np.array(sim_matrix[i])))
+        writer.write('Neg: %s\n' %list_neg[neg_index])    
 
 
 # w2v_model.wmdistance
