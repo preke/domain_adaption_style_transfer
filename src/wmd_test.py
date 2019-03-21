@@ -53,9 +53,9 @@ logger.info('sim_matrix_shape: %d, %d\n' %(len(sim_matrix), len(sim_matrix[0])))
 with open('../data/wmd_result', 'w') as writer:
     for i in range(10):
         writer.write('Pos: %s\n' %list_pos[i])    
-        print sim_matrix[i]
+        #print sim_matrix[i]
         neg_index = int(np.argmax(np.array(sim_matrix[i])))
-        print neg_index
+        #print neg_index
         writer.write('Neg: %s\n' %list_neg[neg_index])    
 
 
