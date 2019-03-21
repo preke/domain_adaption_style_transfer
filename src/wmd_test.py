@@ -43,20 +43,21 @@ list_all = list_pos + list_neg
 w2v_model = Word2Vec(list_all, min_count=1)
 
 sim_matrix = []
-for i in range(10):
+for i in range(100):
     sim_matrix.append([])
-    for j in range(1000):
+    for j in range(len(list_neg)):
         sim_matrix[i].append(w2v_model.wmdistance(list_pos[i], list_neg[j]))
 
 logger.info('sim_matrix_shape: %d, %d\n' %(len(sim_matrix), len(sim_matrix[0])))
 
 with open('../data/wmd_result', 'w') as writer:
-    for i in range(10):
+    for i in range(100):
         writer.write('Pos: %s\n' %list_pos[i])    
         #print sim_matrix[i]
         neg_index = int(np.argmax(np.array(sim_matrix[i])))
         #print neg_index
-        writer.write('Neg: %s\n' %list_neg[neg_index])    
+        writer.write('Neg: %s\n' %list_neg[neg_index]) 
+        writer.write('\n')    
 
 
 # w2v_model.wmdistance
