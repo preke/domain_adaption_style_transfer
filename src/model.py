@@ -155,7 +155,6 @@ class CNN_Text(nn.Module):
         self.convs1 = nn.ModuleList([nn.Conv2d(Ci, Co, (K, D)) for K in Ks])
         self.dropout = nn.Dropout(args.dropout)
         self.fc1 = nn.Linear(300, 100)
-
     
     def forward(self, q1):
         q1 = self.embed(q1)
@@ -174,7 +173,6 @@ class ReverseLayerF(Function):
     @staticmethod
     def forward(ctx, x, alpha):
         ctx.alpha = alpha
-
         return x.view_as(x)
 
     @staticmethod
@@ -211,9 +209,6 @@ class LSTMSC(nn.Module):
             batch_first=True,
             dropout=0.2
         )
-
-
-
 
     def get_state(self,input_line):
         batch_size = input_line.size(0)
@@ -279,7 +274,6 @@ class RGLIndividualSaperateSC(nn.Module):
         # self.bi_encoder02 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
         self.cnn_text = CNN_Text(args)
 
-
         self.class_classifier = nn.Linear(hidden_size, num_class)
         self.class_classifier.weight.data.normal_(0, 0.01)
         self.class_classifier.bias.data.fill_(0)
@@ -313,24 +307,17 @@ class RGLIndividualSaperateSC(nn.Module):
         '''
         Current not using mask
         '''
-
-        embed                           = self.embedding(input_line)
-        
+        embed                           = self.embedding(input_line)        
         hidden_bi01, hidden_bi02        = self.get_state(input_line)
-        
         pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
         packed_output01, feature01      = self.bi_encoder01(pack_embed, hidden_bi01)
         unpacked_output01, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01, batch_first = True)
-        
-        
         feature02 = self.cnn_text(input_line)
         # print feature02.size()
         # pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
         # packed_output02, feature02      = self.bi_encoder02(pack_embed, hidden_bi02)
         # unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
         
-        
-
         # pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output01,unpacked_len,batch_first = True)
         # output01, (src_h_t01, src_c_t) = self.encoder01(pack_output, hidden_01)
         # output01,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output01, batch_first = True)
@@ -343,8 +330,6 @@ class RGLIndividualSaperateSC(nn.Module):
         
         # feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
         
-        
-
         feature01 = feature01[-1]
         feature01 = F.tanh(self.linear_feature(feature01))
         
@@ -356,13 +341,10 @@ class RGLIndividualSaperateSC(nn.Module):
         out = F.log_softmax(out.contiguous().view(-1, self.embedding_num))
         return out
 
-
     def forward(self, input_line, lenth, alpha, is_train=True):
         feature01, feature02, output01 = self.extractFeature(input_line, lenth)
         
         reconstruction_out = self.reconstruct(feature01, feature02, output01, input_line, lenth, is_train)
-        
-
         class_out = self.class_classifier(feature02)
         reverse_feature = ReverseLayerF.apply(feature01, alpha)
         class_out   = self.class_classifier(feature02)
