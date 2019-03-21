@@ -17,14 +17,14 @@ neg_sentence_list = []
 stop_words = stopwords.words('english')
 
 logger.info('Read in data...\n')
-with open('../data/amazon_small.pos', 'r') as reader:
+with open('../data/pos.txt', 'r') as reader:
     for line in reader:
         pos_sentence_list.append(line)
         new_line = line.lower().split()
         new_line = [w for w in new_line if w not in stop_words]
         list_pos.append(new_line)
 
-with open('../data/amazon_small.neg', 'r') as reader:
+with open('../data/neg.txt', 'r') as reader:
     for line in reader:
         neg_sentence_list.append(line)
         new_line = line.lower().split()
