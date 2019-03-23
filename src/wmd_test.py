@@ -43,7 +43,7 @@ logger.info('Train word2vec model...\n')
 list_all = list_pos + list_neg
 w2v_model = Word2Vec(list_all, min_count=5)
 
-f1 = file('wmd.pkl', 'wb')
+# f1 = file('wmd.pkl', 'wb')
 sim_matrix = []
 for i in range(10):
     sim_matrix.append([])
