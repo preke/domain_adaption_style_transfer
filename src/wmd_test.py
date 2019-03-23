@@ -29,15 +29,10 @@ with open('../data/neg.txt', 'r') as reader:
     for line in reader:
         neg_sentence_list.append(line)
         new_line = line.lower().split()
-        # new_line = [w for w in new_line if w not in stop_words]
+        new_line = [w for w in new_line if w not in stop_words]
         list_neg.append(new_line)
 
 logger.info('Train word2vec model...\n')
-# train w2v model
-# list_pos = list_pos[:1000]
-# list_neg = list_neg[:1000]
-# pos_sentence_list = pos_sentence_list[:1000]
-# neg_sentence_list = neg_sentence_list[:1000]
 
 
 list_all = list_pos + list_neg
