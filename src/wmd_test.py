@@ -45,7 +45,7 @@ w2v_model = Word2Vec(list_all, min_count=5)
 sim_matrix = []
 for i in range(10):
     sim_matrix.append([])
-    for j in range(list_neg[:10000]):
+    for j in range(10000):
         sim_matrix[i].append(w2v_model.wmdistance(list_pos[i], list_neg[j]))
 
 logger.info('sim_matrix_shape: %d, %d\n' %(len(sim_matrix), len(sim_matrix[0])))
