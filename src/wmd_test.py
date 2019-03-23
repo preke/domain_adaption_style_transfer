@@ -1,6 +1,7 @@
 from nltk.corpus import stopwords
 from gensim.models import Word2Vec
 import numpy as np
+import pickle
 # logging
 import logging
 import logging.config
@@ -42,21 +43,22 @@ logger.info('Train word2vec model...\n')
 list_all = list_pos + list_neg
 w2v_model = Word2Vec(list_all, min_count=5)
 
+f1 = file('wmd.pkl', 'wb')
 sim_matrix = []
 for i in range(10):
     sim_matrix.append([])
-    for j in range(10000):
+    for j in range(20000):
         sim_matrix[i].append(w2v_model.wmdistance(list_pos[i], list_neg[j]))
 
 logger.info('sim_matrix_shape: %d, %d\n' %(len(sim_matrix), len(sim_matrix[0])))
 
 with open('../data/wmd_result', 'w') as writer:
     for i in range(10):
-        writer.write('Pos: %s\n' %list_pos[i])    
+        writer.write('Pos: %s\n' %pos_sentence_list[i])    
         #print sim_matrix[i]
         neg_index = int(np.argmin(np.array(sim_matrix[i])))
         #print neg_index
-        writer.write('Neg: %s\n' %list_neg[neg_index]) 
+        writer.write('Neg: %s\n' %neg_sentence_list[neg_index]) 
         writer.write('\n')    
 
 
