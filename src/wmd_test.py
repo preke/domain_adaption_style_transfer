@@ -54,7 +54,7 @@ with open('../data/wmd_result', 'w') as writer:
     for i in range(10):
         writer.write('Pos: %s\n' %list_pos[i])    
         #print sim_matrix[i]
-        neg_index = int(np.argmax(np.array(sim_matrix[i])))
+        neg_index = int(np.argmin(np.array(sim_matrix[i])))
         #print neg_index
         writer.write('Neg: %s\n' %list_neg[neg_index]) 
         writer.write('\n')    
