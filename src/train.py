@@ -45,18 +45,15 @@ def eval(dev_iter, model, alpha):
         sample  = batch.text[0]
         length  = batch.text[1]
         label   = batch.label         
-        # mask    = generate_mask(torch.max(length), length)
-        # mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         target  = Variable(label)
         
-        logit, _, _, reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha, is_train=False)
+        #logit, _, _, reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha, is_train=False)
+        logit, _, reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha, is_train=False)
         loss                      = F.cross_entropy(logit, target, size_average=False)
-
         feature_iow      = Variable(feature.contiguous().view(-1)).cuda()
         loss_reconstruct = nn.NLLLoss()
         reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
-
 
         avg_loss += loss.data
         corrects += (torch.max(logit, 1)
@@ -78,9 +75,6 @@ def eval(dev_iter, model, alpha):
         
     return accuracy, flag, reconstruct_loss
 
-# def generate_mask(max_length, length):
-#     mask_batch = [ [1]*int(i)+[0]*(int(max_length)-int(i)) for i in list(length)]
-#     return mask_batch
 
 def trainRGL(train_iter, dev_iter, train_data, model, args):    
     save_dir = "RGLModel/concat/"
@@ -108,12 +102,10 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             alpha   = 2. / (1. + np.exp(-10 * p)) - 1
             feature = Variable(sample)
             target  = Variable(label)
-            # mask    = generate_mask(torch.max(length), length)
-            # mask    = Variable(torch.FloatTensor(mask).cuda())
             
             
-            # class_out, domain_out, out, reconstruct_out = model(feature, length, alpha, mask)
-            class_out, domain_out, out, reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha)
+            # class_out, domain_out, out, reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha)
+            class_out, out, reconstruct_out = model(feature[:, :-1], [i-1 for i in length.tolist()], alpha)
             feature_iow     = Variable(feature[:,1:].contiguous().view(-1)).cuda()
 
 
@@ -121,18 +113,16 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
             reconstruct_loss = loss_reconstruct(reconstruct_out, feature_iow)
             
             err_label   = loss_class(class_out, target)
-            err_domain  = loss_domain(class_out, target)
+            # err_domain  = loss_domain(domain_out, target)
             
-
-            '''
-            How to give weights to each loss
-            '''
-            err = err_domain + err_label + lamda * out + 5*reconstruct_loss
+            
+            # How to give weights to each loss
+            # err = err_domain + err_label + lamda * out + 5*reconstruct_loss
+            err = err_label + lamda*out + 5*reconstruct_loss
             err.backward()
             torch.nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
             optimizer.step()
-            if cnt_batch % 2000 == 0:
-                
+            if cnt_batch % 2000 == 0:                
                 acc, flag, eval_aeloss = eval(dev_iter, model, alpha)
                 show_reconstruct_results(dev_iter, model, args, cnt_batch, eval_aeloss)
                 save_path = save_dir + "epoch_" + str(epoch) + "_batch_" + str(cnt_batch) + "_acc_" + str(acc) +"_bestmodel.pt"
@@ -143,35 +133,19 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
                       % (epoch, cnt_batch, len_iter, err_label.cpu().data.numpy(),
                          err_domain.cpu().data.numpy(), out, reconstruct_loss))
 
-                
-                # Try to illustrate the Style Transfer
-                # small_pos_path   = '../data/amazon_small.pos'
-                # small_neg_path   = '../data/amazon_small.neg'
-                # small_pos        = '../data/amazon_small.pos'
-                # small_neg        = '../data/amazon_small.neg'
-                
-                # if not os.path.exists(small_pos):
-                #     preprocess_pos_neg(small_pos_path, small_pos)
-                #     preprocess_pos_neg(small_neg_path, small_neg)
-                # pos_iter, neg_iter = load_pos_neg_data(small_pos, small_neg, text_field, args)
-                # style_transfer(pos_iter, neg_iter, model, args, cnt_batch)
-
             cnt_batch += 1
         cnt_epoch += 1
 
+
 def show_reconstruct_results(dev_iter, model, args, cnt=0, reconstruct_loss=0.0):
-    writer = open('f12_logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
+    writer = open('rec_logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
     cnt_batch = 0
     for batch in dev_iter:
         # logger.info('In ' + str(cnt_batch) + '  batch...')
         sample  = batch.text[0]
         length  = batch.text[1]
-        # mask    = generate_mask(torch.max(length), length)
-        # mask    = Variable(torch.FloatTensor(mask).cuda())
         feature = Variable(sample)
         
-
-
         feature01, feature02, output = model.extractFeature(feature[:, :-1], [i-1 for i in length.tolist()])
         reconstruct_out = model.reconstruct(feature01, feature02, output, feature, [i-1 for i in length.tolist()], is_train=False)
         out_in_batch = reconstruct_out.contiguous().view(len(length), args.max_length, args.vocab_size)

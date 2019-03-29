@@ -14,8 +14,6 @@ config_file = 'logging.ini'
 logging.config.fileConfig(config_file, disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
-
-
 class Attention(nn.Module):
     def __init__(self, hidden_dim):
         super(Attention, self).__init__()
@@ -30,7 +28,6 @@ class Attention(nn.Module):
         prev_s : B x 1 x H 
         '''
         seq_len = enc_h.size(1) 
-
         enc_h_in = self.enc_h_in(enc_h) # B x S x H
         prev_s = self.prev_s_in(prev_s).unsqueeze(1)  # B x 1 x H
 
@@ -61,8 +58,6 @@ class Decoder(nn.Module):
         # self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
 
     def forward(self, content, sentiment, hiddens, target, length, is_train=True):
-        # logger.info('Is train: ' + str(is_train))
-        
         prev_s = content
         if is_train:
             batch_size, target_len = target.size(0), target.size(1)
@@ -94,11 +89,11 @@ class Decoder(nn.Module):
                 target         = self.embed(target).squeeze(1)     
                 ctx            = self.attention(hiddens, prev_s)                        
                 prev_s         = self.decodercell(target, prev_s, ctx)
-                output       = self.dec2word(prev_s)
+                output         = self.dec2word(prev_s)
                 # output         = self.dec2word(torch.cat((prev_s, sentiment), 1))
                 
                 outputs[:,i,:] = output
-                output       = output.add(0.5*self.dec2word(sentiment))
+                output         = output.add(0.5*self.dec2word(sentiment))
                 target         = output.topk(1)[1]
         return outputs
 
@@ -120,21 +115,14 @@ class DecoderCell(nn.Module):
     def forward(self, trg_word, prev_s, ctx):        
         gates = self.input_weights(trg_word) + self.hidden_weights(prev_s) + self.ctx_weights(ctx)
         reset_gate, update_gate = gates.chunk(2, 1)
-
         reset_gate = F.sigmoid(reset_gate)
         update_gate = F.sigmoid(update_gate)
-
-
         prev_s_tilde = self.input_in(trg_word) + self.hidden_in(prev_s) + self.ctx_in(ctx)
         prev_s_tilde = F.tanh(prev_s_tilde)
 
         # print reset_gate.size()
         prev_s = torch.mul((1-reset_gate), prev_s) + torch.mul(reset_gate, prev_s_tilde)
         return prev_s
-
-
-
-
 
 class CNN_Text(nn.Module):
     def __init__(self, args):
@@ -253,7 +241,9 @@ class LSTMSC(nn.Module):
         #print(mask.size())
         feature = torch.sum(output01 * mask, 1) / torch.sum(mask, 1)
         out = self.linear(feature)
-        return out,None,None
+        return out, None, None
+
+
         
 class RGLIndividualSaperateSC(nn.Module):
     def __init__(self, embedding_num, embedding_size, num_class, hidden_size, pre_embedding, w2i, args):
@@ -271,7 +261,6 @@ class RGLIndividualSaperateSC(nn.Module):
         self.w2i = w2i
         
         self.bi_encoder01 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
-        # self.bi_encoder02 = nn.GRU(self.embedding_size, self.hidden_size, 1, bidirectional=True, batch_first=True)
         self.cnn_text = CNN_Text(args)
 
         self.class_classifier = nn.Linear(hidden_size, num_class)
@@ -285,50 +274,24 @@ class RGLIndividualSaperateSC(nn.Module):
         self.decoder = Decoder(self.embedding_num, self.embedding_size, self.hidden_size, args.max_length, self.w2i, pre_embedding)
         self.linear_feature = nn.Linear(hidden_size, hidden_size)
 
-
-    
     def get_state(self, input_line):
         '''
-        Init h and c
+        Init h
         '''
         batch_size = input_line.size(0)
         h0_encoder_bi01 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
-        # c0_encoder_bi01 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
-        
-
         h0_encoder_bi02 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
-        # c0_encoder_bi02 = Variable(torch.zeros(2, batch_size, self.hidden_size), requires_grad=False)
-
-        # return (h0_encoder_bi01.cuda(), c0_encoder_bi01.cuda()), (h0_encoder_bi02.cuda(), c0_encoder_bi02.cuda())
         return h0_encoder_bi01.cuda(), h0_encoder_bi02.cuda()
     
     
     def extractFeature(self, input_line, lenth):
-        '''
-        Current not using mask
-        '''
         embed                           = self.embedding(input_line)        
         hidden_bi01, hidden_bi02        = self.get_state(input_line)
         pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
         packed_output01, feature01      = self.bi_encoder01(pack_embed, hidden_bi01)
         unpacked_output01, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output01, batch_first = True)
-        feature02 = self.cnn_text(input_line)
-        # print feature02.size()
-        # pack_embed                      = torch.nn.utils.rnn.pack_padded_sequence(embed, lenth, batch_first = True)
-        # packed_output02, feature02      = self.bi_encoder02(pack_embed, hidden_bi02)
-        # unpacked_output02, unpacked_len = torch.nn.utils.rnn.pad_packed_sequence(packed_output02, batch_first = True)
         
-        # pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output01,unpacked_len,batch_first = True)
-        # output01, (src_h_t01, src_c_t) = self.encoder01(pack_output, hidden_01)
-        # output01,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output01, batch_first = True)
-        # mask = mask.unsqueeze(2)
-        # feature01 = torch.sum(output01 * mask, 1) / torch.sum(mask, 1)
-        
-        # pack_output = torch.nn.utils.rnn.pack_padded_sequence(unpacked_output02,unpacked_len,batch_first = True)
-        # output02, (src_h_t02, src_c_t) = self.encoder02(pack_output, hidden_02)
-        # output02,uppacked_lenth = torch.nn.utils.rnn.pad_packed_sequence(output02, batch_first = True)
-        
-        # feature02 = torch.sum(output02 * mask, 1) / torch.sum(mask, 1) 
+        feature02 = self.cnn_text(input_line) 
         
         feature01 = feature01[-1]
         feature01 = F.tanh(self.linear_feature(feature01))
@@ -342,17 +305,18 @@ class RGLIndividualSaperateSC(nn.Module):
         return out
 
     def forward(self, input_line, lenth, alpha, is_train=True):
-        feature01, feature02, output01 = self.extractFeature(input_line, lenth)
         
+
+        feature01, feature02, output01 = self.extractFeature(input_line, lenth)
         reconstruction_out = self.reconstruct(feature01, feature02, output01, input_line, lenth, is_train)
-        class_out = self.class_classifier(feature02)
-        reverse_feature = ReverseLayerF.apply(feature01, alpha)
-        class_out   = self.class_classifier(feature02)
-        domain_out  = self.domain_classifier(reverse_feature)
-        feature_out = feature01.mm(feature02.t())
-        feature_out = feature_out ** 2
-        feature_out = torch.mean(feature_out)
-        return class_out, domain_out, feature_out, reconstruction_out
+        class_out          = self.class_classifier(feature02)
+        # reverse_feature    = ReverseLayerF.apply(feature01, alpha)
+        # domain_out         = self.domain_classifier(reverse_feature)
+        feature_out        = feature01.mm(feature02.t())
+        feature_out        = feature_out ** 2
+        feature_out        = torch.mean(feature_out)
+        # return class_out, domain_out, feature_out, reconstruction_out
+        return class_out, feature_out, reconstruction_out
 
 
 # class Decoder(nn.Module):

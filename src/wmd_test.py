@@ -35,8 +35,8 @@ class Preprocess(object):
         text = self.punctuate(text)
         word_list = word_tokenize(text)
         word_list = [i for i in word_list if i not in self.stop]
-#         lancaster_stemmer = LancasterStemmer()
-#         word_list = [lancaster_stemmer.stem(i) for i in word_list]
+        # lancaster_stemmer = LancasterStemmer()
+        # word_list = [lancaster_stemmer.stem(i) for i in word_list]
         return word_list
 
 def get_wmd(list_pos, list_neg, pos_sentence_list, neg_sentence_list):
@@ -44,7 +44,6 @@ def get_wmd(list_pos, list_neg, pos_sentence_list, neg_sentence_list):
     list_all = list_pos + list_neg
     w2v_model = Word2Vec(list_all, min_count=5)
 
-    # f1 = file('wmd.pkl', 'wb')
     sim_matrix = []
     for i in range(10):
         sim_matrix.append([])
@@ -136,11 +135,11 @@ def mask_style_words(list_pos, list_neg):
     return pos_words_set, neg_words_set, list_pos, list_neg
 
 
-
-
 if __name__ == '__main__':    
     list_pos, list_neg, pos_sentence_list, neg_sentence_list = read_in_data()
     pos_words_set, neg_words_set, list_pos_new,list_neg_new = mask_style_words(list_pos, list_neg)
     get_wmd(list_pos_new, list_neg_new, pos_sentence_list, neg_sentence_list)
+
+
 
 
