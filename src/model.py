@@ -55,7 +55,7 @@ class Decoder(nn.Module):
         
 
         self.dec2word    = nn.Linear(hidden_dim, vocab_size)
-        # self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
+        self.combine_hidden = nn.Linear(hidden_dim*2, hidden_dim)
 
     def forward(self, content, sentiment, hiddens, target, length, is_train=True):
         prev_s = content
@@ -90,10 +90,10 @@ class Decoder(nn.Module):
                 ctx            = self.attention(hiddens, prev_s)                        
                 prev_s         = self.decodercell(target, prev_s, ctx)
                 output         = self.dec2word(prev_s)
-                # output         = self.dec2word(torch.cat((prev_s, sentiment), 1))
+                output         = self.dec2word(
+                                    self.combine_hidden(torch.cat((prev_s, sentiment), 1)))
                 
                 outputs[:,i,:] = output
-                output         = output.add(0.5*self.dec2word(sentiment))
                 target         = output.topk(1)[1]
         return outputs
 
