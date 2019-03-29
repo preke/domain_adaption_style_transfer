@@ -138,7 +138,7 @@ def trainRGL(train_iter, dev_iter, train_data, model, args):
 
 
 def show_reconstruct_results(dev_iter, model, args, cnt=0, reconstruct_loss=0.0):
-    writer = open('rec_logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
+    writer = open('res/rec_logs_'+str(cnt)+'_' + str(float(reconstruct_loss)) + '_.txt', 'w')
     cnt_batch = 0
     for batch in dev_iter:
         # logger.info('In ' + str(cnt_batch) + '  batch...')
